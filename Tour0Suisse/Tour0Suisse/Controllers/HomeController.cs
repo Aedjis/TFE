@@ -39,7 +39,7 @@ namespace Tour0Suisse.Controllers
         {
             ViewData["Message"] = "Page d'inscription";
 
-            return View();
+            return View("~/Views/Inscription/Inscription.cshtml");
         }
 
         public IActionResult Privacy()

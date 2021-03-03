@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Inscription";
+}
+<h2>@ViewData["Title"]</h2>
+<h3>@ViewData["Message"]</h3>
+
+
+<form asp-controller="Inscription" asp-action="Create" method="post" class="form-horizontal">
+    <label>Pseudo : </label>
+    <input name="Pseudo" type="text" maxlength="50" required />
+    <br />
+    <label>Email : </label>
+    <input name="Email" type="email" required />
+    <br />
+    <label>Mot de passe : </label>
+    <input name="Password" type="password" id="Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="doit contenir un nombre une minuscule, une majuscule et au moins 8 characteres" required />
+    <br />
+    <label>Confirmation du mot de passe : </label>
+    <input name="PasswordConf" type="password" id="PasswordConf" required />
+    <br />
+    <label></label>
+    <input name="Submit" id="Submit" type="submit"/>
+    <br />
+</form>
+
+<script>
+    var pw = document.getElementById("Password");
+    var cpw = document.getElementById("PasswordConf");
+    function CheckPassword() {
+        if (pw.value != cpw.value) {
+            //getElementById("Submit").disable = true;
+            cpw.setCustomValidity("Les mots de passe ne concorde pas!");
+        } else {
+            //getElementById("Submit").disable = false;
+            cpw.setCustomValidity('');
+        }
+    }
+
+    pw.onkeyup = CheckPassword;
+    cpw.onkeyup = CheckPassword;
+</script>
