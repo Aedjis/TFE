@@ -20,7 +20,7 @@ namespace Tour0Suisse.Controllers
         public IActionResult Connexion()
         {
             ViewData["Message"] = "Page de connexion";
-            return View();
+            return View("~/Views/Connexion/Connexion.cshtml");
         }
         public IActionResult Profil()
         {

@@ -12563,9 +12563,9 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse\\Tour0Suisse.csproj",
-      "projectName": "Tour0Suisse",
-      "projectPath": "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse\\Tour0Suisse.csproj",
+      "projectUniqueName": "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse\\Tour0Suisse.Web.csproj",
+      "projectName": "Tour0Suisse.Web",
+      "projectPath": "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse\\Tour0Suisse.Web.csproj",
       "packagesPath": "C:\\Users\\Aedjis-PC\\.nuget\\packages\\",
       "outputPath": "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse\\obj\\",
       "projectStyle": "PackageReference",

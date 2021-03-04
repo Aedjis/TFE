@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tour0Suisse", "Tour0Suisse\Tour0Suisse.csproj", "{67ED4EAE-AD35-455E-AB6F-094BF296B6A4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tour0Suisse.Web", "Tour0Suisse\Tour0Suisse.Web.csproj", "{67ED4EAE-AD35-455E-AB6F-094BF296B6A4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tour0Suisse.Repository", "Tour0Suisse.Repository\Tour0Suisse.Repository.csproj", "{24FA3AE9-4B91-4030-9DF5-E2F64B4ED870}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{67ED4EAE-AD35-455E-AB6F-094BF296B6A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67ED4EAE-AD35-455E-AB6F-094BF296B6A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67ED4EAE-AD35-455E-AB6F-094BF296B6A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24FA3AE9-4B91-4030-9DF5-E2F64B4ED870}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24FA3AE9-4B91-4030-9DF5-E2F64B4ED870}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24FA3AE9-4B91-4030-9DF5-E2F64B4ED870}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24FA3AE9-4B91-4030-9DF5-E2F64B4ED870}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

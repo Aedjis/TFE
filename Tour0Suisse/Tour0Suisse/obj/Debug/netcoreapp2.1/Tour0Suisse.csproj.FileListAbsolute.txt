@@ -28,8 +28,8 @@ E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreap
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Tour0Suisse.dll
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Tour0Suisse.pdb
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Tour0Suisse.csproj.CopyComplete
-E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Home\Connexion.g.cshtml.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Home\Tournoi.g.cshtml.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Home\Profil.g.cshtml.cs
-E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Inscription\Inscription.g.cshtml.cs
-E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Inscription\InscriptionReussie.g.cshtml.cs
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\User\Connexion.g.cshtml.cs
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\User\Inscription.g.cshtml.cs
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\User\InscriptionReussie.g.cshtml.cs
