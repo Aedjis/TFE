@@ -164,7 +164,7 @@ ID_PlayerTwo INT NOT NULL,
 PartNumber INT NOT NULL,
 ID_Deck_PlayerOne INT NOT NULL,
 ID_Deck_PlayerTwo INT NOT NULL,
-ResultPart INT NULL,
+ResultPart TINYINT NULL,
 
 CONSTRAINT PK_Part__XXXX PRIMARY KEY(ID_Tournament, RoundNumber, ID_PlayerOne, ID_PlayerTwo, PartNumber) -- besoin de l'id que de un joureur
 )ON Tournoi
@@ -299,3 +299,105 @@ ALTER TABLE [DeckJoueur]
 ADD CONSTRAINT FK_DeckJoueur_Deck__XXXX	FOREIGN KEY (ID_Deck)
 										REFERENCES [Deck](ID_Deck)
 GO
+
+--____________FIN CREATION DES LIEN ENTRE LES TABLES_________________________
+
+--____________________________________________________
+
+--____________DEBUT CREATION DES VUES________________________
+CREATE VIEW [View_ResultPartPlayer] AS
+SELECT ID_Tournament, RoundNumber, PartNumber, ID_PlayerOne AS ID_Player,	CASE ResultPart
+																				WHEN 2
+																				THEN -1
+																				ELSE ResultPart
+																			END AS Resulta
+FROM Partie
+union
+SELECT ID_Tournament, RoundNumber, PartNumber, ID_PlayerTWO AS ID_Player,	CASE ResultPart
+																				WHEN 2
+																				THEN 1
+																				WHEN null
+																				THEN null
+																				ELSE (0-ResultPart)
+																			END AS Resulta
+FROM Partie
+GO
+
+
+CREATE VIEW [View_ResultMatchPlayer] AS
+SELECT ID_Tournament, RoundNumber, ID_Player,	CASE 
+													WHEN SUM(Resulta) >0
+													THEN 1
+													WHEN SUM(Resulta) <0
+													THEN -1
+													WHEN SUM(Resulta) =0
+													THEN 0
+													ELSE null
+												END AS Resulta
+FROM [View_ResultPartPlayer]
+GROUP BY ID_Tournament, RoundNumber, ID_Player
+GO
+
+CREATE VIEW [View_ClassementTemporaire] AS
+SELECT	ID_Tournament, 
+		ID_Player, 
+		SUM(CASE WHEN Resulta = 1 THEN 1 ELSE 0 END) AS Victoire, 
+		SUM(CASE WHEN Resulta = 0 THEN 1 ELSE 0 END) AS Egaliter, 
+		SUM(CASE WHEN Resulta = 2 THEN 1 ELSE 0 END) AS Defaite
+FROM [View_ResultMatchPlayer]
+GROUP BY ID_Tournament, ID_Player
+ORDER BY  Victoire DESC, Egaliter DESC, Defaite ASC
+GO
+--____________FIN CREATION DES VUES________________________
+--______________________________________________________________
+
+
+--____________________DEBUT CREATION STORED PROCEDURE____________________________
+
+CREATE PROCEDURE SP_Pairing 
+	@ID_Tournament INT, 
+	@RoundNumber INT
+AS
+BEGIN
+	Declare @ID_Player INT;
+	Declare @Victoire INT;
+	Declare @Egaliter INT;
+	Declare @Defaite INT;
+
+
+	--1 on crée des groupes basés sur le nombre de victoire 
+
+	--pour chaque groupe (en commençant par celui avec le plus de victoire) 
+	--2 on les tri (ASC) en fonction du nombre d'adversaire de leur qu'ils n'ont pas déjà rencontré. S’il y a des joueurs qui ont déjà rencontré tous les autres du groupe on le report dans le groupe suivant
+	--3 en commençant par le joueur reporté du groupe d'avant, dans l'ordre on leur attribue un adversaire (au hasard) qu'ils n'ont pas encore rencontré, si ce n'est pas possible on met le joueur en attente
+	--4 s’il n'y a que 1 joueur en attente on le report au group suivant,
+	--sinon on cherche une paire de joueur déjà appareillé qui pourrais correspondre à des joueurs en attente. et on répète le processus jusqu'à ne plus en trouvé.
+	-- s’il reste encore des joueurs en attente on les reports au groupe suivant.
+
+	--5 pour le dernier groupe s’il n'y a qu’un joueur reporté on lui donne un bail (victoire gratuite).
+	-- sinon on recommence depuis le début mais en commençant par le groupe avec le moins de victoire.
+
+
+	--Declare Cursor_ClassementTemporaire Cursor For
+	--	Select ID_Player, Victoire, Egaliter, Defaite 
+	--	from View_ClassementTemporaire
+	--	where ID_Tournament = @ID_Tournament;
+
+	--Open Cursor_ClassementTemporaire;
+
+	--Fetch Cursor_ClassementTemporaire into ;
+	--while @@FETCH_STATUS = 0
+	--Begin
+			
+			
+
+	--	Fetch Cursor_ClassementTemporaire into ;
+
+	--End
+		
+	--close Cursor_ClassementTemporaire;
+	--Deallocate Cursor_ClassementTemporaire;
+END
+GO
+
+--____________________FIN CREATION STORED PROCEDURE____________________________
