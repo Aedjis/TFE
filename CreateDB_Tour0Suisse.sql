@@ -79,8 +79,9 @@ CREATE TABLE [Utilisateur] (
 ID_User INT NOT NULL IDENTITY,
 Pseudo VARCHAR(50) NOT NULL, 
 Email VARCHAR(256) NOT NULL,
-[Password] VARCHAR(50) NOT NULL,
+[Password] BINARY(64) NOT NULL, -- le mot de passe est haché en SHA2_512 (HASHBYTES('SHA2_512', @pPassword))
 Organizer BIT NOT NULL DEFAULT(0),
+[DELETED] date null DEFAULT(null),
 
 CONSTRAINT PK_User__XXXX PRIMARY KEY(ID_User)
 )
@@ -100,6 +101,7 @@ ID_Tournament INT NOT NULL IDENTITY,
 [Name] VARCHAR(50) NOT NULL,
 [Date] DATETIME NOT NULL,
 ID_Game INT NOT NULL,
+[DELETED] date null DEFAULT(null),
 
 CONSTRAINT PK_Tournament__XXXX PRIMARY KEY(ID_Tournament)
 )ON Tournoi
@@ -173,6 +175,7 @@ GO
 CREATE TABLE [Organisateur](
 ID_Tournament INT NOT NULL,
 ID_User INT NOT NULL,
+[Level] int default(1)
 
 CONSTRAINT PK_Organizer__XXXX PRIMARY KEY(ID_Tournament, ID_User)
 )ON Tournoi
@@ -194,6 +197,20 @@ ID_Deck INT NOT NULL,
 CONSTRAINT PK_DeckPlayer__XXXX PRIMARY KEY(ID_Tournament, ID_User, ID_Deck)
 )ON Tournoi
 GO
+--____________FIN CREATION TABLE_________________________
+
+--____________________________________________________________________________
+
+--____________DEBUT CREATION CONTRAINT_____________________
+
+ALTER TABLE [Utilisateur]
+ADD CONSTRAINT CK_Utilisateur_EmailValid__XXXX	CHECK (Email LIKE '%_@__%.__%')
+GO
+
+ALTER TABLE [Utilisateur]
+ADD CONSTRAINT UK_Utilisateur_EmailUnique__XXXX	UNIQUE (Email)
+GO
+
 --____________FIN CREATION TABLE_________________________
 
 --____________________________________________________________________________
@@ -305,6 +322,76 @@ GO
 --____________________________________________________
 
 --____________DEBUT CREATION DES VUES________________________
+CREATE VIEW [View_User] AS
+SELECT ID_User, Pseudo, Email, [Password], Organizer
+FROM Utilisateur
+WHERE DELETED is null
+GO
+
+CREATE VIEW [View_Tournament] AS
+SELECT ID_Tournament, ID_Game, [Name], [Date]
+FROM Tournoi
+WHERE DELETED is null
+GO
+
+CREATE VIEW [View_Orga] AS
+SELECT O.ID_Tournament, t.Name, O.ID_User, U.Pseudo, O.[Level]
+FROM Organisateur as O
+JOIN Tournoi as T
+	ON O.ID_Tournament = T.ID_Tournament
+JOIN Utilisateur as U
+	ON O.ID_User = u.Pseudo
+GO
+
+CREATE VIEW [View_Participant] AS
+SELECT J.ID_Tournament, t.Name, J.ID_User, U.Pseudo
+FROM Joueur as J
+JOIN Tournoi as T
+	ON J.ID_Tournament = T.ID_Tournament
+JOIN Utilisateur as U
+	ON J.ID_User = u.Pseudo
+GO
+
+CREATE VIEW [View_Jeu] AS
+SELECT ID_Game, [Name]
+FROM Jeu
+GO
+
+CREATE VIEW [View_Resulta] AS
+SELECT R.ID_Tournament, T.Name, R.ID_User, U.Pseudo, R.Rank, R.Score, R.FirstTieBreake, R.SecondTieBreake, R.ThirdTieBreake, R.LastTieBreake, R.LastTieBreakeRules
+FROM Resultat as R
+JOIN Tournoi as T
+	ON T.ID_Tournament = R.ID_Tournament
+JOIN Utilisateur as U
+	ON U.ID_User = R.ID_User
+GO
+
+CREATE VIEW [View_Partie] AS
+SELECT P.ID_Tournament, T.Name, P.RoundNumber, P.PartNumber, P.ResultPart, P.ID_PlayerOne, UOne.Pseudo AS [PlayerOne], P.ID_Deck_PlayerOne, DOne.DeckList AS [DeckOne], UTwo.Pseudo AS [PlayerTwo], P.ID_Deck_PlayerTwo, DTwo.DeckList AS [DeckTwo]
+FROM Partie as P
+JOIN Tournoi as T
+	ON T.ID_Tournament = p.ID_Tournament
+JOIN Utilisateur as UOne
+	ON UOne.ID_User = P.ID_PlayerOne
+JOIN Utilisateur as UTwo
+	ON UTwo.ID_User = P.ID_PlayerTwo
+JOIN Deck as DOne
+	ON DOne.ID_Deck = P.ID_Deck_PlayerOne
+JOIN Deck as DTwo
+	ON DTwo.ID_Deck = P.ID_Deck_PlayerTwo
+GO
+
+CREATE VIEW[View_Deck] AS
+SELECT DJ.ID_Tournament, T.Name, DJ.ID_User, U.Pseudo, DJ.ID_Deck, D.DeckList
+FROM DeckJoueur AS DJ
+JOIN Deck AS D
+	ON D.ID_Deck = DJ.ID_Deck
+JOIN Tournoi AS T
+	ON T.ID_Tournament = DJ.ID_Tournament
+JOIN Utilisateur AS U
+	ON U.ID_User = DJ.ID_User
+GO
+
 CREATE VIEW [View_ResultPartPlayer] AS
 SELECT ID_Tournament, RoundNumber, PartNumber, ID_PlayerOne AS ID_Player,	CASE ResultPart
 																				WHEN 2
@@ -346,7 +433,7 @@ SELECT	ID_Tournament,
 		SUM(CASE WHEN Resulta = 2 THEN 1 ELSE 0 END) AS Defaite
 FROM [View_ResultMatchPlayer]
 GROUP BY ID_Tournament, ID_Player
-ORDER BY  Victoire DESC, Egaliter DESC, Defaite ASC
+--ORDER BY  Victoire DESC, Egaliter DESC, Defaite ASC
 GO
 --____________FIN CREATION DES VUES________________________
 --______________________________________________________________
@@ -354,50 +441,190 @@ GO
 
 --____________________DEBUT CREATION STORED PROCEDURE____________________________
 
-CREATE PROCEDURE SP_Pairing 
-	@ID_Tournament INT, 
-	@RoundNumber INT
+--CREATE PROCEDURE SP_Pairing 
+--	@ID_Tournament INT, 
+--	@RoundNumber INT
+--AS
+--BEGIN
+--	Declare @ID_Player INT;
+--	Declare @Victoire INT;
+--	Declare @Egaliter INT;
+--	Declare @Defaite INT;
+
+
+--	--1 on crée des groupes basés sur le nombre de victoire 
+
+--	--pour chaque groupe (en commençant par celui avec le plus de victoire) 
+--	--2 on les tri (ASC) en fonction du nombre d'adversaire de leur qu'ils n'ont pas déjà rencontré. S’il y a des joueurs qui ont déjà rencontré tous les autres du groupe on le report dans le groupe suivant
+--	--3 en commençant par le joueur reporté du groupe d'avant, dans l'ordre on leur attribue un adversaire (au hasard) qu'ils n'ont pas encore rencontré, si ce n'est pas possible on met le joueur en attente
+--	--4 s’il n'y a que 1 joueur en attente on le report au group suivant,
+--	--sinon on cherche une paire de joueur déjà appareillé qui pourrais correspondre à des joueurs en attente. et on répète le processus jusqu'à ne plus en trouvé.
+--	-- s’il reste encore des joueurs en attente on les reports au groupe suivant.
+
+--	--5 pour le dernier groupe s’il n'y a qu’un joueur reporté on lui donne un bail (victoire gratuite).
+--	-- sinon on recommence depuis le début mais en commençant par le groupe avec le moins de victoire.
+
+
+--	--Declare Cursor_ClassementTemporaire Cursor For
+--	--	Select ID_Player, Victoire, Egaliter, Defaite 
+--	--	from View_ClassementTemporaire
+--	--	where ID_Tournament = @ID_Tournament;
+
+--	--Open Cursor_ClassementTemporaire;
+
+--	--Fetch Cursor_ClassementTemporaire into ;
+--	--while @@FETCH_STATUS = 0
+--	--Begin
+			
+			
+
+--	--	Fetch Cursor_ClassementTemporaire into ;
+
+--	--End
+		
+--	--close Cursor_ClassementTemporaire;
+--	--Deallocate Cursor_ClassementTemporaire;
+--END
+--GO
+
+CREATE PROCEDURE SP_Create_User
+	@Pseudo VARCHAR(50), 
+	@Email VARCHAR(256),
+	@Password BINARY(64), --soit varcahr(50) si passé en claire soit binary (64) si haché
+	@responseMessage NVARCHAR(250) OUTPUT
 AS
 BEGIN
-	Declare @ID_Player INT;
-	Declare @Victoire INT;
-	Declare @Egaliter INT;
-	Declare @Defaite INT;
+	
+	SET @responseMessage = '';	
 
-
-	--1 on crée des groupes basés sur le nombre de victoire 
-
-	--pour chaque groupe (en commençant par celui avec le plus de victoire) 
-	--2 on les tri (ASC) en fonction du nombre d'adversaire de leur qu'ils n'ont pas déjà rencontré. S’il y a des joueurs qui ont déjà rencontré tous les autres du groupe on le report dans le groupe suivant
-	--3 en commençant par le joueur reporté du groupe d'avant, dans l'ordre on leur attribue un adversaire (au hasard) qu'ils n'ont pas encore rencontré, si ce n'est pas possible on met le joueur en attente
-	--4 s’il n'y a que 1 joueur en attente on le report au group suivant,
-	--sinon on cherche une paire de joueur déjà appareillé qui pourrais correspondre à des joueurs en attente. et on répète le processus jusqu'à ne plus en trouvé.
-	-- s’il reste encore des joueurs en attente on les reports au groupe suivant.
-
-	--5 pour le dernier groupe s’il n'y a qu’un joueur reporté on lui donne un bail (victoire gratuite).
-	-- sinon on recommence depuis le début mais en commençant par le groupe avec le moins de victoire.
-
-
-	--Declare Cursor_ClassementTemporaire Cursor For
-	--	Select ID_Player, Victoire, Egaliter, Defaite 
-	--	from View_ClassementTemporaire
-	--	where ID_Tournament = @ID_Tournament;
-
-	--Open Cursor_ClassementTemporaire;
-
-	--Fetch Cursor_ClassementTemporaire into ;
-	--while @@FETCH_STATUS = 0
-	--Begin
-			
+	BEGIN TRANSACTION;
+		BEGIN TRY
 			
 
-	--	Fetch Cursor_ClassementTemporaire into ;
+			if( @Pseudo IS NULL OR (TRIM(@Pseudo)) ='')
+			Begin
+				RAISERROR('Le Pseudo est vide',16,1);
+			End
 
-	--End
-		
-	--close Cursor_ClassementTemporaire;
-	--Deallocate Cursor_ClassementTemporaire;
+			if( @Password IS NULL OR (TRIM(@Password)) ='')
+			Begin
+				RAISERROR('Le mot de passe est vide',16,1);
+			End
+	
+			if( @Email IS NULL OR (@Email NOT LIKE '%_@__%.__%'))
+			Begin
+				RAISERROR('Le Email est invalide',16,1);
+			End
+
+			else if( (SELECT count(*) FROM Utilisateur WHERE @Email = Email)<>0)
+			Begin
+				RAISERROR('Le Email est déjà utiliser',16,1);
+			End
+
+
+			INSERT INTO Utilisateur (Pseudo, Email, [Password])
+			VALUES (@Pseudo, @Email, @Password)
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE() ;
+			ROLLBACK;
+		END CATCH
+	COMMIT;
+
+	if(@responseMessage ='' and (SELECT COUNT(*) FROM Utilisateur WHERE @Pseudo = Pseudo and @Email = Email)=1)
+	BEGIN
+		SET @responseMessage = 'Création de l utilisateur '+@Pseudo+' avec comme adresse email '+@Email;
+	END
+
 END
 GO
+
+
+CREATE PROCEDURE SP_EditUser
+	@ID_User INT ,
+	@Organizer BIT=NULL,
+	@Pseudo VARCHAR(50) =NULL, 
+	@Email VARCHAR(256)=NULL,
+	@Password BINARY(64)=NULL, --soit varcahr(50) si passé en claire soit binary (64) si haché
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+
+	BEGIN TRANSACTION;
+		BEGIN TRY
+			if( @ID_User IS NULL OR @ID_User <=0)
+				Begin
+					RAISERROR('Le ID user est invalide',16,1);
+				End
+
+			DECLARE @HMDP BINARY(64) = null;
+			if( @Pseudo IS NULL OR (TRIM(@Pseudo)) ='')
+				Begin
+					SET @Pseudo = NULL
+				End
+
+			if( @Password IS NULL OR (TRIM(@Password)) ='')
+				Begin
+					SET @Password = NULL
+				End
+			--else
+			--	BEGIN
+			--		SET @HMDP =  HASHBYTES('SHA2_512', @Password);
+			--	END
+			-- legacy si le mot de passe était en claire
+
+			if( @Email IS NULL OR (@Email NOT LIKE '%_@__%.__%'))
+				Begin
+					SET @Email = NULL
+				End
+
+			if(@Pseudo is null and @Password is null and @Email is null and @Organizer is null)
+				BEGIN
+					RAISERROR('Aucune update',16,1);
+				END
+
+			UPDATE Utilisateur
+			SET Pseudo = ISNULL(@Pseudo, Pseudo),
+				[Password] = ISNULL(@Password, [Password]),
+				Email = ISNULL(@Email, Email),
+				Organizer = ISNULL(@Organizer, Organizer)
+			WHERE ID_User = @ID_User
+
+			SET @responseMessage='utilisateur mis a jour';
+
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			ROLLBACK;
+		END CATCH
+
+END
+GO
+
+CREATE PROCEDURE DeleteUser
+	@ID_User INT ,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_User IS NULL OR @ID_User <=0)
+				Begin
+					RAISERROR('Le ID user est invalide',16,1);
+				End
+
+			UPDATE Utilisateur
+			SET DELETED = CAST( GETDATE() AS Date )
+			WHERE ID_User = @ID_User
+			
+			SET @responseMessage='l utilisateur a été supprimer';
+
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			ROLLBACK;
+		END CATCH
+END
 
 --____________________FIN CREATION STORED PROCEDURE____________________________
