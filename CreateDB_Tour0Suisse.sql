@@ -101,6 +101,10 @@ ID_Tournament INT NOT NULL IDENTITY,
 [Name] VARCHAR(50) NOT NULL,
 [Date] DATETIME NOT NULL,
 ID_Game INT NOT NULL,
+[PPWin] INT NOT NULL DEFAULT(2),
+[PPDraw] INT NOT NULL DEFAULT(1),
+[PPLose] INT NOT NULL DEFAULT(0),
+[Over] BIT NOT NULL DEFAULT(0),
 [DELETED] date null DEFAULT(null),
 
 CONSTRAINT PK_Tournament__XXXX PRIMARY KEY(ID_Tournament)
@@ -211,7 +215,7 @@ ALTER TABLE [Utilisateur]
 ADD CONSTRAINT UK_Utilisateur_EmailUnique__XXXX	UNIQUE (Email)
 GO
 
---____________FIN CREATION TABLE_________________________
+--____________FIN CREATION CONTRAINT_________________________
 
 --____________________________________________________________________________
 
@@ -329,7 +333,7 @@ WHERE DELETED is null
 GO
 
 CREATE VIEW [View_Tournament] AS
-SELECT ID_Tournament, ID_Game, [Name], [Date]
+SELECT ID_Tournament, ID_Game, [Name], [Date], [PPWin], [PPDraw], [PPLose]
 FROM Tournoi
 WHERE DELETED is null
 GO
@@ -399,6 +403,7 @@ SELECT ID_Tournament, RoundNumber, PartNumber, ID_PlayerOne AS ID_Player,	CASE R
 																				ELSE ResultPart
 																			END AS Resulta
 FROM Partie
+WHERE ID_Tournament IN (SELECT ID_Tournament FROM Tournoi WHERE [Over] = 0)
 union
 SELECT ID_Tournament, RoundNumber, PartNumber, ID_PlayerTWO AS ID_Player,	CASE ResultPart
 																				WHEN 2
@@ -408,6 +413,7 @@ SELECT ID_Tournament, RoundNumber, PartNumber, ID_PlayerTWO AS ID_Player,	CASE R
 																				ELSE (0-ResultPart)
 																			END AS Resulta
 FROM Partie
+WHERE ID_Tournament IN (SELECT ID_Tournament FROM Tournoi WHERE [Over] = 0)
 GO
 
 
@@ -435,9 +441,35 @@ FROM [View_ResultMatchPlayer]
 GROUP BY ID_Tournament, ID_Player
 --ORDER BY  Victoire DESC, Egaliter DESC, Defaite ASC
 GO
+
+CREATE VIEW [View_ScoreClassementTemporaire] AS
+SELECT	V.ID_Tournament, 
+		ID_Player, 
+		(V.Victoire * T.PPWin + V.Egaliter * T.PPDraw + V.Defaite * T.PPLose) AS Score,
+		Victoire, 
+		Egaliter, 
+		Defaite
+FROM [View_ClassementTemporaire] as V
+JOIN Tournoi as T
+	ON T.ID_Tournament = V.ID_Tournament
+GO
 --____________FIN CREATION DES VUES________________________
 --______________________________________________________________
 
+
+--_______________DEBUT CREATION TRIGGER___________________________________
+
+--CREATE TRIGGER OnEndTournament
+--ON Tournoi
+--AFTER INSERT, UPDATE
+--AS
+--	-- create result tournoi
+--GO
+
+----pour le moment en attente car pas sur que ça soit une bonne idée de le mettre en trigeur
+
+--_______________DEBUT CREATION TRIGGER___________________________________
+--___________________________________________
 
 --____________________DEBUT CREATION STORED PROCEDURE____________________________
 
@@ -524,12 +556,12 @@ BEGIN
 
 			INSERT INTO Utilisateur (Pseudo, Email, [Password])
 			VALUES (@Pseudo, @Email, @Password)
+			COMMIT;
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE() ;
 			ROLLBACK;
 		END CATCH
-	COMMIT;
 
 	if(@responseMessage ='' and (SELECT COUNT(*) FROM Utilisateur WHERE @Pseudo = Pseudo and @Email = Email)=1)
 	BEGIN
@@ -590,9 +622,10 @@ BEGIN
 				Organizer = ISNULL(@Organizer, Organizer)
 			WHERE ID_User = @ID_User
 
+			COMMIT;
+
 			SET @responseMessage='utilisateur mis a jour';
 
-			COMMIT;
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE();
@@ -602,22 +635,24 @@ BEGIN
 END
 GO
 
-CREATE PROCEDURE DeleteUser
+CREATE PROCEDURE SP_DeleteUser
 	@ID_User INT ,
 	@responseMessage NVARCHAR(250) OUTPUT
 AS
 BEGIN
 	BEGIN TRANSACTION
 		BEGIN TRY
-			if( @ID_User IS NULL OR @ID_User <=0)
+			if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
 				Begin
-					RAISERROR('Le ID user est invalide',16,1);
+					RAISERROR('Le utilisateur est introuvable',16,1);
 				End
 
 			UPDATE Utilisateur
 			SET DELETED = CAST( GETDATE() AS Date )
 			WHERE ID_User = @ID_User
 			
+			COMMIT;
+
 			SET @responseMessage='l utilisateur a été supprimer';
 
 		END TRY
@@ -626,5 +661,178 @@ BEGIN
 			ROLLBACK;
 		END CATCH
 END
+GO
 
+CREATE PROCEDURE SP_CreateTournoi
+	@Name VARCHAR(50),
+	@Date DATETIME,
+	@ID_Game INT,
+	@PPWin INT =2,
+	@PPDraw INT =1,
+	@PPLose INT =0,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if(@Name IS NULL OR (TRIM(@Name)) ='')
+				BEGIN
+					RAISERROR('Le nom du tournoi est vide',16,1);
+				END
+			if(@Date IS NULL OR @Date < GETDATE())
+				BEGIN
+					RAISERROR('La date du tournoi est incorrect',16,1);
+				END
+			if(@ID_Game IS NULL OR (SELECT COUNT(*) FROM Jeu WHERE @ID_Game = ID_Game) <> 1)
+				BEGIN
+					RAISERROR('Le jeu du tournoi est introuvable',16,1);
+				END
+			if(@PPWin IS NULL)
+				BEGIN
+					SET @PPWin = 2;
+				END
+			if(@PPDraw IS NULL)
+				BEGIN
+					SET @PPDraw = 1;
+				END
+			if(@PPLose IS NULL)
+				BEGIN
+					SET @PPLose = 0;
+				END
+
+				INSERT INTO Tournoi ([Name], [Date], [ID_Game], [PPWin], [PPDraw], [PPLose])
+					VALUES(@Name, @Date, @ID_Game, @PPWin, @PPDraw, @PPLose) 
+
+				SET @responseMessage='le tournoi a été creer';
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			ROLLBACK;
+		END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_EditTournoi
+	@ID_Tournoi INT,
+	@Date DATETIME =NULL,
+	@Name VARCHAR(50) =NULL,
+	@ID_Game INT =NULL,
+	@PPWin INT =NULL,
+	@PPDraw INT =NULL,
+	@PPLose INT =NULL,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) = 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
+			if(@Name IS NULL OR (TRIM(@Name)) ='')
+				BEGIN
+					SET @Name = NULL;
+				END
+			if(@Date < GETDATE())
+				BEGIN
+					RAISERROR('La date du tournoi est incorrect',16,1);
+				END
+			if((SELECT COUNT(*) FROM Jeu WHERE @ID_Game = ID_Game) <> 1)
+				BEGIN
+					RAISERROR('Le jeu du tournoi est introuvable',16,1);
+				END
+
+			
+
+			if(@Name is null and @Date is null and @ID_Game is null and @PPWin is null and @PPDraw is null and @PPLose is null)
+				BEGIN
+					RAISERROR('Aucune update',16,1);
+				END
+
+			UPDATE Tournoi
+			SET	[Name] = ISNULL(@Name, [Name]),
+				[Date] = ISNULL(@Date, [Date]),
+				[ID_Game] = ISNULL(@ID_Game, [ID_Game]),
+				[PPWin] = ISNULL(@PPWin, [PPWin]),
+				[PPDraw] = ISNULL(@PPDraw, [PPDraw]),
+				[PPLose] = ISNULL(@PPLose, [PPLose])
+			WHERE @ID_Tournoi = ID_Tournament
+
+				SET @responseMessage='le tournoi a été mis a jour';
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			ROLLBACK;
+		END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_EndTournoi
+	@ID_Tournoi INT ,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
+
+			if((SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and [Over] =1)) <> 0) 
+				BEGIN
+					RAISERROR('Le tournoi est déjà fini',16,1);
+				END
+
+			--inseré ici la création des résulta du tournoi ou faire un triggeur pour le faire sur le changement de over a 1
+
+			INSERT INTO Resultat ([ID_Tournament], [ID_User], [Score], [Rank], [FirstTieBreake], [SecondTieBreake], [ThirdTieBreake])
+			SELECT ID_Tournament, ID_Player, Score, 0, 1, 2, 3  --0 doit calculé le rank, ...
+			FROM [View_ScoreClassementTemporaire]
+
+			UPDATE Tournoi
+			SET [Over] = 1
+			WHERE ID_Tournament = @ID_Tournoi
+			
+			COMMIT;
+
+			SET @responseMessage='le tournoi a été fini, le classement a été généré';
+
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			ROLLBACK;
+		END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_DeleteTournoi
+	@ID_Tournoi INT ,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
+
+			UPDATE Tournoi
+			SET DELETED = CAST( GETDATE() AS Date )
+			WHERE ID_Tournament = @ID_Tournoi
+			
+			COMMIT;
+
+			SET @responseMessage='le tournoi a été supprimer';
+
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			ROLLBACK;
+		END CATCH
+END
+GO
 --____________________FIN CREATION STORED PROCEDURE____________________________
