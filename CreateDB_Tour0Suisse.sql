@@ -100,6 +100,7 @@ CREATE TABLE [Tournoi] (
 ID_Tournament INT NOT NULL IDENTITY,
 [Name] VARCHAR(50) NOT NULL,
 [Date] DATETIME NOT NULL,
+[Desciption] TEXT NULL,
 ID_Game INT NOT NULL,
 [PPWin] INT NOT NULL DEFAULT(2),
 [PPDraw] INT NOT NULL DEFAULT(1),
@@ -133,11 +134,9 @@ ID_Tournament INT NOT NULL,
 ID_User INT NOT NULL,
 [Rank] INT NOT NULL,
 Score INT NOT NULL,
-FirstTieBreake INT NOT NULL,
-SecondTieBreake INT NOT NULL,
-ThirdTieBreake INT NOT NULL,
-LastTieBreake INT NULL,
-LastTieBreakeRules VARCHAR(50) NULL,
+TieBreaker INT NOT NULL,
+AdditionalTieBreaker INT NULL,
+AdditionalTieBreakerRules VARCHAR(50) NULL,
 
 CONSTRAINT PK_Result__XXXX PRIMARY KEY(ID_Tournament, ID_User)
 )ON Tournoi
@@ -185,13 +184,13 @@ CONSTRAINT PK_Organizer__XXXX PRIMARY KEY(ID_Tournament, ID_User)
 )ON Tournoi
 GO
 
-CREATE TABLE [Joueur](
-ID_Tournament INT NOT NULL,
-ID_User INT NOT NULL,
+--CREATE TABLE [Joueur](  --fait doublons avec le tablme deck joueur
+--ID_Tournament INT NOT NULL,
+--ID_User INT NOT NULL,
 
-CONSTRAINT PK_Player__XXXX PRIMARY KEY(ID_Tournament, ID_User)
-)ON Tournoi
-GO
+--CONSTRAINT PK_Player__XXXX PRIMARY KEY(ID_Tournament, ID_User)
+--)ON Tournoi
+--GO
 
 CREATE TABLE [DeckJoueur](
 ID_Tournament INT NOT NULL,
@@ -296,20 +295,20 @@ ADD CONSTRAINT FK_Organisateur_Tournoi__XXXX	FOREIGN KEY (ID_Tournament)
 												REFERENCES [Tournoi](ID_Tournament)
 GO
 
-ALTER TABLE [Joueur]
-ADD CONSTRAINT FK_Joueur_Utilisateur__XXXX	FOREIGN KEY (ID_User)
-											REFERENCES [UTilisateur](ID_User)
-GO
+--ALTER TABLE [Joueur]
+--ADD CONSTRAINT FK_Joueur_Utilisateur__XXXX	FOREIGN KEY (ID_User)
+--											REFERENCES [UTilisateur](ID_User)
+--GO
 
-ALTER TABLE [Joueur]
-ADD CONSTRAINT FK_Joueur_Tournoi__XXXX	FOREIGN KEY (ID_Tournament)
-										REFERENCES [Tournoi](ID_Tournament)
-GO
+--ALTER TABLE [Joueur]
+--ADD CONSTRAINT FK_Joueur_Tournoi__XXXX	FOREIGN KEY (ID_Tournament)
+--										REFERENCES [Tournoi](ID_Tournament)
+--GO
 
-ALTER TABLE [DeckJoueur]
-ADD CONSTRAINT FK_DeckJoueur_Utilisateur__XXXX	FOREIGN KEY (ID_User)
-												REFERENCES [Utilisateur](ID_User)
-GO
+--ALTER TABLE [DeckJoueur]
+--ADD CONSTRAINT FK_DeckJoueur_Utilisateur__XXXX	FOREIGN KEY (ID_User)
+--												REFERENCES [Utilisateur](ID_User)
+--GO
 
 ALTER TABLE [DeckJoueur]
 ADD CONSTRAINT FK_DeckJoueur_Tournoi__XXXX	FOREIGN KEY (ID_Tournament)
@@ -348,8 +347,8 @@ JOIN Utilisateur as U
 GO
 
 CREATE VIEW [View_Participant] AS
-SELECT J.ID_Tournament, t.Name, J.ID_User, U.Pseudo
-FROM Joueur as J
+SELECT DISTINCT J.ID_Tournament, t.Name, J.ID_User, U.Pseudo
+FROM DeckJoueur as J
 JOIN Tournoi as T
 	ON J.ID_Tournament = T.ID_Tournament
 JOIN Utilisateur as U
@@ -362,7 +361,7 @@ FROM Jeu
 GO
 
 CREATE VIEW [View_Resulta] AS
-SELECT R.ID_Tournament, T.Name, R.ID_User, U.Pseudo, R.Rank, R.Score, R.FirstTieBreake, R.SecondTieBreake, R.ThirdTieBreake, R.LastTieBreake, R.LastTieBreakeRules
+SELECT R.ID_Tournament, T.Name, R.ID_User, U.Pseudo, R.Rank, R.Score, R.TieBreaker, R.AdditionalTieBreaker, R.AdditionalTieBreakerRules
 FROM Resultat as R
 JOIN Tournoi as T
 	ON T.ID_Tournament = R.ID_Tournament
@@ -416,6 +415,10 @@ FROM Partie
 WHERE ID_Tournament IN (SELECT ID_Tournament FROM Tournoi WHERE [Over] = 0)
 GO
 
+CREATE VIEW [View_Match] AS
+SELECT [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo], [ID_Tournament]
+FROM [Match]
+GO
 
 CREATE VIEW [View_ResultMatchPlayer] AS
 SELECT ID_Tournament, RoundNumber, ID_Player,	CASE 
@@ -788,9 +791,26 @@ BEGIN
 
 			--inseré ici la création des résulta du tournoi ou faire un triggeur pour le faire sur le changement de over a 1
 
-			INSERT INTO Resultat ([ID_Tournament], [ID_User], [Score], [Rank], [FirstTieBreake], [SecondTieBreake], [ThirdTieBreake])
-			SELECT ID_Tournament, ID_Player, Score, 0, 1, 2, 3  --0 doit calculé le rank, ...
-			FROM [View_ScoreClassementTemporaire]
+
+			INSERT INTO Resultat ([ID_Tournament], [ID_User], [Score], [TieBreaker], [Rank])
+			SELECT VSCT.ID_Tournament, VSCT.ID_Player, VSCT.Score, SUM(tb.opponentScore) AS TieBreaker, RANK() OVER(ORDER BY VSCT.Score,SUM(tb.opponentScore))  AS [Rank]
+			FROM	(
+						SELECT VM.ID_Tournament, VM.ID_PlayerOne AS player, VM.ID_PlayerTwo AS opponent, VSCT.Score AS opponentScore
+						FROM [View_Match] AS VM
+						JOIN [View_ScoreClassementTemporaire] AS VSCT
+							ON VSCT.ID_Tournament = VM.ID_Tournament and vsct.ID_Player = VM.ID_PlayerTwo
+						WHERE VM.ID_Tournament = @ID_Tournoi
+						union
+						SELECT VM.ID_Tournament, VM.ID_PlayerTwo AS player, VM.ID_PlayerOne AS opponent, VSCT.Score AS opponentScore
+						FROM [View_Match] AS VM
+						JOIN [View_ScoreClassementTemporaire] AS VSCT
+							ON VSCT.ID_Tournament = VM.ID_Tournament and vsct.ID_Player = VM.ID_PlayerOne
+						WHERE VM.ID_Tournament = @ID_Tournoi
+					) AS TB
+			JOIN [View_ScoreClassementTemporaire] AS VSCT
+				ON TB.ID_Tournament = VSCT.ID_Tournament and TB.player = VSCT.ID_Player
+			GROUP BY VSCT.ID_Tournament, VSCT.ID_Player, VSCT.Score
+			ORDER BY [Rank]
 
 			UPDATE Tournoi
 			SET [Over] = 1
