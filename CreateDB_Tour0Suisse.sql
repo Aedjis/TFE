@@ -70,13 +70,29 @@ Go
 
 --______________________DEBUT DE CREATION DE TYPE_______________________________
 
+CREATE TYPE ID_List AS TABLE(
+ID INT NOT NULL PRIMARY KEY
+);
+GO
+
+CREATE TYPE List_Deck AS TABLE(
+DeckList TEXT NOT NULL
+);
+GO
+
+CREATE TYPE List_Pairing AS TABLE(
+ID_PlayerOne INT,
+ID_PlayerTwo INT
+);
+GO
+
 --______________________FIN DE CREATION DE TYPE_______________________________
 --____________________________________________________________________________________________
 
 --_____________DEBUT CREATION TABLE_______________________
 
 CREATE TABLE [Utilisateur] (
-ID_User INT NOT NULL IDENTITY,
+ID_User INT NOT NULL IDENTITY(0,1),
 Pseudo VARCHAR(50) NOT NULL, 
 Email VARCHAR(256) NOT NULL,
 [Password] BINARY(64) NOT NULL, -- le mot de passe est haché en SHA2_512 (HASHBYTES('SHA2_512', @pPassword))
@@ -97,11 +113,12 @@ CONSTRAINT PK_PseudoIG__XXXX PRIMARY KEY(ID_User, ID_Game)
 GO
 
 CREATE TABLE [Tournoi] (
-ID_Tournament INT NOT NULL IDENTITY,
+ID_Tournament INT NOT NULL IDENTITY(1,1),
 [Name] VARCHAR(50) NOT NULL,
 [Date] DATETIME NOT NULL,
 [Desciption] TEXT NULL,
 ID_Game INT NOT NULL,
+[DeckListNumber] INT NOT NULL DEFAULT(0),
 [PPWin] INT NOT NULL DEFAULT(2),
 [PPDraw] INT NOT NULL DEFAULT(1),
 [PPLose] INT NOT NULL DEFAULT(0),
@@ -121,7 +138,7 @@ CONSTRAINT PK_Game__XXXX PRIMARY KEY(ID_Game)
 GO
 
 CREATE TABLE [Deck](
-ID_Deck INT NOT NULL IDENTITY,
+ID_Deck INT NOT NULL IDENTITY(0,1),
 DeckList Text NOT NULL,
 ID_Game INT NOT NULL,
 
@@ -196,6 +213,7 @@ CREATE TABLE [DeckJoueur](
 ID_Tournament INT NOT NULL,
 ID_User INT NOT NULL,
 ID_Deck INT NOT NULL,
+[Drop] BIT NOT NULL DEFAULT(0),
 
 CONSTRAINT PK_DeckPlayer__XXXX PRIMARY KEY(ID_Tournament, ID_User, ID_Deck)
 )ON Tournoi
@@ -324,6 +342,23 @@ GO
 
 --____________________________________________________
 
+--_____________DEBUT DE CREATION D'UTILISATEUR, JEU, DECK VIDE______________________
+
+INSERT INTO Utilisateur ([Pseudo], [Email], [Password], [Organizer], [DELETED])
+	VALUES('Bye', 'NaN@NaN.NaN', HASHBYTES('SHA2_512',''), 0, GETDATE())
+
+INSERT INTO Jeu([Name])
+	VALUES('Autre')
+
+INSERT INTO Deck([ID_Game], DeckList)
+	VALUES(1, '')
+
+GO
+
+--_____________FIN DE CREATION D'UTILISATEUR, JEU, DECK VIDE______________________
+
+--______________________________________________________
+
 --____________DEBUT CREATION DES VUES________________________
 CREATE VIEW [View_User] AS
 SELECT ID_User, Pseudo, Email, [Password], Organizer
@@ -332,7 +367,7 @@ WHERE DELETED is null
 GO
 
 CREATE VIEW [View_Tournament] AS
-SELECT ID_Tournament, ID_Game, [Name], [Date], [PPWin], [PPDraw], [PPLose]
+SELECT ID_Tournament, ID_Game, [Name], [Date], [DeckListNumber], [PPWin], [PPDraw], [PPLose]
 FROM Tournoi
 WHERE DELETED is null
 GO
@@ -670,6 +705,8 @@ CREATE PROCEDURE SP_CreateTournoi
 	@Name VARCHAR(50),
 	@Date DATETIME,
 	@ID_Game INT,
+	@Description TEXT,
+	@DeckListNumber INT =0,
 	@PPWin INT =2,
 	@PPDraw INT =1,
 	@PPLose INT =0,
@@ -690,6 +727,10 @@ BEGIN
 				BEGIN
 					RAISERROR('Le jeu du tournoi est introuvable',16,1);
 				END
+			if(@DeckListNumber IS NULL)
+				BEGIN
+					SET @DeckListNumber = 0;
+				END
 			if(@PPWin IS NULL)
 				BEGIN
 					SET @PPWin = 2;
@@ -703,8 +744,8 @@ BEGIN
 					SET @PPLose = 0;
 				END
 
-				INSERT INTO Tournoi ([Name], [Date], [ID_Game], [PPWin], [PPDraw], [PPLose])
-					VALUES(@Name, @Date, @ID_Game, @PPWin, @PPDraw, @PPLose) 
+				INSERT INTO Tournoi ([Name], [Date], [ID_Game], [Desciption], [DeckListNumber], [PPWin], [PPDraw], [PPLose])
+					VALUES(@Name, @Date, @ID_Game, @Description, @DeckListNumber, @PPWin, @PPDraw, @PPLose) 
 
 				SET @responseMessage='le tournoi a été creer';
 			COMMIT;
@@ -721,6 +762,8 @@ CREATE PROCEDURE SP_EditTournoi
 	@Date DATETIME =NULL,
 	@Name VARCHAR(50) =NULL,
 	@ID_Game INT =NULL,
+	@Description TEXT = NULL,
+	@DeckListNumber INT =NULL,
 	@PPWin INT =NULL,
 	@PPDraw INT =NULL,
 	@PPLose INT =NULL,
@@ -748,7 +791,7 @@ BEGIN
 
 			
 
-			if(@Name is null and @Date is null and @ID_Game is null and @PPWin is null and @PPDraw is null and @PPLose is null)
+			if(@Name is null and @Date is null and @ID_Game is null and @PPWin is null and @PPDraw is null and @PPLose is null and @DeckListNumber is null and @Description is null)
 				BEGIN
 					RAISERROR('Aucune update',16,1);
 				END
@@ -757,6 +800,8 @@ BEGIN
 			SET	[Name] = ISNULL(@Name, [Name]),
 				[Date] = ISNULL(@Date, [Date]),
 				[ID_Game] = ISNULL(@ID_Game, [ID_Game]),
+				[Desciption] = ISNULL(@Description, [Desciption]),
+				[DeckListNumber] = ISNULL(@DeckListNumber, [DeckListNumber]),
 				[PPWin] = ISNULL(@PPWin, [PPWin]),
 				[PPDraw] = ISNULL(@PPDraw, [PPDraw]),
 				[PPLose] = ISNULL(@PPLose, [PPLose])
@@ -855,4 +900,217 @@ BEGIN
 		END CATCH
 END
 GO
+
+CREATE PROCEDURE SP_RegisterTournoi
+	@ID_Tournoi INT,
+	@ID_User INT,
+	@ListDeck List_Deck READONLY,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	DECLARE @DeckID INT = null
+	DECLARE @IDGame INT;
+	DECLARE @ListID ID_List;
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null and [Date]> GETDATE())) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
+			if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('L utilisateur est introuvable',16,1);
+				End
+			if((SELECT COUNT(*) FROM @ListDeck) > (SELECT [DeckListNumber] FROM Tournoi WHERE ID_Tournament = @ID_Tournoi))
+				Begin
+					RAISERROR('trop de deck on été soumis',16,1);
+				End
+
+			SELECT @IDGame = [ID_Game] 
+			FROM Tournoi
+			WHERE ID_Tournament = @ID_Tournoi
+
+			if((SELECT COUNT(*) FROM @ListDeck) > 0)
+				BEGIN
+
+					INSERT INTO Deck ([DeckList], [ID_Game])
+						OUTPUT inserted.ID_Deck INTO @ListID
+						SELECT DeckList, @IDGame
+						FROM @ListDeck
+
+			
+					DECLARE ListDeckCursor CURSOR FOR
+									SELECT ID FROM @ListID;
+
+					OPEN ListDeckCursor;
+
+					FETCH ListDeckCursor INTO @DeckID;
+					WHILE @@FETCH_STATUS = 0
+					BEGIN
+						INSERT INTO DeckJoueur ([ID_Tournament], [ID_User], [ID_Deck])
+							VALUES(@ID_Tournoi, @ID_User, @DeckID)
+
+						FETCH ListDeckCursor INTO @DeckID;
+					END
+
+					
+					CLOSE ListDeckCursor;
+					DEALLOCATE ListDeckCursor;
+				END
+			ELSE
+				BEGIN
+					INSERT INTO DeckJoueur ([ID_Tournament], [ID_User], [ID_Deck])
+						VALUES(@ID_Tournoi, @ID_User, 0)
+				END
+
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			ROLLBACK;
+		END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_UnregisterTournoi
+	@ID_Tournoi INT,
+	@ID_User INT,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and [Date]> GETDATE())) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
+			if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User)) <> 1)
+				Begin
+					RAISERROR('L utilisateur est introuvable',16,1);
+				End
+			
+			DELETE DeckJoueur
+			WHERE [ID_Tournament] = @ID_Tournoi AND [ID_User] = @ID_User
+
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			ROLLBACK;
+		END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_UpdateDeck
+	@ID_Tournoi INT,
+	@ID_User INT,
+	@ID_Deck INT,
+	@DeckList TEXT,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	DECLARE @IDGame INT
+	DECLARE @IDDeck INT
+	DECLARE @ListID ID_List
+	BEGIN TRY
+		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null and [Date]> GETDATE())) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
+		if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
+			Begin
+				RAISERROR('L utilisateur est introuvable',16,1);
+			End
+		if( @ID_Deck IS NULL OR (SELECT COUNT(*) FROM Deck WHERE (ID_Deck = @ID_Deck )) <> 1)
+			Begin
+				RAISERROR('Le deck est introuvable',16,1);
+			End
+
+		if(@ID_Deck <> 0)
+			BEGIN
+				DELETE DeckJoueur
+				WHERE [ID_Tournament] = @ID_Tournoi AND [ID_User] = @ID_User  AND [ID_Deck] = @ID_Deck
+			END
+		ELSE IF ((SELECT COUNT(*) FROM DeckJoueur WHERE ID_Tournament = @ID_Tournoi and ID_User = @ID_User) >= (SELECT [DeckListNumber] FROM Tournoi WHERE ID_Tournament = @ID_Tournoi))
+			BEGIN
+				RAISERROR('trop de deck on été soumis',16,1);
+			END
+		
+		SELECT @IDGame = [ID_Game] 
+			FROM Tournoi
+			WHERE ID_Tournament = @ID_Tournoi
+
+		INSERT INTO Deck ([DeckList], [ID_Game])
+			OUTPUT inserted.ID_Deck INTO @ListID
+			VALUES(@DeckList, @IDGame)
+
+		SELECT ID = @IDDeck 
+			FROM @ListID
+		
+		INSERT INTO DeckJoueur ([ID_Tournament], [ID_User], [ID_Deck])
+			VALUES(@ID_Tournoi, @ID_User, @IDDeck)
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_AddAdmin
+	@ID_Tournoi INT,
+	@ID_User INT,
+	@Level INT = 1,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
+		if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
+			Begin
+				RAISERROR('L utilisateur est introuvable',16,1);
+			End
+		
+		INSERT INTO Organisateur ([ID_Tournament], [ID_User], [Level])
+			VALUES(@ID_Tournoi, @ID_User, @Level)
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_AddGame
+	@Name VARCHAR(50),
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @Name IS NULL OR TRIM(@Name) ='')
+				Begin
+					RAISERROR('Le Nom du jeu est vide',16,1);
+				End
+
+		
+		INSERT INTO Jeu ([Name])
+			VALUES(@Name)
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+--faire la procédure pairing 
+
 --____________________FIN CREATION STORED PROCEDURE____________________________
