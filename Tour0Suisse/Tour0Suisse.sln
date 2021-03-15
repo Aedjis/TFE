@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tour0Suisse.Web", "Tour0Sui
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tour0Suisse.Repository", "Tour0Suisse.Repository\Tour0Suisse.Repository.csproj", "{24FA3AE9-4B91-4030-9DF5-E2F64B4ED870}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tour0Suisse.Model", "Tour0Suisse.Model\Tour0Suisse.Model.csproj", "{ADBD54D5-F5BD-4743-B7C9-7BF26D01AC16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{24FA3AE9-4B91-4030-9DF5-E2F64B4ED870}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24FA3AE9-4B91-4030-9DF5-E2F64B4ED870}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24FA3AE9-4B91-4030-9DF5-E2F64B4ED870}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ADBD54D5-F5BD-4743-B7C9-7BF26D01AC16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ADBD54D5-F5BD-4743-B7C9-7BF26D01AC16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ADBD54D5-F5BD-4743-B7C9-7BF26D01AC16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ADBD54D5-F5BD-4743-B7C9-7BF26D01AC16}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
