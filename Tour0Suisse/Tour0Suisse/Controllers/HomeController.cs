@@ -20,12 +20,12 @@ namespace Tour0Suisse.Controllers
         public IActionResult Connexion()
         {
             ViewData["Message"] = "Page de connexion";
-            return View("~/Views/Connexion/Connexion.cshtml");
+            return View("~/Views/User/Connexion.cshtml");
         }
         public IActionResult Profil()
         {
             ViewData["Message"] = "Page de profil";
-            return View();
+            return View("~/Views/User/Profil.cshtml");
         }
 
         public IActionResult Tournoi()
@@ -39,7 +39,7 @@ namespace Tour0Suisse.Controllers
         {
             ViewData["Message"] = "Page d'inscription";
 
-            return View("~/Views/Inscription/Inscription.cshtml");
+            return View("~/Views/User/Inscription.cshtml");
         }
 
         public IActionResult Privacy()

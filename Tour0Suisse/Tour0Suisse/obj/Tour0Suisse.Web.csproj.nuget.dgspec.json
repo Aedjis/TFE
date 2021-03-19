@@ -4,6 +4,17 @@
     "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse\\Tour0Suisse.Web.csproj": {}
   },
   "projects": {
+    "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse.Model\\Tour0Suisse.Model.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse.Model\\Tour0Suisse.Model.csproj",
+        "projectName": "Tour0Suisse.Model",
+        "projectPath": "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse.Model\\Tour0Suisse.Model.csproj"
+      },
+      "frameworks": {
+        "net472": {}
+      }
+    },
     "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse\\Tour0Suisse.Web.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -29,7 +40,11 @@
         },
         "frameworks": {
           "netcoreapp2.1": {
-            "projectReferences": {}
+            "projectReferences": {
+              "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse.Model\\Tour0Suisse.Model.csproj": {
+                "projectPath": "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse.Model\\Tour0Suisse.Model.csproj"
+              }
+            }
           }
         },
         "warningProperties": {

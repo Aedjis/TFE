@@ -5,29 +5,29 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Tour0Suisse.Controllers
+namespace Tour0Suisse.Web.Controllers
 {
-    public class UserController : Controller
+    public class TournamentController : Controller
     {
-        // GET: User
-        public ActionResult LogIn()
+        // GET: Tournament
+        public ActionResult Index()
         {
-            return View("~/Views/User/Connexion.cshtml");
+            return View();
         }
 
-        // GET: User/Details/5
+        // GET: Tournament/Details/5
         public ActionResult Details(int id)
         {
-            return View("~/Views/User/Profil.cshtml");
+            return View();
         }
 
-        // GET: User/Create
+        // GET: Tournament/Create
         public ActionResult Create()
         {
-            return View("~/Views/User/Inscription.cshtml");
+            return View();
         }
 
-        // POST: User/Create
+        // POST: Tournament/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Create(IFormCollection collection)
@@ -36,21 +36,21 @@ namespace Tour0Suisse.Controllers
             {
                 // TODO: Add insert logic here
 
-                return View("~/Views/Home/Index.cshtml");
+                return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View("~/Views/User/Inscription.cshtml");
+                return View();
             }
         }
 
-        // GET: User/Edit/5
+        // GET: Tournament/Edit/5
         public ActionResult Edit(int id)
         {
-            return View("~/Views/User/Edit.cshtml");
+            return View();
         }
 
-        // POST: User/Edit/5
+        // POST: Tournament/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Edit(int id, IFormCollection collection)
@@ -59,21 +59,21 @@ namespace Tour0Suisse.Controllers
             {
                 // TODO: Add update logic here
 
-                return View("~/Views/User/Profil.cshtml");
+                return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View("~/Views/User/Edit.cshtml");
+                return View();
             }
         }
 
-        // GET: User/Delete/5
+        // GET: Tournament/Delete/5
         public ActionResult Delete(int id)
         {
-            return View("~/Views/User/Delete.cshtml");
+            return View();
         }
 
-        // POST: User/Delete/5
+        // POST: Tournament/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public ActionResult Delete(int id, IFormCollection collection)
@@ -82,11 +82,11 @@ namespace Tour0Suisse.Controllers
             {
                 // TODO: Add delete logic here
 
-                return View("~/Views/User/Deleted.cshtml");
+                return RedirectToAction(nameof(Index));
             }
             catch
             {
-                return View("~/Views/User/Delete.cshtml");
+                return View();
             }
         }
     }

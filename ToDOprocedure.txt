@@ -1,0 +1,74 @@
+utilisateur : 
+insert ---
+update ---
+delete ---
+view ---
+
+pseudo : 
+insert ---
+update ---
+delete---
+VIEW----
+
+tournoi : 
+insert ---
+update ---
+update end ---
+delete ---
+view ---
+
+jeu : 
+insert ---
+update---
+delete---
+view ---
+
+deck : 
+insert (c'est dans le register ou l'update deck car l'update c'est du delete if exist puis insert)
+update ---
+delete(c'est dans le register ou l'update deck car l'update c'est du delete if exist puis insert)
+
+resultat : 
+insert (ce fait sur le end tournoi)
+update---
+delete---
+view ---
+
+round : 
+insert---
+update---
+delete---
+VIEW----
+
+match : 
+insert---
+update---
+delete---
+view ---
+
+partie : 
+insert---
+update---
+delete---
+view ---
+
+ID_Tournament INT NOT NULL,
+RoundNumber INT NOT NULL,
+ID_PlayerOne INT NOT NULL,
+ID_PlayerTwo INT NOT NULL,
+PartNumber INT NOT NULL,
+ID_Deck_PlayerOne INT NOT NULL,
+ID_Deck_PlayerTwo INT NOT NULL,
+ResultPart TINYINT NULL,
+
+organizateur : 
+insert ---
+update ---
+delete---
+view ---
+
+deckjoueur : 
+insert ---
+update  (inexistant car c'est update deck)
+delete ---
+view (participant et deck) ---

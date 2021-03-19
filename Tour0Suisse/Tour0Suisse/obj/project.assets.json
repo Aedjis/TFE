@@ -4615,6 +4615,15 @@
         "runtime": {
           "lib/netstandard1.3/System.Xml.XPath.XDocument.dll": {}
         }
+      },
+      "Tour0Suisse.Model/1.0.0": {
+        "type": "project",
+        "compile": {
+          "bin/placeholder/Tour0Suisse.Model.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Tour0Suisse.Model.dll": {}
+        }
       }
     }
   },
@@ -12546,6 +12555,11 @@
         "system.xml.xpath.xdocument.4.3.0.nupkg.sha512",
         "system.xml.xpath.xdocument.nuspec"
       ]
+    },
+    "Tour0Suisse.Model/1.0.0": {
+      "type": "project",
+      "path": "../Tour0Suisse.Model/Tour0Suisse.Model.csproj",
+      "msbuildProject": "../Tour0Suisse.Model/Tour0Suisse.Model.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -12553,7 +12567,8 @@
       "Microsoft.AspNetCore.App >= 2.1.1",
       "Microsoft.AspNetCore.Razor.Design >= 2.1.2",
       "Microsoft.NETCore.App >= 2.1.0",
-      "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 2.1.10"
+      "Microsoft.VisualStudio.Web.CodeGeneration.Design >= 2.1.10",
+      "Tour0Suisse.Model >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -12585,7 +12600,11 @@
       },
       "frameworks": {
         "netcoreapp2.1": {
-          "projectReferences": {}
+          "projectReferences": {
+            "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse.Model\\Tour0Suisse.Model.csproj": {
+              "projectPath": "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse.Model\\Tour0Suisse.Model.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

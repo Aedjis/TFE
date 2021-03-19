@@ -132,6 +132,7 @@ GO
 CREATE TABLE [Jeu](
 ID_Game INT NOT NULL IDENTITY,
 [Name] VARCHAR(50) NOT NULL,
+DELETED BIT DEFAULT(0),
 
 CONSTRAINT PK_Game__XXXX PRIMARY KEY(ID_Game)
 )ON Reste
@@ -363,13 +364,34 @@ GO
 CREATE VIEW [View_User] AS
 SELECT ID_User, Pseudo, Email, [Password], Organizer
 FROM Utilisateur
-WHERE DELETED is null
+WHERE DELETED is null and ID_User >0
+GO
+
+CREATE VIEW [View_Pseudo] AS
+SELECT P.ID_User, U.Pseudo, P.ID_Game, J.[Name], IG_Pseudo
+FROM PseudoIG AS P
+JOIN Utilisateur AS U
+	ON P.ID_User = U.ID_User
+JOIN Jeu AS J
+	ON P.ID_Game = J.ID_Game
+GO
+
+CREATE VIEW [View_DeletedUser] AS
+SELECT ID_User, Pseudo, Email, [Password], Organizer
+FROM Utilisateur
+WHERE DELETED is not null and ID_User >0
 GO
 
 CREATE VIEW [View_Tournament] AS
 SELECT ID_Tournament, ID_Game, [Name], [Date], [DeckListNumber], [PPWin], [PPDraw], [PPLose]
 FROM Tournoi
 WHERE DELETED is null
+GO
+
+CREATE VIEW [View_DeletedTournament] AS
+SELECT ID_Tournament, ID_Game, [Name], [Date], [DeckListNumber], [PPWin], [PPDraw], [PPLose]
+FROM Tournoi
+WHERE DELETED is not null
 GO
 
 CREATE VIEW [View_Orga] AS
@@ -467,6 +489,11 @@ SELECT ID_Tournament, RoundNumber, ID_Player,	CASE
 												END AS Resulta
 FROM [View_ResultPartPlayer]
 GROUP BY ID_Tournament, RoundNumber, ID_Player
+UNION
+SELECT ID_Tournament, RoundNumber, ID_PlayerOne AS ID_Player,	1 AS Resulta
+FROM [View_Match]
+WHERE ID_PlayerTwo = 0
+GROUP BY ID_Tournament, RoundNumber, ID_PlayerOne
 GO
 
 CREATE VIEW [View_ClassementTemporaire] AS
@@ -490,6 +517,13 @@ SELECT	V.ID_Tournament,
 FROM [View_ClassementTemporaire] as V
 JOIN Tournoi as T
 	ON T.ID_Tournament = V.ID_Tournament
+GO
+
+CREATE VIEW [View_Round] AS
+SELECT R.ID_Tournament, T.[Name], R.RoundNumber, R.StartRound
+FROM [Round] AS R
+JOIN Tournoi AS T
+	ON R.ID_Tournament = T.ID_Tournament
 GO
 --____________FIN CREATION DES VUES________________________
 --______________________________________________________________
@@ -557,6 +591,118 @@ GO
 --END
 --GO
 
+CREATE PROCEDURE SP_ADD_PseudoIG
+	@ID_User INT,
+	@ID_Game INT,
+	@PseudoIG VARCHAR(50),
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	
+	SET @responseMessage = '';
+
+	BEGIN TRANSACTION
+		BEGIN TRY
+			
+			if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le utilisateur est introuvable',16,1);
+				End
+
+			if( @ID_Game IS NULL OR (SELECT COUNT(*) FROM Jeu WHERE (ID_Game = @ID_Game)) <> 1)
+				Begin
+					RAISERROR('Le utilisateur est introuvable',16,1);
+				End
+
+			if( @PseudoIG IS NULL OR (TRIM(@PseudoIG)) ='')
+				Begin
+					RAISERROR('Le Pseudo est vide',16,1);
+				End
+
+			INSERT INTO PseudoIG (ID_User, ID_Game, IG_Pseudo)
+				VALUES (@ID_User, @ID_Game, @PseudoIG)
+			COMMIT
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE() ;
+			ROLLBACK;
+		END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_EDIT_PseudoIG
+	@ID_User INT,
+	@ID_Game INT,
+	@PseudoIG VARCHAR(50),
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	
+	SET @responseMessage = '';
+
+	BEGIN TRANSACTION
+		BEGIN TRY
+			
+			if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le utilisateur est introuvable',16,1);
+				End
+
+			if( @ID_Game IS NULL OR (SELECT COUNT(*) FROM Jeu WHERE (ID_Game = @ID_Game)) <> 1)
+				Begin
+					RAISERROR('Le utilisateur est introuvable',16,1);
+				End
+
+			if( @PseudoIG IS NULL OR (TRIM(@PseudoIG)) ='')
+				Begin
+					RAISERROR('Le Pseudo est vide',16,1);
+				End
+
+			UPDATE PseudoIG
+				SET IG_Pseudo = @PseudoIG
+				WHERE ID_User = @ID_User AND ID_Game = @ID_Game
+			COMMIT
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE() ;
+			ROLLBACK;
+		END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_Delete_PseudoIG
+	@ID_User INT,
+	@ID_Game INT,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	
+	SET @responseMessage = '';
+
+	BEGIN TRANSACTION
+		BEGIN TRY
+			
+			if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le utilisateur est introuvable',16,1);
+				End
+
+			if( @ID_Game IS NULL OR (SELECT COUNT(*) FROM Jeu WHERE (ID_Game = @ID_Game)) <> 1)
+				Begin
+					RAISERROR('Le utilisateur est introuvable',16,1);
+				End
+
+			DELETE PseudoIG
+				WHERE ID_User = @ID_User AND ID_Game = @ID_Game
+			COMMIT
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE() ;
+			ROLLBACK;
+		END CATCH
+END
+GO
+
 CREATE PROCEDURE SP_Create_User
 	@Pseudo VARCHAR(50), 
 	@Email VARCHAR(256),
@@ -572,24 +718,24 @@ BEGIN
 			
 
 			if( @Pseudo IS NULL OR (TRIM(@Pseudo)) ='')
-			Begin
-				RAISERROR('Le Pseudo est vide',16,1);
-			End
+				Begin
+					RAISERROR('Le Pseudo est vide',16,1);
+				End
 
 			if( @Password IS NULL OR (TRIM(@Password)) ='')
-			Begin
-				RAISERROR('Le mot de passe est vide',16,1);
-			End
+				Begin
+					RAISERROR('Le mot de passe est vide',16,1);
+				End
 	
 			if( @Email IS NULL OR (@Email NOT LIKE '%_@__%.__%'))
-			Begin
-				RAISERROR('Le Email est invalide',16,1);
-			End
+				Begin
+					RAISERROR('Le Email est invalide',16,1);
+				End
 
 			else if( (SELECT count(*) FROM Utilisateur WHERE @Email = Email)<>0)
-			Begin
-				RAISERROR('Le Email est déjà utiliser',16,1);
-			End
+				Begin
+					RAISERROR('Le Email est déjà utiliser',16,1);
+				End
 
 
 			INSERT INTO Utilisateur (Pseudo, Email, [Password])
@@ -622,9 +768,9 @@ BEGIN
 
 	BEGIN TRANSACTION;
 		BEGIN TRY
-			if( @ID_User IS NULL OR @ID_User <=0)
+			if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
 				Begin
-					RAISERROR('Le ID user est invalide',16,1);
+					RAISERROR('Le utilisateur est introuvable',16,1);
 				End
 
 			DECLARE @HMDP BINARY(64) = null;
@@ -834,7 +980,7 @@ BEGIN
 					RAISERROR('Le tournoi est déjà fini',16,1);
 				END
 
-			--inseré ici la création des résulta du tournoi ou faire un triggeur pour le faire sur le changement de over a 1
+			--(inseré ici la création des résulta du tournoi ou faire un triggeur pour le faire sur le changement de over a 1)
 
 
 			INSERT INTO Resultat ([ID_Tournament], [ID_User], [Score], [TieBreaker], [Rank])
@@ -1088,6 +1234,69 @@ BEGIN
 END
 GO
 
+CREATE PROCEDURE SP_EDITAdmin
+	@ID_Tournoi INT,
+	@ID_User INT,
+	@Level INT,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
+		if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
+			Begin
+				RAISERROR('L utilisateur est introuvable',16,1);
+			End
+
+		if(@Level is null or @Level <0)
+			BEGIN
+				RAISERROR('Niveau d admin incorrecte',16,1);
+			END
+		
+		UPDATE Organisateur
+			SET [Level] = @Level
+			WHERE [ID_User] = @ID_User AND [ID_Tournament] = @ID_Tournoi
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_DELETEAdmin
+	@ID_Tournoi INT,
+	@ID_User INT,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
+		if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
+			Begin
+				RAISERROR('L utilisateur est introuvable',16,1);
+			END
+
+		DELETE Organisateur
+			WHERE [ID_User] = @ID_User AND [ID_Tournament] = @ID_Tournoi
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
 CREATE PROCEDURE SP_AddGame
 	@Name VARCHAR(50),
 	@responseMessage NVARCHAR(250) OUTPUT
@@ -1111,6 +1320,988 @@ BEGIN
 	END CATCH
 END
 GO
+
+CREATE PROCEDURE SP_EDITGame
+	@ID_Game INT,
+	@Name VARCHAR(50),
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+
+		if( @ID_Game IS NULL OR (SELECT COUNT(*) FROM Jeu WHERE (ID_Game = @ID_Game)) <> 1)
+				Begin
+					RAISERROR('Le Nom du jeu est vide',16,1);
+				End
+
+		if( @Name IS NULL OR TRIM(@Name) ='')
+				Begin
+					RAISERROR('Le Nom du jeu est vide',16,1);
+				End
+
+		
+		UPDATE  Jeu 
+			SET [Name] = (@Name)
+			WHERE ID_Game = @ID_Game
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_DELETEGame
+	@ID_Game INT,
+	@Name VARCHAR(50),
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+
+		if( @ID_Game IS NULL OR (SELECT COUNT(*) FROM Jeu WHERE (ID_Game = @ID_Game)) <> 1)
+				Begin
+					RAISERROR('Le Nom du jeu est vide',16,1);
+				End
+
+		if( @Name IS NULL OR TRIM(@Name) ='')
+				Begin
+					RAISERROR('Le Nom du jeu est vide',16,1);
+				End
+
+		
+		UPDATE  Jeu 
+			SET [Name] = (@Name),
+				DELETED = 1
+			WHERE ID_Game = @ID_Game
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_EDITResultat
+	@ID_User INT,
+	@ID_Tournament INT,
+	@Rank INT = null,
+	@Score INT = NULL,
+	@TieBreaker INT = NULL,
+	@AddTieBreaker INT = NULL,
+	@AddTieBreakerRules VARCHAR(50) = NULL,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		
+		if( @ID_User IS NULL )
+			Begin
+				RAISERROR('Le champs  utilisateur est vide',16,1);
+			End
+
+		if( @ID_Tournament IS NULL)
+			Begin
+				RAISERROR('Le champs tournoi est vide',16,1);
+			End
+
+		if ((SELECT COUNT(*) FROM Resultat WHERE (ID_User = @ID_User AND ID_Tournament = @ID_Tournament)) <> 1)
+			BEGIN
+				RAISERROR('La combinaison tournoi utilisateur est invalide',16,1);
+			END
+
+		if( @Rank is null AND @Score is null AND @TieBreaker is null AND @AddTieBreaker is null AND @AddTieBreakerRules is null)
+			BEGIN
+				RAISERROR('Aucune modification', 16, 1)
+			END
+
+		
+		UPDATE  Resultat 
+			SET [Rank] = ISNULL(@Rank, [Rank]),
+				[Score] = ISNULL(@Score, [Score]),
+				[TieBreaker] = ISNULL(@TieBreaker, [TieBreaker]),
+				[AdditionalTieBreakerRules] = ISNULL(@AddTieBreakerRules, [AdditionalTieBreakerRules]),
+				[AdditionalTieBreaker] = ISNULL(@AddTieBreaker, [AdditionalTieBreaker])
+			WHERE ID_Tournament = @ID_Tournament AND ID_User = @ID_User
+				
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_DELETEDResultat
+	@ID_Tournament INT,
+	@ID_User INT = null,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournament IS NULL)
+			Begin
+				RAISERROR('Le champs tournoi est vide',16,1);
+			End
+
+		if ( @ID_User IS NOT NULL AND (SELECT COUNT(*) FROM Resultat WHERE (ID_User = @ID_User AND ID_Tournament = @ID_Tournament)) <> 1)
+			BEGIN
+				RAISERROR('La combinaison tournoi utilisateur est invalide',16,1);
+			END
+		if(@ID_User IS NOT NULL)
+			BEGIN
+				DELETE  Resultat 
+					WHERE ID_Tournament = @ID_Tournament AND ID_User = @ID_User
+			END
+		else
+			BEGIN
+				DELETE  Resultat 
+					WHERE ID_Tournament = @ID_Tournament
+			END
+				
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_CREATE_Round
+	@ID_Tournoi INT,
+	@RoundNumber INT,
+	@Start DateTime,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+			Begin
+				RAISERROR('Le tournoi est introuvable',16,1);
+			End
+
+		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
+			BEGIN
+				RAISERROR('la round existe déjà', 16, 1);
+			END
+
+		if(@Start is null or @Start < GETDATE())
+			BEGIN
+				RAISERROR('la date de début est incorrecte', 16, 1);
+			END
+
+		
+		INSERT INTO [Round]([ID_Tournament], [RoundNumber], [StartRound])
+			VALUES(@ID_Tournoi, @RoundNumber, @Start)
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_DELETE_Round
+	@ID_Tournoi INT,
+	@RoundNumber INT,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi)) <> 1)
+			Begin
+				RAISERROR('Le tournoi est introuvable',16,1);
+			End
+
+		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) <>1))
+			BEGIN
+				RAISERROR('la round n existe pas', 16, 1);
+			END
+
+		IF((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0)
+			BEGIN
+				RAISERROR('Il existe des match pour cette round', 16, 1);
+			END
+		
+		DELETE [Round]
+			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_DELETE_RoundAndMatch
+	@ID_Tournoi INT,
+	@RoundNumber INT,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi)) <> 1)
+			Begin
+				RAISERROR('Le tournoi est introuvable',16,1);
+			End
+
+		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) <>1))
+			BEGIN
+				RAISERROR('la round n existe pas', 16, 1);
+			END
+
+		IF((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) =0)
+			BEGIN
+				RAISERROR('Il n existe pas match pour cette round', 16, 1);
+			END
+
+		DELETE [Match] 
+			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
+		
+		DELETE [Round]
+			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_CREATE_Match
+	@ID_Tournoi INT,
+	@RoundNumber INT,
+	@ID_PlayerOne INT,
+	@ID_PlayerTwo INT = 0,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+			Begin
+				RAISERROR('Le tournoi est introuvable',16,1);
+			End
+
+		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
+			BEGIN
+				RAISERROR('la round existe déjà', 16, 1);
+			END
+
+		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerOne)) <> 1 )
+			BEGIN
+				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
+			END
+
+		if(@ID_PlayerTwo is null or @ID_PlayerTwo = 0)
+			BEGIN
+				INSERT INTO [Match] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo])
+					VALUES(@ID_Tournoi, @RoundNumber, @ID_PlayerOne, 0)
+			END
+		else if((SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerTwo)) <> 1 )
+			BEGIN
+				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
+			END
+		else
+			BEGIN
+				INSERT INTO [Match] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo])
+					VALUES(@ID_Tournoi, @RoundNumber, @ID_PlayerOne, @ID_PlayerTwo)
+			END
+
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+
+
+CREATE PROCEDURE SP_CREATE_Match_ALLPairing
+	@ID_Tournoi INT,
+	@RoundNumber INT,
+	@Pairing List_Pairing READONLY,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+			Begin
+				RAISERROR('Le tournoi est introuvable',16,1);
+			End
+
+		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
+			BEGIN
+				RAISERROR('la round existe déjà', 16, 1);
+			END
+
+		if((SELECT COUNT(*) FROM @Pairing) =0)
+			BEGIN
+				RAISERROR('le pairing est vide', 16, 1);
+			END
+
+		if	(
+				CEILING((SELECT COUNT(distinct [ID_User])
+				FROM DeckJoueur
+				WHERE [ID_Tournament] = @ID_Tournoi and [Drop] = 0)
+				*0.5)
+				=
+				(SELECT COUNT(*)
+				FROM @Pairing)
+			)
+			BEGIN
+				RAISERROR('le pairing est incorrect, le nombre de joueur ne correspond pas par rapport au nombre de match', 16, 1);
+			END
+
+		if	(
+				(SELECT count(distinct [ID_User])
+				FROM DeckJoueur
+				WHERE [ID_Tournament] = @ID_Tournoi and [Drop] = 0 AND  EXISTS(	SELECT ID_PlayerOne
+																				FROM @Pairing
+																				UNION
+																				SELECT ID_PlayerTwo
+																				FROM @Pairing))
+				=
+				(SELECT count(distinct [ID_User])
+				FROM DeckJoueur
+				WHERE [ID_Tournament] = @ID_Tournoi and [Drop] = 0 )
+			)
+			BEGIN
+				RAISERROR('le pairing est incorrect, le nombre de joueur ne correspond pas', 16, 1);
+			END
+
+		INSERT INTO [Match] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo])
+			SELECT @ID_Tournoi, @RoundNumber, ID_PlayerOne, ID_PlayerTwo
+			FROM @Pairing
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_EDIT_Match
+	@ID_Tournoi INT,
+	@RoundNumber INT,
+	@ID_PlayerOne INT,
+	@ID_PlayerTwo INT ,
+	@ID_NewPone INT null,
+	@ID_NewPTwo INT null,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+			Begin
+				RAISERROR('Le tournoi est introuvable',16,1);
+			End
+
+		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
+			BEGIN
+				RAISERROR('la round existe déjà', 16, 1);
+			END
+
+		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerOne)) <> 1 )
+			BEGIN
+				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
+			END
+
+		if((SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerTwo)) <> 1 )
+			BEGIN
+				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
+			END
+
+		if((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and RoundNumber = @RoundNumber and ID_PlayerOne = @ID_PlayerOne and ID_PlayerTwo = @ID_PlayerTwo)) <> 1)
+			BEGIN
+				RAISERROR('le match est introuvable', 16, 1);
+			END
+
+		if(@ID_NewPone is null and @ID_NewPTwo is null)
+			BEGIN
+				RAISERROR('pas de modification', 16, 1);
+			END
+
+		UPDATE [Match]
+			SET ID_PlayerOne = ISNULL(@ID_NewPone, ID_PlayerOne),
+				ID_PlayerTwo = ISNULL(@ID_NewPTwo, ID_PlayerTwo)
+			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber and [ID_PlayerOne] = @ID_PlayerOne and [ID_PlayerTwo] = @ID_PlayerTwo
+
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_DELETE_Match
+	@ID_Tournoi INT,
+	@RoundNumber INT,
+	@ID_PlayerOne INT,
+	@ID_PlayerTwo INT,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+			Begin
+				RAISERROR('Le tournoi est introuvable',16,1);
+			End
+
+		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
+			BEGIN
+				RAISERROR('la round existe déjà', 16, 1);
+			END
+
+		if((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and RoundNumber = @RoundNumber and ID_PlayerOne = @ID_PlayerOne and ID_PlayerTwo = @ID_PlayerTwo)) <> 1)
+			BEGIN
+				RAISERROR('le match est introuvable', 16, 1);
+			END
+
+
+		DELETE [Match]
+			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber and [ID_PlayerOne] = @ID_PlayerOne and [ID_PlayerTwo] = @ID_PlayerTwo
+
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+
+CREATE PROCEDURE SP_CREATE_Partie
+	@ID_Tournament INT,
+	@RoundNumber INT,
+	@ID_PlayerOne INT,
+	@ID_PlayerTwo INT,
+	@PartNumber INT,
+	@ID_Deck_PlayerOne INT,
+	@ID_Deck_PlayerTwo INT,
+	@ResultPart TINYINT = NULL,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournament IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournament and DELETED is null)) <> 1)
+			Begin
+				RAISERROR('Le tournoi est introuvable',16,1);
+			End
+
+		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournament and @RoundNumber = RoundNumber)) <> 1))
+			BEGIN
+				RAISERROR('la round n existe pas', 16, 1);
+			END
+
+		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
+			BEGIN
+				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
+			END
+
+		if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
+			BEGIN
+				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
+			END
+
+		if(@ID_Deck_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerOne and ID_User = @ID_PlayerOne and ID_Tournament = @ID_Tournament))>0)
+			BEGIN
+				RAISERROR('le deck1 nes pas bon', 16, 1);
+			END
+
+		if(@ID_Deck_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerTwo and ID_User = @ID_PlayerTwo and ID_Tournament = @ID_Tournament))>0)
+			BEGIN
+				RAISERROR('le deck2 nes pas bon', 16, 1);
+			END
+		if(@ResultPart is not null AND(@ResultPart <0 or @ResultPart > 2))
+			BEGIN
+				RAISERROR('le resulta est incorect', 16, 1);
+			END
+
+		INSERT INTO [Partie] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo], [PartNumber], [ID_Deck_PlayerOne], [ID_Deck_PlayerTwo], [ResultPart])
+			VALUES(@ID_Tournament, @RoundNumber, @ID_PlayerOne, @ID_PlayerTwo, @PartNumber, @ID_Deck_PlayerOne, @ID_Deck_PlayerTwo, @ResultPart)
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+
+
+
+CREATE PROCEDURE SP_EDIT_Partie
+	@ID_Tournament INT,
+	@RoundNumber INT,
+	@ID_PlayerOne INT,
+	@ID_PlayerTwo INT,
+	@PartNumber INT,
+	@ID_Deck_PlayerOne INT,
+	@ID_Deck_PlayerTwo INT,
+	@ResultPart TINYINT,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournament IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournament and DELETED is null)) <> 1)
+			Begin
+				RAISERROR('Le tournoi est introuvable',16,1);
+			End
+
+		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournament and @RoundNumber = RoundNumber)) <> 1))
+			BEGIN
+				RAISERROR('la round n existe pas', 16, 1);
+			END
+
+		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
+			BEGIN
+				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
+			END
+
+		if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
+			BEGIN
+				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
+			END
+
+		if(@ID_Deck_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerOne and ID_User = @ID_PlayerOne and ID_Tournament = @ID_Tournament))>0)
+			BEGIN
+				RAISERROR('le deck1 nes pas bon', 16, 1);
+			END
+
+		if(@ID_Deck_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerTwo and ID_User = @ID_PlayerTwo and ID_Tournament = @ID_Tournament))>0)
+			BEGIN
+				RAISERROR('le deck2 nes pas bon', 16, 1);
+			END
+		if(@ResultPart IS NULL OR (@ResultPart <0 or @ResultPart > 2))
+			BEGIN
+				RAISERROR('le resulta est incorect', 16, 1);
+			END
+		if((SELECT COUNT(*) FROM [Partie] WHERE ([ID_Tournament] = @ID_Tournament AND [RoundNumber] = @RoundNumber AND [ID_PlayerOne] = @ID_PlayerOne AND [ID_PlayerTwo] = @ID_PlayerTwo AND [PartNumber] = @PartNumber)) <> 1)
+			BEGIN
+				RAISERROR('Partie introuvable', 16, 1);
+			END
+
+		UPDATE [Partie]
+			SET [ResultPart] = @ResultPart,
+				[ID_Deck_PlayerOne] = @ID_Deck_PlayerOne,
+				[ID_Deck_PlayerTwo] = @ID_Deck_PlayerTwo
+			WHERE ([ID_Tournament] = @ID_Tournament AND [RoundNumber] = @RoundNumber AND [ID_PlayerOne] = @ID_PlayerOne AND [ID_PlayerTwo] = @ID_PlayerTwo AND [PartNumber] = @PartNumber)
+		
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_DELETE_Partie
+	@ID_Tournament INT,
+	@RoundNumber INT,
+	@ID_PlayerOne INT,
+	@ID_PlayerTwo INT,
+	@PartNumber INT,
+	@responseMessage NVARCHAR(250) OUTPUT
+AS
+BEGIN
+	BEGIN TRY
+		if( @ID_Tournament IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournament and DELETED is null)) <> 1)
+			Begin
+				RAISERROR('Le tournoi est introuvable',16,1);
+			End
+
+		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournament and @RoundNumber = RoundNumber)) <> 1))
+			BEGIN
+				RAISERROR('la round n existe pas', 16, 1);
+			END
+
+		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
+			BEGIN
+				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
+			END
+
+		if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
+			BEGIN
+				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
+			END
+
+		DELETE [Partie]
+			WHERE ([ID_Tournament] = @ID_Tournament AND [RoundNumber] = @RoundNumber AND [ID_PlayerOne] = @ID_PlayerOne AND [ID_PlayerTwo] = @ID_PlayerTwo AND [PartNumber] = @PartNumber)
+		
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+
+
 --faire la procédure pairing 
 
 --____________________FIN CREATION STORED PROCEDURE____________________________
+
+
+
+--________________DEBUT CREATION DES LOGIN_______________________________________________
+
+
+--Add Login API
+if not exists(select * from sys.sql_logins where name = 'API_User')
+	Create Login [API_User]
+	With Password = '1234@Test',
+	Default_Database = [Tour0Suisse]	
+Go
+
+Create User [API_User]
+	For Login [API_User]
+Go
+
+
+
+--________________FIN CREATION DES LOGIN_______________________________________________
+
+--___________________DEBUT AUTORISATION_______________________________________________
+
+
+GRANT VIEW DEFINITION ON TYPE::[dbo].[ID_List]   To [API_User]
+GO
+
+GRANT CONTROL ON TYPE::[dbo].[ID_List]       To [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON TYPE::[dbo].[List_Deck]   To [API_User]
+GO
+
+GRANT CONTROL ON TYPE::[dbo].[List_Deck]       To [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON TYPE::[dbo].[List_Pairing]   To [API_User]
+GO
+
+GRANT CONTROL ON TYPE::[dbo].[List_Pairing]       To [API_User]
+GO
+
+
+Grant execute 
+	on [dbo].[SP_ADD_PseudoIG] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_AddAdmin] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_AddGame] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_CREATE_Match] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_CREATE_Match_ALLPairing] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_CREATE_Partie] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_CREATE_Round] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_Create_User] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_CreateTournoi] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_DELETE_Match] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_DELETE_Partie] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_Delete_PseudoIG] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_DELETE_Round] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_DELETE_RoundAndMatch] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_DELETEAdmin] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_DELETEDResultat] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_DELETEGame] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_DeleteTournoi] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_DeleteUser] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_EDIT_Match] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_EDIT_Partie] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_EDIT_PseudoIG] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_EDITAdmin] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_EDITGame] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_EDITResultat] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_EditTournoi] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_EditUser] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_EndTournoi] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_RegisterTournoi] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_UnregisterTournoi] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_UpdateDeck] To [API_User]
+GO
+
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_ClassementTemporaire] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_ClassementTemporaire] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_ClassementTemporaire] TO [API_User]
+GO
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_Deck] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_Deck] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_Deck] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_DeletedUser] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_DeletedUser] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_DeletedUser] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_DeletedTournament] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_DeletedTournament] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_DeletedTournament] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_Jeu] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_Jeu] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_Jeu] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_Match] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_Match] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_Match] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_Orga] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_Orga] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_Orga] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_Participant] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_Participant] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_Participant] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_Partie] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_Partie] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_Partie] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_Pseudo] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_Pseudo] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_Pseudo] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_Resulta] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_Resulta] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_Resulta] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_ResultMatchPlayer] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_ResultMatchPlayer] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_ResultMatchPlayer] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_ResultPartPlayer] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_ResultPartPlayer] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_ResultPartPlayer] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_Round] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_Round] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_Round] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_ScoreClassementTemporaire] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_ScoreClassementTemporaire] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_ScoreClassementTemporaire] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_Tournament] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_Tournament] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_Tournament] TO [API_User]
+GO
+
+
+
+GRANT VIEW DEFINITION ON [dbo].[View_User] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_User] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_User] TO [API_User]
+GO
+
+
+
+
+--___________________FIN AUTORISATION_______________________________________________
+
+
+use master
+GO
