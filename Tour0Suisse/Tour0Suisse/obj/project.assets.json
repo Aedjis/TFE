@@ -4618,6 +4618,7 @@
       },
       "Tour0Suisse.Model/1.0.0": {
         "type": "project",
+        "framework": ".NETCoreApp,Version=v2.1",
         "compile": {
           "bin/placeholder/Tour0Suisse.Model.dll": {}
         },

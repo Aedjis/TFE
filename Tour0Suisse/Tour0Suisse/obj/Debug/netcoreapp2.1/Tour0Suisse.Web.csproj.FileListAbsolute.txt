@@ -36,3 +36,4 @@ E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreap
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\bin\Debug\netcoreapp2.1\Tour0Suisse.Model.dll
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\bin\Debug\netcoreapp2.1\Tour0Suisse.Model.pdb
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Tournament\Create.g.cshtml.cs
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\bin\Debug\netcoreapp2.1\Tour0Suisse.Model.dll.config

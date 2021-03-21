@@ -1,0 +1,11 @@
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\bin\Debug\netcoreapp2.1\Tour0Suisse.Repository.deps.json
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\bin\Debug\netcoreapp2.1\Tour0Suisse.Repository.runtimeconfig.json
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\bin\Debug\netcoreapp2.1\Tour0Suisse.Repository.runtimeconfig.dev.json
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\bin\Debug\netcoreapp2.1\Tour0Suisse.Repository.dll
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\obj\Debug\netcoreapp2.1\Tour0Suisse.Repository.csproj.CoreCompileInputs.cache
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\obj\Debug\netcoreapp2.1\Tour0Suisse.Repository.AssemblyInfoInputs.cache
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\obj\Debug\netcoreapp2.1\Tour0Suisse.Repository.AssemblyInfo.cs
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\obj\Debug\netcoreapp2.1\Tour0Suisse.Repository.csprojAssemblyReference.cache
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\bin\Debug\netcoreapp2.1\Tour0Suisse.Repository.pdb
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\obj\Debug\netcoreapp2.1\Tour0Suisse.Repository.dll
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\obj\Debug\netcoreapp2.1\Tour0Suisse.Repository.pdb
