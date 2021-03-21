@@ -118,6 +118,7 @@ ID_Tournament INT NOT NULL IDENTITY(1,1),
 [Date] DATETIME NOT NULL,
 [Desciption] TEXT NULL,
 ID_Game INT NOT NULL,
+[MaxNumberPlayer] INT NULL DEFAULT(NULL),
 [DeckListNumber] INT NOT NULL DEFAULT(0),
 [PPWin] INT NOT NULL DEFAULT(2),
 [PPDraw] INT NOT NULL DEFAULT(1),
@@ -205,6 +206,7 @@ GO
 CREATE TABLE [Joueur](  --fait doublons avec le tablme deck joueur
 ID_Tournament INT NOT NULL,
 ID_User INT NOT NULL,
+RegisterDate DateTime DEFAULT(GETDATE()),
 CheckIn DateTime NULL,
 [Drop] BIT NOT NULL DEFAULT(0),
 
@@ -384,13 +386,13 @@ WHERE DELETED is not null and ID_User >0
 GO
 
 CREATE VIEW [View_Tournament] AS
-SELECT ID_Tournament, ID_Game, [Name], [Date], [DeckListNumber], [PPWin], [PPDraw], [PPLose]
+SELECT ID_Tournament, ID_Game, [Name], [Date], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose]
 FROM Tournoi
 WHERE DELETED is null
 GO
 
 CREATE VIEW [View_DeletedTournament] AS
-SELECT ID_Tournament, ID_Game, [Name], [Date], [DeckListNumber], [PPWin], [PPDraw], [PPLose]
+SELECT ID_Tournament, ID_Game, [Name], [Date], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose]
 FROM Tournoi
 WHERE DELETED is not null
 GO
@@ -405,7 +407,7 @@ JOIN Utilisateur as U
 GO
 
 CREATE VIEW [View_Participant] AS
-SELECT DISTINCT J.ID_Tournament, t.[Name], J.ID_User, U.Pseudo, J.CheckIn, J.[Drop]
+SELECT DISTINCT J.ID_Tournament, t.[Name], J.ID_User, U.Pseudo, J.RegisterDate, J.CheckIn, J.[Drop]
 FROM Joueur as J
 JOIN Tournoi as T
 	ON J.ID_Tournament = T.ID_Tournament
@@ -853,6 +855,7 @@ CREATE PROCEDURE SP_CreateTournoi
 	@Date DATETIME,
 	@ID_Game INT,
 	@Description TEXT,
+	@MaxNumberPlayer INT,
 	@DeckListNumber INT =0,
 	@PPWin INT =2,
 	@PPDraw INT =1,
@@ -862,6 +865,10 @@ AS
 BEGIN
 	BEGIN TRANSACTION
 		BEGIN TRY
+			if( @MaxNumberPlayer is null or @MaxNumberPlayer = 0)
+				BEGIN
+					SET @MaxNumberPlayer = NULL;
+				END
 			if(@Name IS NULL OR (TRIM(@Name)) ='')
 				BEGIN
 					RAISERROR('Le nom du tournoi est vide',16,1);
@@ -891,8 +898,8 @@ BEGIN
 					SET @PPLose = 0;
 				END
 
-				INSERT INTO Tournoi ([Name], [Date], [ID_Game], [Desciption], [DeckListNumber], [PPWin], [PPDraw], [PPLose])
-					VALUES(@Name, @Date, @ID_Game, @Description, @DeckListNumber, @PPWin, @PPDraw, @PPLose) 
+				INSERT INTO Tournoi ([Name], [Date], [ID_Game], [Desciption], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose])
+					VALUES(@Name, @Date, @ID_Game, @Description, @MaxNumberPlayer, @DeckListNumber, @PPWin, @PPDraw, @PPLose) 
 
 				SET @responseMessage='le tournoi a été creer';
 			COMMIT;
@@ -910,6 +917,7 @@ CREATE PROCEDURE SP_EditTournoi
 	@Name VARCHAR(50) =NULL,
 	@ID_Game INT =NULL,
 	@Description TEXT = NULL,
+	@MaxNumberPlayer INT =NULL,
 	@DeckListNumber INT =NULL,
 	@PPWin INT =NULL,
 	@PPDraw INT =NULL,
@@ -919,6 +927,10 @@ AS
 BEGIN
 	BEGIN TRANSACTION
 		BEGIN TRY
+			if( @MaxNumberPlayer is null or @MaxNumberPlayer = 0)
+				BEGIN
+					SET @MaxNumberPlayer = NULL;
+				END
 			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) = 1)
 				Begin
 					RAISERROR('Le tournoi est introuvable',16,1);
@@ -938,7 +950,7 @@ BEGIN
 
 			
 
-			if(@Name is null and @Date is null and @ID_Game is null and @PPWin is null and @PPDraw is null and @PPLose is null and @DeckListNumber is null and @Description is null)
+			if(@Name is null and @Date is null and @ID_Game is null and @PPWin is null and @PPDraw is null and @PPLose is null and @DeckListNumber is null and @Description is null and @MaxNumberPlayer is null)
 				BEGIN
 					RAISERROR('Aucune update',16,1);
 				END
@@ -948,6 +960,7 @@ BEGIN
 				[Date] = ISNULL(@Date, [Date]),
 				[ID_Game] = ISNULL(@ID_Game, [ID_Game]),
 				[Desciption] = ISNULL(@Description, [Desciption]),
+				[MaxNumberPlayer] = @MaxNumberPlayer,
 				[DeckListNumber] = ISNULL(@DeckListNumber, [DeckListNumber]),
 				[PPWin] = ISNULL(@PPWin, [PPWin]),
 				[PPDraw] = ISNULL(@PPDraw, [PPDraw]),
