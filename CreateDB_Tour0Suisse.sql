@@ -202,19 +202,20 @@ CONSTRAINT PK_Organizer__XXXX PRIMARY KEY(ID_Tournament, ID_User)
 )ON Tournoi
 GO
 
---CREATE TABLE [Joueur](  --fait doublons avec le tablme deck joueur
---ID_Tournament INT NOT NULL,
---ID_User INT NOT NULL,
+CREATE TABLE [Joueur](  --fait doublons avec le tablme deck joueur
+ID_Tournament INT NOT NULL,
+ID_User INT NOT NULL,
+CheckIn DateTime NULL,
+[Drop] BIT NOT NULL DEFAULT(0),
 
---CONSTRAINT PK_Player__XXXX PRIMARY KEY(ID_Tournament, ID_User)
---)ON Tournoi
---GO
+CONSTRAINT PK_Player__XXXX PRIMARY KEY(ID_Tournament, ID_User)
+)ON Tournoi
+GO
 
 CREATE TABLE [DeckJoueur](
 ID_Tournament INT NOT NULL,
 ID_User INT NOT NULL,
 ID_Deck INT NOT NULL,
-[Drop] BIT NOT NULL DEFAULT(0),
 
 CONSTRAINT PK_DeckPlayer__XXXX PRIMARY KEY(ID_Tournament, ID_User, ID_Deck)
 )ON Tournoi
@@ -314,20 +315,20 @@ ADD CONSTRAINT FK_Organisateur_Tournoi__XXXX	FOREIGN KEY (ID_Tournament)
 												REFERENCES [Tournoi](ID_Tournament)
 GO
 
---ALTER TABLE [Joueur]
---ADD CONSTRAINT FK_Joueur_Utilisateur__XXXX	FOREIGN KEY (ID_User)
---											REFERENCES [UTilisateur](ID_User)
---GO
+ALTER TABLE [Joueur]
+ADD CONSTRAINT FK_Joueur_Utilisateur__XXXX	FOREIGN KEY (ID_User)
+											REFERENCES [UTilisateur](ID_User)
+GO
 
---ALTER TABLE [Joueur]
---ADD CONSTRAINT FK_Joueur_Tournoi__XXXX	FOREIGN KEY (ID_Tournament)
---										REFERENCES [Tournoi](ID_Tournament)
---GO
+ALTER TABLE [Joueur]
+ADD CONSTRAINT FK_Joueur_Tournoi__XXXX	FOREIGN KEY (ID_Tournament)
+										REFERENCES [Tournoi](ID_Tournament)
+GO
 
---ALTER TABLE [DeckJoueur]
---ADD CONSTRAINT FK_DeckJoueur_Utilisateur__XXXX	FOREIGN KEY (ID_User)
---												REFERENCES [Utilisateur](ID_User)
---GO
+ALTER TABLE [DeckJoueur]
+ADD CONSTRAINT FK_DeckJoueur_Utilisateur__XXXX	FOREIGN KEY (ID_User)
+												REFERENCES [Utilisateur](ID_User)
+GO
 
 ALTER TABLE [DeckJoueur]
 ADD CONSTRAINT FK_DeckJoueur_Tournoi__XXXX	FOREIGN KEY (ID_Tournament)
@@ -395,7 +396,7 @@ WHERE DELETED is not null
 GO
 
 CREATE VIEW [View_Orga] AS
-SELECT O.ID_Tournament, t.Name, O.ID_User, U.Pseudo, O.[Level]
+SELECT O.ID_Tournament, t.[Name], O.ID_User, U.Pseudo, O.[Level]
 FROM Organisateur as O
 JOIN Tournoi as T
 	ON O.ID_Tournament = T.ID_Tournament
@@ -404,8 +405,8 @@ JOIN Utilisateur as U
 GO
 
 CREATE VIEW [View_Participant] AS
-SELECT DISTINCT J.ID_Tournament, t.Name, J.ID_User, U.Pseudo
-FROM DeckJoueur as J
+SELECT DISTINCT J.ID_Tournament, t.[Name], J.ID_User, U.Pseudo, J.CheckIn, J.[Drop]
+FROM Joueur as J
 JOIN Tournoi as T
 	ON J.ID_Tournament = T.ID_Tournament
 JOIN Utilisateur as U
@@ -1103,11 +1104,10 @@ BEGIN
 					CLOSE ListDeckCursor;
 					DEALLOCATE ListDeckCursor;
 				END
-			ELSE
-				BEGIN
-					INSERT INTO DeckJoueur ([ID_Tournament], [ID_User], [ID_Deck])
-						VALUES(@ID_Tournoi, @ID_User, 0)
-				END
+
+			INSERT INTO Joueur ([ID_Tournament], [ID_User])
+				VALUES(@ID_Tournoi, @ID_User)
+				
 
 			COMMIT;
 		END TRY
@@ -1136,6 +1136,8 @@ BEGIN
 				End
 			
 			DELETE DeckJoueur
+			WHERE [ID_Tournament] = @ID_Tournoi AND [ID_User] = @ID_User
+			DELETE Joueur
 			WHERE [ID_Tournament] = @ID_Tournoi AND [ID_User] = @ID_User
 
 			COMMIT;
@@ -1601,7 +1603,7 @@ BEGIN
 				RAISERROR('la round existe déjà', 16, 1);
 			END
 
-		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerOne)) <> 1 )
+		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerOne)) <> 1 )
 			BEGIN
 				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
 			END
@@ -1611,7 +1613,7 @@ BEGIN
 				INSERT INTO [Match] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo])
 					VALUES(@ID_Tournoi, @RoundNumber, @ID_PlayerOne, 0)
 			END
-		else if((SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerTwo)) <> 1 )
+		else if((SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerTwo)) <> 1 )
 			BEGIN
 				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
 			END
@@ -1658,7 +1660,7 @@ BEGIN
 
 		if	(
 				CEILING((SELECT COUNT(distinct [ID_User])
-				FROM DeckJoueur
+				FROM Joueur
 				WHERE [ID_Tournament] = @ID_Tournoi and [Drop] = 0)
 				*0.5)
 				=
@@ -1671,7 +1673,7 @@ BEGIN
 
 		if	(
 				(SELECT count(distinct [ID_User])
-				FROM DeckJoueur
+				FROM Joueur
 				WHERE [ID_Tournament] = @ID_Tournoi and [Drop] = 0 AND  EXISTS(	SELECT ID_PlayerOne
 																				FROM @Pairing
 																				UNION
@@ -1679,7 +1681,7 @@ BEGIN
 																				FROM @Pairing))
 				=
 				(SELECT count(distinct [ID_User])
-				FROM DeckJoueur
+				FROM Joueur
 				WHERE [ID_Tournament] = @ID_Tournoi and [Drop] = 0 )
 			)
 			BEGIN
@@ -1720,12 +1722,12 @@ BEGIN
 				RAISERROR('la round existe déjà', 16, 1);
 			END
 
-		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerOne)) <> 1 )
+		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerOne)) <> 1 )
 			BEGIN
 				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
 			END
 
-		if((SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerTwo)) <> 1 )
+		if((SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerTwo)) <> 1 )
 			BEGIN
 				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
 			END
@@ -1817,12 +1819,12 @@ BEGIN
 				RAISERROR('la round n existe pas', 16, 1);
 			END
 
-		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
+		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
 			BEGIN
 				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
 			END
 
-		if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
+		if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
 			BEGIN
 				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
 			END
@@ -1879,12 +1881,12 @@ BEGIN
 				RAISERROR('la round n existe pas', 16, 1);
 			END
 
-		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
+		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
 			BEGIN
 				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
 			END
 
-		if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
+		if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
 			BEGIN
 				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
 			END
@@ -1942,12 +1944,12 @@ BEGIN
 				RAISERROR('la round n existe pas', 16, 1);
 			END
 
-		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
+		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
 			BEGIN
 				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
 			END
 
-		if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
+		if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
 			BEGIN
 				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
 			END
