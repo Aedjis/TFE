@@ -1,0 +1,73 @@
+﻿@model Tour0Suisse.Model.Utilisateur
+
+@{
+    ViewData["Title"] = "UpdateProfil";
+}
+
+<h2>UpdateProfil</h2>
+
+<h4>Utilisateur</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-controller="User" asp-action="Edit" method="post" class="form-horizontal">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Pseudo" class="control-label"></label>
+                <input asp-for="Pseudo" class="form-control" maxlength="50" required />
+                <span asp-validation-for="Pseudo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" class="form-control" type="email" required />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" type="password" id="Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="doit contenir un nombre une minuscule, une majuscule et au moins 8 characteres" required />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label>Confirmation du mot de passe : </label>
+                <input name="PasswordConf" type="password" id="PasswordConf" required />
+            </div>
+            <div class="form-group">
+                <div class="checkbox">
+                    <label>
+                        <input asp-for="Organizer" /> @Html.DisplayNameFor(model => model.Organizer)
+                    </label>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Delete" asp-route-id="@Model.IdUser">Supprimer votre compte</a> |
+    <a asp-action="Details">Retourner au profil</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<script>
+    var pw = document.getElementById("Password");
+    var cpw = document.getElementById("PasswordConf");
+    function CheckPassword() {
+        if (pw.value != cpw.value) {
+            //getElementById("Submit").disable = true;
+            cpw.setCustomValidity("Les mots de passe ne concorde pas!");
+        } else {
+            //getElementById("Submit").disable = false;
+            cpw.setCustomValidity('');
+        }
+    }
+
+    pw.onkeyup = CheckPassword;
+    cpw.onkeyup = CheckPassword;
+</script>

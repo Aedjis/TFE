@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using Tour0Suisse.Web.Data;
 
 namespace Tour0Suisse
 {
@@ -25,7 +26,11 @@ namespace Tour0Suisse
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            //DEBUT MODIF
+            //modif pour fair fonction apicontext
+            services.AddDbContext<APIcontext>();
+            //fin modif
+
+            //DEBUT MODIF (pour les cookie)
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {

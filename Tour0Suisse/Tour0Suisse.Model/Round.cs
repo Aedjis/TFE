@@ -7,7 +7,7 @@ namespace Tour0Suisse.Model
     {
         public Round()
         {
-            Match = new HashSet<Match>();
+            //Match = new HashSet<Match>(); ereur inconu
         }
 
         public int IdTournament { get; set; }

@@ -5,9 +5,11 @@ VisualStudioVersion = 16.0.29102.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tour0Suisse.Web", "Tour0Suisse\Tour0Suisse.Web.csproj", "{67ED4EAE-AD35-455E-AB6F-094BF296B6A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tour0Suisse.Repository", "Tour0Suisse.Repository\Tour0Suisse.Repository.csproj", "{45683F8E-919F-44DA-B38C-BB9EBD1412F3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tour0Suisse.Repository", "Tour0Suisse.Repository\Tour0Suisse.Repository.csproj", "{45683F8E-919F-44DA-B38C-BB9EBD1412F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tour0Suisse.Model", "Tour0Suisse.Model\Tour0Suisse.Model.csproj", "{5323CC7A-0E3B-4AE9-A99D-90342229B77B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tour0Suisse.Model", "Tour0Suisse.Model\Tour0Suisse.Model.csproj", "{5323CC7A-0E3B-4AE9-A99D-90342229B77B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tour0Suisse.API", "Tour0Suisse.API\Tour0Suisse.API.csproj", "{59DAB052-DE60-4718-BBB8-B34AE0FBA796}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{5323CC7A-0E3B-4AE9-A99D-90342229B77B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5323CC7A-0E3B-4AE9-A99D-90342229B77B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5323CC7A-0E3B-4AE9-A99D-90342229B77B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59DAB052-DE60-4718-BBB8-B34AE0FBA796}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59DAB052-DE60-4718-BBB8-B34AE0FBA796}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59DAB052-DE60-4718-BBB8-B34AE0FBA796}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59DAB052-DE60-4718-BBB8-B34AE0FBA796}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

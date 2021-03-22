@@ -15,13 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Views\Tournament\Create.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
     <Content Update="Views\User\Profil.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Views\Home\Tournoi.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\User\InscriptionReussie.cshtml">

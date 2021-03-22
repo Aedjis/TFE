@@ -1,0 +1,17 @@
+﻿@model Tour0Suisse.Model.Utilisateur
+
+@{
+    ViewData["Title"] = "DeletedCompte";
+}
+
+<h2>Supprimer son compte</h2>
+
+<h3>Etes-vous sur de vouloir supprimer votre compte?</h3>
+
+<div>
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="IdUser" />
+        <input type="submit" value="Delete" class="btn btn-default" /> |
+        <a asp-action="Details">Retourner au profil</a>
+    </form>
+</div>

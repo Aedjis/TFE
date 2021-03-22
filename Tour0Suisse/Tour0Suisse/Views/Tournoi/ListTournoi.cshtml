@@ -1,0 +1,54 @@
+﻿@model IEnumerable<Tour0Suisse.Model.Tournoi>
+
+@{
+    ViewData["Title"] = "ListTournoi";
+}
+
+<h2>ListTournoi</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Desciption)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdGame)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeckListNumber)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Desciption)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdGame)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DeckListNumber)
+            </td>
+            <td>
+                @Html.ActionLink("S'inscire", "Register", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

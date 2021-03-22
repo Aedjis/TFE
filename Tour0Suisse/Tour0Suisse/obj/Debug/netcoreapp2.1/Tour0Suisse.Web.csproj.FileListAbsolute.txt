@@ -15,7 +15,6 @@ E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreap
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Tour0Suisse.Web.RazorCoreGenerate.cache
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Home\Index.g.cshtml.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Home\Privacy.g.cshtml.cs
-E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Home\Tournoi.g.cshtml.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Shared\Error.g.cshtml.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Shared\_CookieConsentPartial.g.cshtml.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Shared\_Layout.g.cshtml.cs
@@ -35,5 +34,8 @@ E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreap
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Tour0Suisse.Web.csprojAssemblyReference.cache
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\bin\Debug\netcoreapp2.1\Tour0Suisse.Model.dll
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\bin\Debug\netcoreapp2.1\Tour0Suisse.Model.pdb
-E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Tournament\Create.g.cshtml.cs
-E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\bin\Debug\netcoreapp2.1\Tour0Suisse.Model.dll.config
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\User\UpdateProfil.g.cshtml.cs
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\User\DeletedCompte.g.cshtml.cs
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\User\AllUser.g.cshtml.cs
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Tournoi\ListTournoi.g.cshtml.cs
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Tournoi\CreateTournoi.g.cshtml.cs
