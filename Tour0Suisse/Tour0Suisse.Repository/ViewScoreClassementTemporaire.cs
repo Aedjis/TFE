@@ -11,5 +11,7 @@ namespace Tour0Suisse.Repository
         public int? Victoire { get; set; }
         public int? Egaliter { get; set; }
         public int? Defaite { get; set; }
+        public string IGPseudo { get; set; }
+        public string Pseudo { get; set; }
     }
 }

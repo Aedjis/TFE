@@ -365,13 +365,12 @@ GO
 
 --____________DEBUT CREATION DES VUES________________________
 CREATE VIEW [View_User] AS
-SELECT ID_User, Pseudo, Email, [Password], Organizer
+SELECT ID_User, Pseudo, Email, [Password], Organizer, DELETED
 FROM Utilisateur
-WHERE DELETED is null and ID_User >0
 GO
 
 CREATE VIEW [View_Pseudo] AS
-SELECT P.ID_User, U.Pseudo, P.ID_Game, J.[Name], IG_Pseudo
+SELECT P.ID_User AS ID_User, U.Pseudo AS Pseudo, P.ID_Game AS ID_Game, J.[Name] AS [Game], IG_Pseudo
 FROM PseudoIG AS P
 JOIN Utilisateur AS U
 	ON P.ID_User = U.ID_User
@@ -379,22 +378,11 @@ JOIN Jeu AS J
 	ON P.ID_Game = J.ID_Game
 GO
 
-CREATE VIEW [View_DeletedUser] AS
-SELECT ID_User, Pseudo, Email, [Password], Organizer
-FROM Utilisateur
-WHERE DELETED is not null and ID_User >0
-GO
-
 CREATE VIEW [View_Tournament] AS
-SELECT ID_Tournament, ID_Game, [Name], [Date], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose]
-FROM Tournoi
-WHERE DELETED is null
-GO
-
-CREATE VIEW [View_DeletedTournament] AS
-SELECT ID_Tournament, ID_Game, [Name], [Date], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose]
-FROM Tournoi
-WHERE DELETED is not null
+SELECT ID_Tournament, T.[Name] AS [Name], T.ID_Game AS ID_Game, J.[Name] AS [Game], [Date], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose], T.DELETED
+FROM Tournoi AS T
+JOIN Jeu AS J
+	ON T.ID_Game = J.ID_Game
 GO
 
 CREATE VIEW [View_Orga] AS
@@ -406,38 +394,38 @@ JOIN Utilisateur as U
 	ON O.ID_User = u.Pseudo
 GO
 
-CREATE VIEW [View_Participant] AS
-SELECT DISTINCT J.ID_Tournament, t.[Name], J.ID_User, U.Pseudo, J.RegisterDate, J.CheckIn, J.[Drop]
+CREATE VIEW [View_Participant] AS 
+SELECT DISTINCT J.ID_Tournament, t.[Name], J.ID_User, VP.Pseudo, VP.IG_Pseudo, J.RegisterDate, J.CheckIn, J.[Drop]
 FROM Joueur as J
 JOIN Tournoi as T
 	ON J.ID_Tournament = T.ID_Tournament
-JOIN Utilisateur as U
-	ON J.ID_User = u.Pseudo
+JOIN View_Pseudo as VP
+	ON J.ID_User = VP.ID_User and T.ID_Game = VP.ID_Game
 GO
 
 CREATE VIEW [View_Jeu] AS
-SELECT ID_Game, [Name]
-FROM Jeu
+SELECT ID_Game, [Name], DELETED
+FROM Jeu 
 GO
 
-CREATE VIEW [View_Resulta] AS
-SELECT R.ID_Tournament, T.Name, R.ID_User, U.Pseudo, R.Rank, R.Score, R.TieBreaker, R.AdditionalTieBreaker, R.AdditionalTieBreakerRules
+CREATE VIEW [View_Resulta] AS 
+SELECT R.ID_Tournament, T.Name, R.ID_User, VP.Pseudo, VP.IG_Pseudo, R.Rank, R.Score, R.TieBreaker, R.AdditionalTieBreaker, R.AdditionalTieBreakerRules
 FROM Resultat as R
 JOIN Tournoi as T
 	ON T.ID_Tournament = R.ID_Tournament
-JOIN Utilisateur as U
-	ON U.ID_User = R.ID_User
+JOIN View_Pseudo as VP
+	ON R.ID_User = VP.ID_User and T.ID_Game = VP.ID_Game
 GO
 
-CREATE VIEW [View_Partie] AS
-SELECT P.ID_Tournament, T.Name, P.RoundNumber, P.PartNumber, P.ResultPart, P.ID_PlayerOne, UOne.Pseudo AS [PlayerOne], P.ID_Deck_PlayerOne, DOne.DeckList AS [DeckOne], UTwo.Pseudo AS [PlayerTwo], P.ID_Deck_PlayerTwo, DTwo.DeckList AS [DeckTwo]
+CREATE VIEW [View_Partie] AS 
+SELECT P.ID_Tournament, T.Name, P.RoundNumber, P.PartNumber, P.ResultPart, P.ID_PlayerOne, VPOne.Pseudo AS [PlayerOne], VPOne.IG_Pseudo AS[IGPseudoOne], P.ID_Deck_PlayerOne, DOne.DeckList AS [DeckOne], P.ID_PlayerTwo, VPTwo.Pseudo AS [PlayerTwo], VPTwo.IG_Pseudo AS[IGPseudoTwo], P.ID_Deck_PlayerTwo, DTwo.DeckList AS [DeckTwo]
 FROM Partie as P
 JOIN Tournoi as T
 	ON T.ID_Tournament = p.ID_Tournament
-JOIN Utilisateur as UOne
-	ON UOne.ID_User = P.ID_PlayerOne
-JOIN Utilisateur as UTwo
-	ON UTwo.ID_User = P.ID_PlayerTwo
+JOIN View_Pseudo as VPOne
+	ON VPOne.ID_User = P.ID_PlayerOne
+JOIN View_Pseudo as VPTwo
+	ON VPTwo.ID_User = P.ID_PlayerTwo
 JOIN Deck as DOne
 	ON DOne.ID_Deck = P.ID_Deck_PlayerOne
 JOIN Deck as DTwo
@@ -445,7 +433,7 @@ JOIN Deck as DTwo
 GO
 
 CREATE VIEW[View_Deck] AS
-SELECT DJ.ID_Tournament, T.Name, DJ.ID_User, U.Pseudo, DJ.ID_Deck, D.DeckList
+SELECT DJ.ID_Tournament, T.Name, DJ.ID_User, U.Pseudo, DJ.ID_Deck, D.DeckList, J.ID_Game, J.Name AS [Game]
 FROM DeckJoueur AS DJ
 JOIN Deck AS D
 	ON D.ID_Deck = DJ.ID_Deck
@@ -453,66 +441,86 @@ JOIN Tournoi AS T
 	ON T.ID_Tournament = DJ.ID_Tournament
 JOIN Utilisateur AS U
 	ON U.ID_User = DJ.ID_User
+JOIN Jeu AS J
+	ON J.ID_Game = T.ID_Game
 GO
 
 CREATE VIEW [View_ResultPartPlayer] AS
-SELECT ID_Tournament, RoundNumber, PartNumber, ID_PlayerOne AS ID_Player,	CASE ResultPart
-																				WHEN 2
-																				THEN -1
-																				ELSE ResultPart
-																			END AS Resulta
-FROM Partie
-WHERE ID_Tournament IN (SELECT ID_Tournament FROM Tournoi WHERE [Over] = 0)
+SELECT P.ID_Tournament, RoundNumber, PartNumber, ID_PlayerOne AS ID_Player, VP.Pseudo, VP.IG_Pseudo,	CASE ResultPart
+																											WHEN 2
+																											THEN -1
+																											ELSE ResultPart
+																										END AS Resulta
+FROM Partie AS P
+JOIN Tournoi AS T
+	ON T.ID_Tournament = P.ID_Tournament
+JOIN View_Pseudo AS VP
+	ON VP.ID_User = P.ID_PlayerOne AND VP.ID_Game = T.ID_Game
+WHERE P.ID_Tournament IN (SELECT ID_Tournament FROM Tournoi WHERE [Over] = 0)
 union
-SELECT ID_Tournament, RoundNumber, PartNumber, ID_PlayerTWO AS ID_Player,	CASE ResultPart
-																				WHEN 2
-																				THEN 1
-																				WHEN null
-																				THEN null
-																				ELSE (0-ResultPart)
-																			END AS Resulta
-FROM Partie
-WHERE ID_Tournament IN (SELECT ID_Tournament FROM Tournoi WHERE [Over] = 0)
+SELECT P.ID_Tournament, RoundNumber, PartNumber, ID_PlayerTWO AS ID_Player, VP.Pseudo, VP.IG_Pseudo,	CASE ResultPart
+																											WHEN 2
+																											THEN 1
+																											WHEN null
+																											THEN null
+																											ELSE (0-ResultPart)
+																										END AS Resulta
+FROM Partie AS P
+JOIN Tournoi AS T
+	ON T.ID_Tournament = P.ID_Tournament
+JOIN View_Pseudo AS VP
+	ON VP.ID_User = P.ID_PlayerTWO AND VP.ID_Game = T.ID_Game
+WHERE P.ID_Tournament IN (SELECT ID_Tournament FROM Tournoi WHERE [Over] = 0)
 GO
 
 CREATE VIEW [View_Match] AS
-SELECT [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo], [ID_Tournament]
-FROM [Match]
+SELECT M.[ID_Tournament], [RoundNumber], [ID_PlayerOne], VPO.Pseudo AS [PlayerOne], VPO.IG_Pseudo AS [PseudoPlayerOne], [ID_PlayerTwo], VPT.Pseudo AS [PlayerTow], VPT.IG_Pseudo AS [PseudoPlayerTow]
+FROM [Match] AS M
+JOIN Tournoi AS T
+	ON T.ID_Tournament = M.ID_Tournament
+JOIN View_Pseudo AS VPO
+	ON VPO.ID_User = M.ID_PlayerOne AND VPO.ID_Game = T.ID_Game
+JOIN View_Pseudo AS VPT
+	ON VPT.ID_User = M.ID_PlayerTwo AND VPT.ID_Game = T.ID_Game
 GO
 
 CREATE VIEW [View_ResultMatchPlayer] AS
-SELECT ID_Tournament, RoundNumber, ID_Player,	CASE 
-													WHEN SUM(Resulta) >0
-													THEN 1
-													WHEN SUM(Resulta) <0
-													THEN -1
-													WHEN SUM(Resulta) =0
-													THEN 0
-													ELSE null
-												END AS Resulta
+SELECT ID_Tournament, RoundNumber, ID_Player, Pseudo, IG_Pseudo, 	CASE 
+																		WHEN SUM(Resulta) >0
+																		THEN 1
+																		WHEN SUM(Resulta) <0
+																		THEN -1
+																		WHEN SUM(Resulta) =0
+																		THEN 0
+																		ELSE null
+																	END AS Resulta
 FROM [View_ResultPartPlayer]
-GROUP BY ID_Tournament, RoundNumber, ID_Player
+GROUP BY ID_Tournament, RoundNumber, ID_Player, Pseudo, IG_Pseudo
 UNION
-SELECT ID_Tournament, RoundNumber, ID_PlayerOne AS ID_Player,	1 AS Resulta
+SELECT ID_Tournament, RoundNumber, ID_PlayerOne AS ID_Player, [PlayerOne] AS Pseudo, [PseudoPlayerOne] AS IG_Pseudo ,	1 AS Resulta
 FROM [View_Match]
 WHERE ID_PlayerTwo = 0
-GROUP BY ID_Tournament, RoundNumber, ID_PlayerOne
+GROUP BY ID_Tournament, RoundNumber, ID_PlayerOne, [PlayerOne], [PseudoPlayerOne]
 GO
 
 CREATE VIEW [View_ClassementTemporaire] AS
 SELECT	ID_Tournament, 
 		ID_Player, 
+		Pseudo, 
+		IG_Pseudo,
 		SUM(CASE WHEN Resulta = 1 THEN 1 ELSE 0 END) AS Victoire, 
 		SUM(CASE WHEN Resulta = 0 THEN 1 ELSE 0 END) AS Egaliter, 
 		SUM(CASE WHEN Resulta = 2 THEN 1 ELSE 0 END) AS Defaite
 FROM [View_ResultMatchPlayer]
-GROUP BY ID_Tournament, ID_Player
+GROUP BY ID_Tournament, ID_Player, Pseudo, IG_Pseudo
 --ORDER BY  Victoire DESC, Egaliter DESC, Defaite ASC
 GO
 
 CREATE VIEW [View_ScoreClassementTemporaire] AS
 SELECT	V.ID_Tournament, 
 		ID_Player, 
+		Pseudo, 
+		IG_Pseudo,
 		(V.Victoire * T.PPWin + V.Egaliter * T.PPDraw + V.Defaite * T.PPLose) AS Score,
 		Victoire, 
 		Egaliter, 
@@ -598,11 +606,13 @@ CREATE PROCEDURE SP_ADD_PseudoIG
 	@ID_User INT,
 	@ID_Game INT,
 	@PseudoIG VARCHAR(50),
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
 	
 	SET @responseMessage = '';
+	SET @Reussie = 1;
 
 	BEGIN TRANSACTION
 		BEGIN TRY
@@ -628,6 +638,7 @@ BEGIN
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE() ;
+			SET @Reussie = 0;
 			ROLLBACK;
 		END CATCH
 END
@@ -637,11 +648,13 @@ CREATE PROCEDURE SP_EDIT_PseudoIG
 	@ID_User INT,
 	@ID_Game INT,
 	@PseudoIG VARCHAR(50),
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
 	
 	SET @responseMessage = '';
+	SET @Reussie = 1;
 
 	BEGIN TRANSACTION
 		BEGIN TRY
@@ -668,6 +681,7 @@ BEGIN
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE() ;
+			SET @Reussie = 0;
 			ROLLBACK;
 		END CATCH
 END
@@ -676,11 +690,13 @@ GO
 CREATE PROCEDURE SP_Delete_PseudoIG
 	@ID_User INT,
 	@ID_Game INT,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
 	
 	SET @responseMessage = '';
+	SET @Reussie = 1;
 
 	BEGIN TRANSACTION
 		BEGIN TRY
@@ -701,6 +717,7 @@ BEGIN
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE() ;
+			SET @Reussie = 0;
 			ROLLBACK;
 		END CATCH
 END
@@ -710,11 +727,13 @@ CREATE PROCEDURE SP_Create_User
 	@Pseudo VARCHAR(50), 
 	@Email VARCHAR(256),
 	@Password BINARY(64), --soit varcahr(50) si passé en claire soit binary (64) si haché
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
 	
 	SET @responseMessage = '';	
+	SET @Reussie = 1;
 
 	BEGIN TRANSACTION;
 		BEGIN TRY
@@ -747,14 +766,9 @@ BEGIN
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE() ;
+			SET @Reussie = 0;
 			ROLLBACK;
 		END CATCH
-
-	if(@responseMessage ='' and (SELECT COUNT(*) FROM Utilisateur WHERE @Pseudo = Pseudo and @Email = Email)=1)
-	BEGIN
-		SET @responseMessage = 'Création de l utilisateur '+@Pseudo+' avec comme adresse email '+@Email;
-	END
-
 END
 GO
 
@@ -765,10 +779,13 @@ CREATE PROCEDURE SP_EditUser
 	@Pseudo VARCHAR(50) =NULL, 
 	@Email VARCHAR(256)=NULL,
 	@Password BINARY(64)=NULL, --soit varcahr(50) si passé en claire soit binary (64) si haché
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
 
+	SET @responseMessage = '';
+	SET @Reussie = 1;
 	BEGIN TRANSACTION;
 		BEGIN TRY
 			if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
@@ -786,11 +803,6 @@ BEGIN
 				Begin
 					SET @Password = NULL
 				End
-			--else
-			--	BEGIN
-			--		SET @HMDP =  HASHBYTES('SHA2_512', @Password);
-			--	END
-			-- legacy si le mot de passe était en claire
 
 			if( @Email IS NULL OR (@Email NOT LIKE '%_@__%.__%'))
 				Begin
@@ -810,12 +822,10 @@ BEGIN
 			WHERE ID_User = @ID_User
 
 			COMMIT;
-
-			SET @responseMessage='utilisateur mis a jour';
-
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
 			ROLLBACK;
 		END CATCH
 
@@ -824,9 +834,14 @@ GO
 
 CREATE PROCEDURE SP_DeleteUser
 	@ID_User INT ,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1;
+
 	BEGIN TRANSACTION
 		BEGIN TRY
 			if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
@@ -845,6 +860,7 @@ BEGIN
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
 			ROLLBACK;
 		END CATCH
 END
@@ -860,9 +876,14 @@ CREATE PROCEDURE SP_CreateTournoi
 	@PPWin INT =2,
 	@PPDraw INT =1,
 	@PPLose INT =0,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1;
+
 	BEGIN TRANSACTION
 		BEGIN TRY
 			if( @MaxNumberPlayer is null or @MaxNumberPlayer = 0)
@@ -906,6 +927,7 @@ BEGIN
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
 			ROLLBACK;
 		END CATCH
 END
@@ -922,9 +944,14 @@ CREATE PROCEDURE SP_EditTournoi
 	@PPWin INT =NULL,
 	@PPDraw INT =NULL,
 	@PPLose INT =NULL,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1;
+
 	BEGIN TRANSACTION
 		BEGIN TRY
 			if( @MaxNumberPlayer is null or @MaxNumberPlayer = 0)
@@ -972,6 +999,7 @@ BEGIN
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
 			ROLLBACK;
 		END CATCH
 END
@@ -979,9 +1007,14 @@ GO
 
 CREATE PROCEDURE SP_EndTournoi
 	@ID_Tournoi INT ,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1;
+
 	BEGIN TRANSACTION
 		BEGIN TRY
 			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
@@ -1028,6 +1061,7 @@ BEGIN
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
 			ROLLBACK;
 		END CATCH
 END
@@ -1035,9 +1069,14 @@ GO
 
 CREATE PROCEDURE SP_DeleteTournoi
 	@ID_Tournoi INT ,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1;
+
 	BEGIN TRANSACTION
 		BEGIN TRY
 			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
@@ -1056,6 +1095,7 @@ BEGIN
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
 			ROLLBACK;
 		END CATCH
 END
@@ -1065,12 +1105,17 @@ CREATE PROCEDURE SP_RegisterTournoi
 	@ID_Tournoi INT,
 	@ID_User INT,
 	@ListDeck List_Deck READONLY,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
 	DECLARE @DeckID INT = null
 	DECLARE @IDGame INT;
 	DECLARE @ListID ID_List;
+
+	SET @responseMessage = '';
+	SET @Reussie = 1;
+
 	BEGIN TRANSACTION
 		BEGIN TRY
 			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null and [Date]> GETDATE())) <> 1)
@@ -1126,6 +1171,7 @@ BEGIN
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
 			ROLLBACK;
 		END CATCH
 END
@@ -1134,9 +1180,14 @@ GO
 CREATE PROCEDURE SP_UnregisterTournoi
 	@ID_Tournoi INT,
 	@ID_User INT,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1;
+
 	BEGIN TRANSACTION
 		BEGIN TRY
 			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and [Date]> GETDATE())) <> 1)
@@ -1157,6 +1208,7 @@ BEGIN
 		END TRY
 		BEGIN CATCH
 			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
 			ROLLBACK;
 		END CATCH
 END
@@ -1167,12 +1219,17 @@ CREATE PROCEDURE SP_UpdateDeck
 	@ID_User INT,
 	@ID_Deck INT,
 	@DeckList TEXT,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
 	DECLARE @IDGame INT
 	DECLARE @IDDeck INT
 	DECLARE @ListID ID_List
+
+	SET @responseMessage = '';
+	SET @Reussie = 1;
+
 	BEGIN TRY
 		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null and [Date]> GETDATE())) <> 1)
 				Begin
@@ -1215,6 +1272,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie = 0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1224,9 +1282,14 @@ CREATE PROCEDURE SP_AddAdmin
 	@ID_Tournoi INT,
 	@ID_User INT,
 	@Level INT = 1,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1;
+
 	BEGIN TRY
 		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
 				Begin
@@ -1244,6 +1307,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie = 0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1253,9 +1317,14 @@ CREATE PROCEDURE SP_EDITAdmin
 	@ID_Tournoi INT,
 	@ID_User INT,
 	@Level INT,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1;
+
 	BEGIN TRY
 		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
 				Begin
@@ -1279,6 +1348,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie = 0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1287,9 +1357,14 @@ GO
 CREATE PROCEDURE SP_DELETEAdmin
 	@ID_Tournoi INT,
 	@ID_User INT,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1;
+
 	BEGIN TRY
 		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
 				Begin
@@ -1307,6 +1382,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie = 0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1314,9 +1390,14 @@ GO
 
 CREATE PROCEDURE SP_AddGame
 	@Name VARCHAR(50),
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1;
+
 	BEGIN TRY
 		if( @Name IS NULL OR TRIM(@Name) ='')
 				Begin
@@ -1331,6 +1412,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie = 0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1339,9 +1421,14 @@ GO
 CREATE PROCEDURE SP_EDITGame
 	@ID_Game INT,
 	@Name VARCHAR(50),
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 
 		if( @ID_Game IS NULL OR (SELECT COUNT(*) FROM Jeu WHERE (ID_Game = @ID_Game)) <> 1)
@@ -1363,6 +1450,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie = 0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1370,10 +1458,14 @@ GO
 
 CREATE PROCEDURE SP_DELETEGame
 	@ID_Game INT,
-	@Name VARCHAR(50),
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 
 		if( @ID_Game IS NULL OR (SELECT COUNT(*) FROM Jeu WHERE (ID_Game = @ID_Game)) <> 1)
@@ -1381,21 +1473,17 @@ BEGIN
 					RAISERROR('Le Nom du jeu est vide',16,1);
 				End
 
-		if( @Name IS NULL OR TRIM(@Name) ='')
-				Begin
-					RAISERROR('Le Nom du jeu est vide',16,1);
-				End
 
 		
 		UPDATE  Jeu 
-			SET [Name] = (@Name),
-				DELETED = 1
+			SET DELETED = 1
 			WHERE ID_Game = @ID_Game
 
 		COMMIT;
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie = 0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1409,9 +1497,14 @@ CREATE PROCEDURE SP_EDITResultat
 	@TieBreaker INT = NULL,
 	@AddTieBreaker INT = NULL,
 	@AddTieBreakerRules VARCHAR(50) = NULL,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 		
 		if( @ID_User IS NULL )
@@ -1448,6 +1541,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie = 0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1456,9 +1550,14 @@ GO
 CREATE PROCEDURE SP_DELETEDResultat
 	@ID_Tournament INT,
 	@ID_User INT = null,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 		if( @ID_Tournament IS NULL)
 			Begin
@@ -1485,6 +1584,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie =0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1494,9 +1594,14 @@ CREATE PROCEDURE SP_CREATE_Round
 	@ID_Tournoi INT,
 	@RoundNumber INT,
 	@Start DateTime,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
 			Begin
@@ -1521,6 +1626,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie =0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1529,9 +1635,14 @@ GO
 CREATE PROCEDURE SP_DELETE_Round
 	@ID_Tournoi INT,
 	@RoundNumber INT,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi)) <> 1)
 			Begin
@@ -1555,6 +1666,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie =0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1563,9 +1675,14 @@ GO
 CREATE PROCEDURE SP_DELETE_RoundAndMatch
 	@ID_Tournoi INT,
 	@RoundNumber INT,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi)) <> 1)
 			Begin
@@ -1592,6 +1709,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie =0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1602,9 +1720,14 @@ CREATE PROCEDURE SP_CREATE_Match
 	@RoundNumber INT,
 	@ID_PlayerOne INT,
 	@ID_PlayerTwo INT = 0,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
 			Begin
@@ -1641,6 +1764,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie=0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1652,9 +1776,14 @@ CREATE PROCEDURE SP_CREATE_Match_ALLPairing
 	@ID_Tournoi INT,
 	@RoundNumber INT,
 	@Pairing List_Pairing READONLY,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
 			Begin
@@ -1709,6 +1838,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie =0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1721,9 +1851,14 @@ CREATE PROCEDURE SP_EDIT_Match
 	@ID_PlayerTwo INT ,
 	@ID_NewPone INT null,
 	@ID_NewPTwo INT null,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
 			Begin
@@ -1765,6 +1900,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie =0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1775,9 +1911,14 @@ CREATE PROCEDURE SP_DELETE_Match
 	@RoundNumber INT,
 	@ID_PlayerOne INT,
 	@ID_PlayerTwo INT,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
 			Begin
@@ -1803,6 +1944,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie =0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1818,9 +1960,14 @@ CREATE PROCEDURE SP_CREATE_Partie
 	@ID_Deck_PlayerOne INT,
 	@ID_Deck_PlayerTwo INT,
 	@ResultPart TINYINT = NULL,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 		if( @ID_Tournament IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournament and DELETED is null)) <> 1)
 			Begin
@@ -1863,6 +2010,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie =0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1880,9 +2028,14 @@ CREATE PROCEDURE SP_EDIT_Partie
 	@ID_Deck_PlayerOne INT,
 	@ID_Deck_PlayerTwo INT,
 	@ResultPart TINYINT,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 		if( @ID_Tournament IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournament and DELETED is null)) <> 1)
 			Begin
@@ -1932,6 +2085,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie =0;
 		ROLLBACK;
 	END CATCH
 END
@@ -1943,9 +2097,14 @@ CREATE PROCEDURE SP_DELETE_Partie
 	@ID_PlayerOne INT,
 	@ID_PlayerTwo INT,
 	@PartNumber INT,
-	@responseMessage NVARCHAR(250) OUTPUT
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
 AS
 BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
 	BEGIN TRY
 		if( @ID_Tournament IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournament and DELETED is null)) <> 1)
 			Begin
@@ -1974,6 +2133,7 @@ BEGIN
 	END TRY
 	BEGIN CATCH
 		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie =0;
 		ROLLBACK;
 	END CATCH
 END
@@ -2149,25 +2309,6 @@ GO
 
 
 
-GRANT VIEW DEFINITION ON [dbo].[View_DeletedUser] TO [API_User]
-GO
-
-GRANT REFERENCES ON [dbo].[View_DeletedUser] TO [API_User]
-GO
-
-GRANT SELECT ON [dbo].[View_DeletedUser] TO [API_User]
-GO
-
-
-
-GRANT VIEW DEFINITION ON [dbo].[View_DeletedTournament] TO [API_User]
-GO
-
-GRANT REFERENCES ON [dbo].[View_DeletedTournament] TO [API_User]
-GO
-
-GRANT SELECT ON [dbo].[View_DeletedTournament] TO [API_User]
-GO
 
 
 

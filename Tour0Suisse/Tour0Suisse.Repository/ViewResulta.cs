@@ -9,6 +9,7 @@ namespace Tour0Suisse.Repository
         public string Name { get; set; }
         public int IdUser { get; set; }
         public string Pseudo { get; set; }
+        public string IGPseudo { get; set; }
         public int Rank { get; set; }
         public int Score { get; set; }
         public int TieBreaker { get; set; }

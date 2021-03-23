@@ -652,7 +652,8 @@
       "Tour0Suisse.Repository/1.0.0": {
         "dependencies": {
           "Microsoft.EntityFrameworkCore": "2.1.14",
-          "Microsoft.EntityFrameworkCore.SqlServer": "2.1.14"
+          "Microsoft.EntityFrameworkCore.SqlServer": "2.1.14",
+          "Tour0Suisse.Model": "1.0.0"
         },
         "runtime": {
           "Tour0Suisse.Repository.dll": {}

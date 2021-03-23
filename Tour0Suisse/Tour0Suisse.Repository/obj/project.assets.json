@@ -945,6 +945,16 @@
         "compile": {
           "ref/netstandard1.3/System.Threading.Tasks.dll": {}
         }
+      },
+      "Tour0Suisse.Model/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v2.1",
+        "compile": {
+          "bin/placeholder/Tour0Suisse.Model.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Tour0Suisse.Model.dll": {}
+        }
       }
     }
   },
@@ -3605,6 +3615,11 @@
         "system.threading.tasks.4.0.11.nupkg.sha512",
         "system.threading.tasks.nuspec"
       ]
+    },
+    "Tour0Suisse.Model/1.0.0": {
+      "type": "project",
+      "path": "../Tour0Suisse.Model/Tour0Suisse.Model.csproj",
+      "msbuildProject": "../Tour0Suisse.Model/Tour0Suisse.Model.csproj"
     }
   },
   "projectFileDependencyGroups": {
@@ -3612,7 +3627,8 @@
       "Microsoft.EntityFrameworkCore >= 2.1.14",
       "Microsoft.EntityFrameworkCore.SqlServer >= 2.1.14",
       "Microsoft.EntityFrameworkCore.Tools >= 2.1.14",
-      "Microsoft.NETCore.App >= 2.1.0"
+      "Microsoft.NETCore.App >= 2.1.0",
+      "Tour0Suisse.Model >= 1.0.0"
     ]
   },
   "packageFolders": {
@@ -3644,7 +3660,11 @@
       },
       "frameworks": {
         "netcoreapp2.1": {
-          "projectReferences": {}
+          "projectReferences": {
+            "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse.Model\\Tour0Suisse.Model.csproj": {
+              "projectPath": "E:\\Aedjis-PC\\Documents\\Cours\\TFE\\TFE\\Tour0Suisse\\Tour0Suisse.Model\\Tour0Suisse.Model.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

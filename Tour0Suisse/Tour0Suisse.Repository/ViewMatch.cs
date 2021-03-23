@@ -9,5 +9,9 @@ namespace Tour0Suisse.Repository
         public int IdPlayerOne { get; set; }
         public int IdPlayerTwo { get; set; }
         public int IdTournament { get; set; }
+        public string PlayerOne { get; set; }
+        public string PseudoOne { get; set; }
+        public string PlayerTow { get; set; }
+        public string PseudoTow { get; set; }
     }
 }

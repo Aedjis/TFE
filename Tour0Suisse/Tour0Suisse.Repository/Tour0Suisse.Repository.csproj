@@ -13,4 +13,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Tour0Suisse.Model\Tour0Suisse.Model.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -11,5 +11,7 @@ namespace Tour0Suisse.Repository
         public string Pseudo { get; set; }
         public int IdDeck { get; set; }
         public string DeckList { get; set; }
+        public int IdGame { get; set; }
+        public string Game { get; set; }
     }
 }

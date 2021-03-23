@@ -9,3 +9,6 @@ E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\obj\Debu
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\bin\Debug\netcoreapp2.1\Tour0Suisse.Repository.pdb
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\obj\Debug\netcoreapp2.1\Tour0Suisse.Repository.dll
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\obj\Debug\netcoreapp2.1\Tour0Suisse.Repository.pdb
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\bin\Debug\netcoreapp2.1\Tour0Suisse.Model.dll
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\bin\Debug\netcoreapp2.1\Tour0Suisse.Model.pdb
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse.Repository\obj\Debug\netcoreapp2.1\Tour0Suisse.Repository.csproj.CopyComplete
