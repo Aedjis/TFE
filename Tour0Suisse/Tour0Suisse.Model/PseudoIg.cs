@@ -7,6 +7,7 @@ namespace Tour0Suisse.Model
     {
         public int IdUser { get; set; }
         public int IdGame { get; set; }
+        public string Game { get; set; }
         public string IgPseudo { get; set; }
 
     }

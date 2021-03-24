@@ -518,6 +518,7 @@ GO
 
 CREATE VIEW [View_ScoreClassementTemporaire] AS
 SELECT	V.ID_Tournament, 
+		T.Name,
 		ID_Player, 
 		Pseudo, 
 		IG_Pseudo,

@@ -27,5 +27,7 @@ namespace Tour0Suisse.Model
         public bool Organizer { get; set; }
         public DateTime? Deleted { get; set; }
 
+        public List<ViewPseudo> PseudoIgs { get; set; }
+
     }
 }

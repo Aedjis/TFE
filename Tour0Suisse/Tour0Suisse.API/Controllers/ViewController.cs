@@ -1,46 +1,139 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Query.Expressions;
+using Tour0Suisse.Model;
+using Tour0Suisse.Repository;
+
+// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Tour0Suisse.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]/[action]")]
     [ApiController]
     public class ViewController : ControllerBase
     {
-        // GET: api/View
+        static private DBTour0SuisseLINQ DB_CURD;
+
+        static ViewController()
+        {
+            string ConnectionString =
+                "Server=DESKTOP-BNVQBMF;Database=Tour0Suisse;user id=API_User;password=1234@Test;";
+
+            DB_CURD = new DBTour0SuisseLINQ(ConnectionString);
+        }
+
+        // GET: api/<ViewController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public IEnumerable<ViewUser> GetUsers()
         {
-            return new string[] { "value1", "value2" };
+            return DB_CURD.ViewUsers().Where(u=>u.Deleted == null);
         }
 
-        // GET: api/View/5
-        [HttpGet("{id}", Name = "Get")]
-        public string Get(int id)
+        // GET api/<ViewController>/5
+        [HttpGet("{id}")]
+        public Utilisateur GetUser(int id)
         {
-            return "value";
+            Utilisateur Retour = null;
+
+            ViewUser MyUser = DB_CURD.GetUser(id);
+            if (MyUser != null)
+            {
+                Retour = new Utilisateur
+                {
+                    IdUser =  MyUser.IdUser,
+                    Pseudo = MyUser.Pseudo,
+                    Email = MyUser.Email,
+                    Organizer = MyUser.Organizer,
+                    Deleted = MyUser.Deleted,
+                    PseudoIgs = DB_CURD.GetPseudosUser(id)
+                };
+            }
+
+
+            return Retour;
         }
 
-        // POST: api/View
-        [HttpPost]
-        public void Post([FromBody] string value)
+        // GET: api/<ViewController>
+        [HttpGet]
+        public IEnumerable<ViewTournament> GetTournaments()
         {
+            List<ViewTournament> Retour = new List<ViewTournament>();
+            Retour.Clear();
+
+            Retour = DB_CURD.ViewTournaments();
+
+            return Retour;
         }
 
-        // PUT: api/View/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        // GET api/<ViewController>/5
+        [HttpGet("{id}")]
+        public Tournoi GetTournament(int id)
         {
+            var t = DB_CURD.GetTournament(id);
+
+            Tournoi retour = new Tournoi
+            {
+                IdTournament = t.IdTournament,
+                Name = t.Name,
+                Date = t.Date,
+                Desciption = t.Name,
+                jeu = DB_CURD.GetJeu(t.IdGame),
+                Participants = DB_CURD.GetParticipantsOf(t.IdTournament),
+                Organisateurs = DB_CURD.GetOrgasOf(t.IdTournament),
+                DeckListNumber = t.DeckListNumber,
+                MaxNumberPlayer = t.MaxNumberPlayer,
+                Ppwin = t.Ppwin,
+                Ppdraw = t.Ppdraw,
+                Pplose = t.Pplose,
+                Over = t.Over,
+                Deleted = t.Deleted
+            };
+            if (retour.Over)
+            {
+                retour.Resultas = DB_CURD.GetResultasOfTournament(retour.IdTournament);
+            }
+            else if(retour.Deleted==null)
+            {
+                var c = DB_CURD.GetScoreClassementTemporairesOfTournamnent(retour.IdTournament);
+                retour.Classement = c.Any() ? c : null;
+            }
+
+            return retour;
         }
 
-        // DELETE: api/ApiWithActions/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+
+        [HttpGet]
+        public IEnumerable<ViewJeu> GetJeus()
         {
+            return DB_CURD.ViewJeus();
         }
+
+
+        [HttpGet("{id}")]
+        public ViewJeu GetJeu(int id)
+        {
+            return DB_CURD.GetJeu(id);
+        }
+
+        //// POST api/<ViewController>
+        //[HttpPost]
+        //public void Post([FromBody] string value)
+        //{
+        //}
+
+        //// PUT api/<ViewController>/5
+        //[HttpPut("{id}")]
+        //public void Put(int id, [FromBody] string value)
+        //{
+        //}
+
+        //// DELETE api/<ViewController>/5
+        //[HttpDelete("{id}")]
+        //public void Delete(int id)
+        //{
+        //}
     }
 }

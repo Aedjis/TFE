@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tour0Suisse.Repository", "T
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tour0Suisse.Model", "Tour0Suisse.Model\Tour0Suisse.Model.csproj", "{5323CC7A-0E3B-4AE9-A99D-90342229B77B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tour0Suisse.API", "Tour0Suisse.API\Tour0Suisse.API.csproj", "{59DAB052-DE60-4718-BBB8-B34AE0FBA796}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tour0Suisse.API", "Tour0Suisse.API\Tour0Suisse.API.csproj", "{29AB956F-6BCD-4219-BFFA-5AE15DC29747}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{5323CC7A-0E3B-4AE9-A99D-90342229B77B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5323CC7A-0E3B-4AE9-A99D-90342229B77B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5323CC7A-0E3B-4AE9-A99D-90342229B77B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{59DAB052-DE60-4718-BBB8-B34AE0FBA796}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{59DAB052-DE60-4718-BBB8-B34AE0FBA796}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{59DAB052-DE60-4718-BBB8-B34AE0FBA796}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{59DAB052-DE60-4718-BBB8-B34AE0FBA796}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29AB956F-6BCD-4219-BFFA-5AE15DC29747}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29AB956F-6BCD-4219-BFFA-5AE15DC29747}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29AB956F-6BCD-4219-BFFA-5AE15DC29747}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29AB956F-6BCD-4219-BFFA-5AE15DC29747}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

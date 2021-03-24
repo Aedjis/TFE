@@ -5,11 +5,13 @@ using System.Linq;
 using System.Data;
 using System.Web;
 using Tour0Suisse.Model;
+using System.Security.Cryptography;
+using System.Text;
 
 
 namespace Tour0Suisse.Repository
 {
-    class DBTour0SuisseLINQ
+    public class DBTour0SuisseLINQ
     {
         private readonly string _ConnectionString;
         public DBTour0SuisseLINQ(string ConnectionString)
@@ -28,6 +30,40 @@ namespace Tour0Suisse.Repository
             return _ViewUsers();
         }
 
+        public ViewUser GetUser(int Id)
+        {
+            ViewUser Retour = null;
+
+            
+            var User = _ViewUsers("WHERE ID_User = " +Id.ToString());
+            if (User.Count == 1)
+            {
+                Retour = User.First();
+            }
+
+            return Retour;
+        }
+
+        public int LogIn(string Email, string Password)
+        {
+            int Retour = -1;
+
+            if (!Password.StartsWith("0x"))
+            {
+                Password = "0x" + Password;
+            }
+
+            //string hex = "0x"+ BitConverter.ToString(Password).Replace("-", "");
+
+            var User =  _ViewUsers("WHERE  Email = '" + Email +  "' AND [Password] = "+ Password.Replace("-", ""));
+            if (User.Count == 1)
+            {
+                Retour = User.First().IdUser;
+            }
+
+            return Retour;
+        }
+
         private List<ViewUser> _ViewUsers(string Where = "")
         {
             List<ViewUser> Retour = new List<ViewUser>();
@@ -41,7 +77,7 @@ namespace Tour0Suisse.Repository
             {
                 SqlConnection db = new SqlConnection(_ConnectionString);
 
-                string querry = "SELECT ID_User, Pseudo, Email, Organizer FROM [View_User] " + Where;
+                string querry = "SELECT ID_User, Pseudo, Email, Organizer, DELETED FROM [View_User] " + Where;
 
                 SqlCommand cmd = db.CreateCommand();
                 cmd.CommandText = querry;
@@ -52,13 +88,15 @@ namespace Tour0Suisse.Repository
 
                 while (reader.Read())
                 {
+                    DateTime temp;
 
                     Retour.Add(new ViewUser
                     {
                         IdUser = int.Parse(reader["ID_User"].ToString()),
                         Pseudo = reader["Pseudo"].ToString(),
                         Email = reader["Email"].ToString(),
-                        Organizer = bool.Parse(reader["Organizer"].ToString())
+                        Organizer = bool.Parse(reader["Organizer"].ToString()),
+                        Deleted = DateTime.TryParse(reader["DELETED"].ToString(), out temp)? temp: (DateTime?)null
                     });
                 }
 
@@ -78,6 +116,11 @@ namespace Tour0Suisse.Repository
         {
             return _ViewTournaments();
         }
+        public ViewTournament GetTournament(int Id)
+        {
+            return _ViewTournaments("WHERE ID_Tournament = " + Id.ToString()).FirstOrDefault();
+        }
+
         private List<ViewTournament> _ViewTournaments(string Where = "")
         {
             List<ViewTournament> Retour = new List<ViewTournament>();
@@ -135,6 +178,11 @@ namespace Tour0Suisse.Repository
             return _ViewPseudos();
         }
 
+        public List<ViewPseudo> GetPseudosUser(int IdUser)
+        {
+            return _ViewPseudos("WHERE ID_User = "+IdUser.ToString());
+        }
+
         private List<ViewPseudo> _ViewPseudos(string Where="")
         {
             List<ViewPseudo> Retour = new List<ViewPseudo>();
@@ -148,7 +196,7 @@ namespace Tour0Suisse.Repository
             {
                 SqlConnection db = new SqlConnection(_ConnectionString);
 
-                string querry = "SELECT ID_User, Pseudo, ID_Game, Game, GamePseudo FROM [View_Pseudo] " + Where;
+                string querry = "SELECT ID_User, ID_Game, Game, IG_Pseudo FROM [View_Pseudo] " + Where;
 
                 SqlCommand cmd = db.CreateCommand();
                 cmd.CommandText = querry;
@@ -165,8 +213,7 @@ namespace Tour0Suisse.Repository
                         IdUser = int.Parse(reader["ID_User"].ToString()),
                         IdGame = int.Parse(reader["ID_Game"].ToString()),
                         Game = reader["Game"].ToString(),
-                        Pseudo = reader["Pseudo"].ToString(),
-                        IgPseudo = reader["GamePseudo"].ToString()
+                        IgPseudo = reader["IG_Pseudo"].ToString()
                     });
                 }
 
@@ -186,6 +233,11 @@ namespace Tour0Suisse.Repository
         public List<ViewOrga> ViewOrgas()
         {
             return _ViewOrgas();
+        }
+
+        public List<ViewOrga> GetOrgasOf(int idTournoi)
+        {
+            return _ViewOrgas("WHERE ID_Tournament = "+ idTournoi.ToString());
         }
 
         private List<ViewOrga> _ViewOrgas(string Where="")
@@ -239,6 +291,11 @@ namespace Tour0Suisse.Repository
         public List<ViewParticipant> ViewParticipants()
         {
             return _ViewParticipants();
+        }
+
+        public List<ViewParticipant> GetParticipantsOf(int IDTournoi)
+        {
+            return _ViewParticipants("WHERE ID_Tournament = " +IDTournoi.ToString());
         }
 
         private List<ViewParticipant> _ViewParticipants(string Where="")
@@ -295,6 +352,11 @@ namespace Tour0Suisse.Repository
         public List<ViewResulta> ViewResultas()
         {
             return _ViewResultas();
+        }
+
+        public List<ViewResulta> GetResultasOfTournament(int IdTournament)
+        {
+            return _ViewResultas("WHERE ID_Tournament = "+IdTournament.ToString());
         }
 
         private List<ViewResulta> _ViewResultas(string Where="")
@@ -587,6 +649,11 @@ namespace Tour0Suisse.Repository
             return _viewJeus();
         }
 
+        public ViewJeu GetJeu(int id)
+        {
+            return _viewJeus("WHERE ID_Game = "+id.ToString()).FirstOrDefault();
+        }
+
         private List<ViewJeu> _viewJeus(string Where = "")
         {
             List<ViewJeu> Retour = new List<ViewJeu>();
@@ -747,6 +814,11 @@ namespace Tour0Suisse.Repository
             return _viewScoreClassementTemporaires();
         }
 
+        public List<ViewScoreClassementTemporaire> GetScoreClassementTemporairesOfTournamnent(int IdTournamnet)
+        {
+            return _viewScoreClassementTemporaires("WHERE ID_Tournament = "+IdTournamnet.ToString());
+        }
+
         private List<ViewScoreClassementTemporaire> _viewScoreClassementTemporaires(string Where = "")
         {
             List<ViewScoreClassementTemporaire> Retour = new List<ViewScoreClassementTemporaire>();
@@ -760,7 +832,7 @@ namespace Tour0Suisse.Repository
             {
                 SqlConnection db = new SqlConnection(_ConnectionString);
 
-                string querry = "SELECT ID_Tournament, ID_Player, Pseudo, IG_Pseudo, Score, Victoire, Egaliter, Defaite From [View_ScoreClassementTemporaire] " + Where;
+                string querry = "SELECT ID_Tournament, Name, ID_Player, Pseudo, IG_Pseudo, Score, Victoire, Egaliter, Defaite From [View_ScoreClassementTemporaire] " + Where;
 
                 SqlCommand cmd = db.CreateCommand();
                 cmd.CommandText = querry;
@@ -774,6 +846,7 @@ namespace Tour0Suisse.Repository
                     Retour.Add(new ViewScoreClassementTemporaire
                     {
                         IdTournament = int.Parse(reader["ID_Tournament"].ToString()),
+                        Tournament = reader["Name"].ToString(),
                         IdPlayer = int.Parse(reader["ID_Player"].ToString()),
                         Pseudo = reader["Pseudo"].ToString(),
                         IGPseudo = reader["IG_Pseudo"].ToString(),
