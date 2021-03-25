@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Tour0Suisse.Model.Tournoi>
+﻿@model IEnumerable<Tour0Suisse.Model.ViewTournament>
 
 @{
     ViewData["Title"] = "ListTournoi";
@@ -16,7 +16,7 @@
                 @Html.DisplayNameFor(model => model.Date)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Desciption)
+                @Html.DisplayNameFor(model => model.Description)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.IdGame)
@@ -37,7 +37,7 @@
                 @Html.DisplayFor(modelItem => item.Date)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Desciption)
+                @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.IdGame)

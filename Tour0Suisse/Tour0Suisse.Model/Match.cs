@@ -6,10 +6,10 @@ namespace Tour0Suisse.Model
     public partial class Match
     {
        
-        public int IdTournament { get; set; }
+        public ViewTournament Tournament { get; set; }
         public int RoundNumber { get; set; }
-        public int IdPlayerOne { get; set; }
-        public int IdPlayerTwo { get; set; }
+        public ViewParticipant Player1 { get; set; }
+        public ViewParticipant Player2 { get; set; }
 
     }
 }

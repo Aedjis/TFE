@@ -293,9 +293,14 @@ namespace Tour0Suisse.Repository
             return _ViewParticipants();
         }
 
-        public List<ViewParticipant> GetParticipantsOf(int IDTournoi)
+        public List<ViewParticipant> GetParticipantsOf(int IdTournoi)
         {
-            return _ViewParticipants("WHERE ID_Tournament = " +IDTournoi.ToString());
+            return _ViewParticipants("WHERE ID_Tournament = " +IdTournoi.ToString());
+        }
+
+        public ViewParticipant GetParticipant(int IDParticipant, int IdTournoi)
+        {
+            return _ViewParticipants("WHERE ID_Tournament = " + IdTournoi.ToString() +"AND ID_User = " + IDParticipant.ToString()).FirstOrDefault();
         }
 
         private List<ViewParticipant> _ViewParticipants(string Where="")
@@ -417,6 +422,35 @@ namespace Tour0Suisse.Repository
             return _ViewParties();
         }
 
+        public List<ViewPartie> ViewPartiesOfMatch( int IdTournoi, int IdPlayer, int RoundNumber = -1)
+        {
+            string WhereRound = (RoundNumber > 0) ? RoundNumber.ToString() : WhereTopRoundOfTournament(IdTournoi);
+
+            return _ViewParties("WHERE ID_Tournament = " + IdTournoi.ToString() + "AND (ID_PlayerOne = " +
+                                IdPlayer.ToString() + " OR ID_PlayerTwo = " + IdPlayer.ToString() +
+                                " ) AND RoundNumber = " + WhereRound);
+        }
+
+        public ViewPartie ViewPartieOfMatch(int IdTournoi, int IdPlayer, int PartNumber = -1, int RoundNumber = -1)
+        {
+            string WhereRound = (RoundNumber > 0) ? RoundNumber.ToString() : WhereTopRoundOfTournament(IdTournoi);
+            string WherePart = (PartNumber > 0) ? PartNumber.ToString() : WhereTopPart(IdTournoi, IdPlayer, RoundNumber);
+
+            return _ViewParties("WHERE ID_Tournament = " + IdTournoi.ToString() + "AND (ID_PlayerOne = " +
+                                IdPlayer.ToString() + " OR ID_PlayerTwo = " + IdPlayer.ToString() +
+                                " ) AND RoundNumber = " + WhereRound + "AND PartNumber = "+WherePart).FirstOrDefault();
+        }
+
+        private string WhereTopPart(int IdTournoi, int IdPlayer, int RoundNumber)
+        {
+            string WherePart;
+            WherePart = "( SELECT max(PartNumber) FROM [View_Partie] WHERE ID_Tournament = " + IdTournoi.ToString() +
+                        "AND (ID_PlayerOne = " +
+                        IdPlayer.ToString() + " OR ID_PlayerTwo = " + IdPlayer.ToString() +
+                        " ) AND RoundNumber = " + RoundNumber + ")";
+            return WherePart;
+        }
+
         private List<ViewPartie> _ViewParties(string Where = "")
         {
             List<ViewPartie> Retour = new List<ViewPartie>();
@@ -449,16 +483,16 @@ namespace Tour0Suisse.Repository
                         RoundNumber = int.Parse(reader["RoundNumber"].ToString()),
                         PartNumber = int.Parse(reader["PartNumber"].ToString()),
                         ResultPart = byte.TryParse(reader["ResultPart"].ToString(), out temp)? temp: (byte?)null,
-                        IdPlayerOne = int.Parse(reader["ID_PlayerOne"].ToString()),
-                        PlayerOne = reader["PlayerOne"].ToString(),
-                        IGPseudoOne = reader["IGPseudoOne"].ToString(),
-                        IdDeckPlayerOne = int.Parse(reader["ID_Deck_PlayerOne"].ToString()),
-                        DeckOne = reader["DeckOne"].ToString(),
-                        IdPlayerTwo = int.Parse(reader["ID_PlayerTwo"].ToString()),
-                        PlayerTwo = reader["PlayerTwo"].ToString(),
-                        IGPseudoTwo = reader["IGPseudoTwo"].ToString(),
-                        IdDeckPlayerTwo = int.Parse(reader["ID_Deck_PlayerOne"].ToString()),
-                        DeckTwo = reader["DeckTwo"].ToString()
+                        IdPlayer1 = int.Parse(reader["ID_PlayerOne"].ToString()),
+                        Player1 = reader["PlayerOne"].ToString(),
+                        IGPseudo1 = reader["IGPseudoOne"].ToString(),
+                        IdDeckPlayer1 = int.Parse(reader["ID_Deck_PlayerOne"].ToString()),
+                        Deck1 = reader["DeckOne"].ToString(),
+                        IdPlayer2 = int.Parse(reader["ID_PlayerTwo"].ToString()),
+                        Player2 = reader["PlayerTwo"].ToString(),
+                        IGPseudo2 = reader["IGPseudoTwo"].ToString(),
+                        IdDeckPlayer2 = int.Parse(reader["ID_Deck_PlayerOne"].ToString()),
+                        Deck2 = reader["DeckTwo"].ToString()
                     });
                 }
 
@@ -479,6 +513,16 @@ namespace Tour0Suisse.Repository
         public List<ViewDeck> ViewDecks()
         {
             return _viewDecks();
+        }
+
+        public List<ViewDeck> GetDecksOfTournament(int Idtournament)
+        {
+            return _viewDecks("WHERE ID_Tournament = "+Idtournament.ToString());
+        }
+
+        public List<ViewDeck> GetDecksOfParticipant(int Idtournament, int IdUser)
+        {
+            return _viewDecks("WHERE ID_Tournament = " + Idtournament.ToString()+ " AND ID_User = "+IdUser.ToString());
         }
 
         private List<ViewDeck> _viewDecks(string Where = "")
@@ -593,6 +637,34 @@ namespace Tour0Suisse.Repository
             return _viewMatches();
         }
 
+        public List<ViewMatch> GetMatchesOfTheRound(int IdTournoi, int IdRound = -1)
+        {
+            string WhereRound = (IdRound < 0)? IdRound.ToString(): WhereTopRoundOfTournament(IdTournoi);
+
+
+            return _viewMatches("WHERE ID_Tournament = "+IdTournoi.ToString()+ " AND RoundNumber = "+WhereRound);
+        }
+
+        public ViewMatch GetMatcheForPlayerOfTheRound(int IdTournoi, int IdPlayer, int IdRound = -1)
+        {
+            string WhereRound = (IdRound < 0) ? IdRound.ToString() : WhereTopRoundOfTournament(IdTournoi);
+
+
+            return _viewMatches("WHERE ID_Tournament = " + IdTournoi.ToString() + "AND (ID_PlayerOne = " +
+                                IdPlayer.ToString() + " OR ID_PlayerTwo = " + IdPlayer.ToString() +
+                                " ) AND RoundNumber = " + WhereRound).FirstOrDefault();
+        }
+
+        private string WhereTopRoundOfTournament(int IdTournoi)
+        {
+            string WhereRound;
+            WhereRound = "( SELECT max(RoundNumber) FROM [View_Match] WHERE ID_Tournament = " +
+                         IdTournoi.ToString() + ")";
+            return WhereRound;
+        }
+
+
+
         private List<ViewMatch> _viewMatches(string Where = "")
         {
             List<ViewMatch> Retour = new List<ViewMatch>();
@@ -606,7 +678,7 @@ namespace Tour0Suisse.Repository
             {
                 SqlConnection db = new SqlConnection(_ConnectionString);
 
-                string querry = "SELECT [ID_Tournament], [RoundNumber], [ID_PlayerOne], [PlayerOne], [PseudoPlayerOne], [ID_PlayerTwo], [PlayerTow], [PseudoPlayerTow] From [View_Match] " + Where;
+                string querry = "SELECT [ID_Tournament], [RoundNumber], [ID_PlayerOne], [PlayerOne], [PseudoPlayerOne], [ID_PlayerTwo], [PlayerTwo], [PseudoPlayerTwo] From [View_Match] " + Where;
 
                 SqlCommand cmd = db.CreateCommand();
                 cmd.CommandText = querry;
@@ -621,12 +693,12 @@ namespace Tour0Suisse.Repository
                     {
                         IdTournament = int.Parse(reader["ID_Tournament"].ToString()),
                         RoundNumber = int.Parse(reader["RoundNumber"].ToString()),
-                        IdPlayerOne = int.Parse(reader["ID_PlayerOne"].ToString()),
-                        PlayerOne = reader["PlayerOne"].ToString(),
-                        PseudoOne = reader["PseudoPlayerOne"].ToString(),
-                        IdPlayerTwo = int.Parse(reader["ID_PlayerTwo"].ToString()),
-                        PlayerTow = reader["PlayerTow"].ToString(),
-                        PseudoTow = reader["PseudoPlayerTow"].ToString()
+                        IdPlayer1 = int.Parse(reader["ID_PlayerOne"].ToString()),
+                        Player1 = reader["PlayerOne"].ToString(),
+                        Pseudo1 = reader["PseudoPlayerOne"].ToString(),
+                        IdPlayer2 = int.Parse(reader["ID_PlayerTwo"].ToString()),
+                        Player2 = reader["PlayerTwo"].ToString(),
+                        Pseudo2 = reader["PseudoPlayerTwo"].ToString()
                     });
                 }
 
@@ -876,6 +948,16 @@ namespace Tour0Suisse.Repository
             return _viewRounds();
         }
 
+        public List<ViewRound> GetRoundsOf(int IdTournoi)
+        {
+            return _viewRounds("WHERE ID_Tournament = "+IdTournoi);
+        }
+
+        public ViewRound GetRoundOf(int IdTournoi, int RoundNumber)
+        {
+            return _viewRounds("WHERE ID_Tournament = " + IdTournoi.ToString()+ " AND RoundNumber = "+RoundNumber.ToString()).FirstOrDefault();
+        }
+
         private List<ViewRound> _viewRounds(string Where = "")
         {
             List<ViewRound> Retour = new List<ViewRound>();
@@ -940,7 +1022,7 @@ namespace Tour0Suisse.Repository
                 cmd.CommandText = "SP_Create_User";
                 cmd.Parameters.AddWithValue("@Pseudo", P.Pseudo);
                 cmd.Parameters.AddWithValue("@Email", P.Email);
-                cmd.Parameters.AddWithValue("@Password", P.HashPassword);
+                cmd.Parameters.AddWithValue("@Password", P.HexHashPassword);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 
@@ -984,7 +1066,7 @@ namespace Tour0Suisse.Repository
                 cmd.Parameters.AddWithValue("@Organizer", P.Organizer);
                 cmd.Parameters.AddWithValue("@Pseudo", P.Pseudo);
                 cmd.Parameters.AddWithValue("@Email", P.Email);
-                cmd.Parameters.AddWithValue("@Password", P.HashPassword);
+                cmd.Parameters.AddWithValue("@Password", P.HexHashPassword);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 
@@ -1024,7 +1106,7 @@ namespace Tour0Suisse.Repository
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 cmd.CommandText = "SP_DeleteUser";
                 cmd.Parameters.AddWithValue("@ID_User", P.IdUser);
-                cmd.Parameters.AddWithValue("@Password", P.HashPassword);
+                cmd.Parameters.AddWithValue("@Password", P.HexHashPassword);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 
@@ -1166,7 +1248,7 @@ namespace Tour0Suisse.Repository
         }
 
 
-        public bool CreateTournoi(Tournoi P)
+        public bool CreateTournoi(ViewTournament P)
         {
             try
             {
@@ -1185,7 +1267,7 @@ namespace Tour0Suisse.Repository
                 cmd.Parameters.AddWithValue("@Name", P.Name);
                 cmd.Parameters.AddWithValue("@Date", P.Date);
                 cmd.Parameters.AddWithValue("@ID_Game", P.IdGame);
-                cmd.Parameters.AddWithValue("@Description", P.Desciption);
+                cmd.Parameters.AddWithValue("@Description", P.Description);
                 cmd.Parameters.AddWithValue("@MaxNumberPlayer", P.MaxNumberPlayer);
                 cmd.Parameters.AddWithValue("@DeckListNumber", P.DeckListNumber);
                 cmd.Parameters.AddWithValue("@PPWin", P.Ppwin);
@@ -1213,7 +1295,7 @@ namespace Tour0Suisse.Repository
         }
 
 
-        public bool EditTournoi(Tournoi P)
+        public bool EditTournoi(ViewTournament P)
         {
             try
             {
@@ -1233,7 +1315,7 @@ namespace Tour0Suisse.Repository
                 cmd.Parameters.AddWithValue("@Name", P.Name);
                 cmd.Parameters.AddWithValue("@Date", P.Date);
                 cmd.Parameters.AddWithValue("@ID_Game", P.IdGame);
-                cmd.Parameters.AddWithValue("@Description", P.Desciption);
+                cmd.Parameters.AddWithValue("@Description", P.Description);
                 cmd.Parameters.AddWithValue("@MaxNumberPlayer", P.MaxNumberPlayer);
                 cmd.Parameters.AddWithValue("@DeckListNumber", P.DeckListNumber);
                 cmd.Parameters.AddWithValue("@PPWin", P.Ppwin);
@@ -1473,7 +1555,7 @@ namespace Tour0Suisse.Repository
         }
 
 
-        public bool AddAdmin(Organisateur P)
+        public bool AddAdmin(ViewOrga P)
         {
             try
             {
@@ -1515,7 +1597,7 @@ namespace Tour0Suisse.Repository
         }
 
 
-        public bool EditAdmin(Organisateur P)
+        public bool EditAdmin(ViewOrga P)
         {
             try
             {
@@ -1557,7 +1639,7 @@ namespace Tour0Suisse.Repository
         }
 
 
-        public bool DeleteAdmin(Organisateur P)
+        public bool DeleteAdmin(ViewOrga P)
         {
             try
             {
@@ -1948,7 +2030,7 @@ namespace Tour0Suisse.Repository
 
 
 
-        public bool CreateMatch(Match P)
+        public bool CreateMatch(ViewMatch P)
         {
             try
             {
@@ -1967,8 +2049,8 @@ namespace Tour0Suisse.Repository
                 cmd.CommandText = "SP_CREATE_Match";
                 cmd.Parameters.AddWithValue("@ID_Tournoi", P.IdTournament);
                 cmd.Parameters.AddWithValue("@RoundNumber", P.RoundNumber);
-                cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayerOne);
-                cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayerTwo);
+                cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayer1);
+                cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayer2);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 
@@ -2003,7 +2085,7 @@ namespace Tour0Suisse.Repository
 
                 foreach (var Paire in ListPairing)
                 {
-                    Pairing.Rows.Add(Paire.IDOne, Paire.IDTwo);
+                    Pairing.Rows.Add(Paire.ID1, Paire.ID2);
                 }
 
                 SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
@@ -2045,7 +2127,7 @@ namespace Tour0Suisse.Repository
 
 
 
-        public bool EditMatch(Match P, PairID NewPair)
+        public bool EditMatch(ViewMatch P, PairID NewPair)
         {
             try
             {
@@ -2064,10 +2146,10 @@ namespace Tour0Suisse.Repository
                 cmd.CommandText = "SP_EDIT_Match";
                 cmd.Parameters.AddWithValue("@ID_Tournoi", P.IdTournament);
                 cmd.Parameters.AddWithValue("@RoundNumber", P.RoundNumber);
-                cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayerOne);
-                cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayerTwo);
-                cmd.Parameters.AddWithValue("@ID_NewPone", NewPair.IDOne);
-                cmd.Parameters.AddWithValue("@ID_NewPTwo", NewPair.IDTwo);
+                cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayer1);
+                cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayer2);
+                cmd.Parameters.AddWithValue("@ID_NewPone", NewPair.ID1);
+                cmd.Parameters.AddWithValue("@ID_NewPTwo", NewPair.ID2);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 
@@ -2092,7 +2174,7 @@ namespace Tour0Suisse.Repository
 
 
 
-        public bool DeleteMatch(Match P)
+        public bool DeleteMatch(ViewMatch P)
         {
             try
             {
@@ -2111,8 +2193,8 @@ namespace Tour0Suisse.Repository
                 cmd.CommandText = "SP_DELETE_Match";
                 cmd.Parameters.AddWithValue("@ID_Tournoi", P.IdTournament);
                 cmd.Parameters.AddWithValue("@RoundNumber", P.RoundNumber);
-                cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayerOne);
-                cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayerTwo);
+                cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayer1);
+                cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayer2);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 
@@ -2156,11 +2238,11 @@ namespace Tour0Suisse.Repository
                 cmd.CommandText = "SP_CREATE_Partie";
                 cmd.Parameters.AddWithValue("@ID_Tournoi", P.IdTournament);
                 cmd.Parameters.AddWithValue("@RoundNumber", P.RoundNumber);
-                cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayerOne);
-                cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayerTwo);
+                cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayer1);
+                cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayer2);
                 cmd.Parameters.AddWithValue("@PartNumber", P.PartNumber);
-                cmd.Parameters.AddWithValue("@ID_Deck_PlayerOne", P.IdDeckPlayerOne);
-                cmd.Parameters.AddWithValue("@ID_Deck_PlayerTwo", P.IdDeckPlayerTwo);
+                cmd.Parameters.AddWithValue("@ID_Deck_PlayerOne", P.IdDeckPlayer1);
+                cmd.Parameters.AddWithValue("@ID_Deck_PlayerTwo", P.IdDeckPlayer2);
                 cmd.Parameters.AddWithValue("@ResultPart", P.ResultPart);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
@@ -2205,11 +2287,11 @@ namespace Tour0Suisse.Repository
                 cmd.CommandText = "SP_EDIT_Partie";
                 cmd.Parameters.AddWithValue("@ID_Tournoi", P.IdTournament);
                 cmd.Parameters.AddWithValue("@RoundNumber", P.RoundNumber);
-                cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayerOne);
-                cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayerTwo);
+                cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayer1);
+                cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayer2);
                 cmd.Parameters.AddWithValue("@PartNumber", P.PartNumber);
-                cmd.Parameters.AddWithValue("@ID_Deck_PlayerOne", P.IdDeckPlayerOne);
-                cmd.Parameters.AddWithValue("@ID_Deck_PlayerTwo", P.IdDeckPlayerTwo);
+                cmd.Parameters.AddWithValue("@ID_Deck_PlayerOne", P.IdDeckPlayer1);
+                cmd.Parameters.AddWithValue("@ID_Deck_PlayerTwo", P.IdDeckPlayer2);
                 cmd.Parameters.AddWithValue("@ResultPart", P.ResultPart);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
@@ -2254,8 +2336,8 @@ namespace Tour0Suisse.Repository
                 cmd.CommandText = "SP_DELETE_Partie";
                 cmd.Parameters.AddWithValue("@ID_Tournoi", P.IdTournament);
                 cmd.Parameters.AddWithValue("@RoundNumber", P.RoundNumber);
-                cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayerOne);
-                cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayerTwo);
+                cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayer1);
+                cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayer2);
                 cmd.Parameters.AddWithValue("@PartNumber", P.PartNumber);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);

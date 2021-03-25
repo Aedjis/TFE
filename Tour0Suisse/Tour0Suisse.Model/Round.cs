@@ -5,14 +5,12 @@ namespace Tour0Suisse.Model
 {
     public partial class Round
     {
-        public Round()
-        {
-            //Match = new HashSet<Match>(); ereur inconu
-        }
 
         public int IdTournament { get; set; }
+        public string Name { get; set; }
         public int RoundNumber { get; set; }
         public DateTime StartRound { get; set; }
+        public IEnumerable<ViewMatch> Matches { get; set; }
 
     }
 }

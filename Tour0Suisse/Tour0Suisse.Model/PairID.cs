@@ -6,7 +6,7 @@ namespace Tour0Suisse.Model
 {
     public struct PairID
     {
-        public int IDOne;
-        public int IDTwo;
+        public int ID1;
+        public int ID2;
     }
 }

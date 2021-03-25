@@ -13,14 +13,15 @@ namespace Tour0Suisse.Model
         public string Email { get; set; }
         public string Password { get; set; }
 
-        public byte[] HashPassword
+        public string HexHashPassword
         {
             get
             {
                 Byte[] inputBytes = Encoding.UTF8.GetBytes(Password);
                 SHA512 shaM = new SHA512Managed();
                 byte[] retour = shaM.ComputeHash(inputBytes);
-                return retour;
+
+                return "0x"+ BitConverter.ToString(retour).Replace("-", "");
             }
         }
 

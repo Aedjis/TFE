@@ -68,12 +68,12 @@ using Tour0Suisse.Models;
             WriteLiteral("\r\n<h2>Supprimer son compte</h2>\r\n\r\n<h3>Etes-vous sur de vouloir supprimer votre compte?</h3>\r\n\r\n<div>\r\n    ");
             EndContext();
             BeginContext(196, 220, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "6cc049baac1442f5b3f4ce1d7d4c1006", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "7616eb45cb434056b6478f402b08a8ae", async() => {
                 BeginContext(222, 10, true);
                 WriteLiteral("\r\n        ");
                 EndContext();
                 BeginContext(232, 40, false);
-                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("input", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.SelfClosing, "94c6bebffe67473fbcca3497bff4cb9b", async() => {
+                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("input", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.SelfClosing, "b3785ed7f44144cfb78660bf81433576", async() => {
                 }
                 );
                 __Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper = CreateTagHelper<global::Microsoft.AspNetCore.Mvc.TagHelpers.InputTagHelper>();
@@ -98,7 +98,7 @@ __Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper.For = ModelExpressionProvid
                 WriteLiteral("\r\n        <input type=\"submit\" value=\"Delete\" class=\"btn btn-default\" /> |\r\n        ");
                 EndContext();
                 BeginContext(356, 47, false);
-                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "976966640d9c47c5b84bdfa6faa48868", async() => {
+                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "6a4c7211da7040dfbb86064405343fdf", async() => {
                     BeginContext(380, 19, true);
                     WriteLiteral("Retourner au profil");
                     EndContext();

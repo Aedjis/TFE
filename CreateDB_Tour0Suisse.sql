@@ -486,6 +486,8 @@ GO
 
 CREATE VIEW [View_ResultMatchPlayer] AS
 SELECT ID_Tournament, RoundNumber, ID_Player, Pseudo, IG_Pseudo, 	CASE 
+																		WHEN count(Resulta) =0
+																		THEN null
 																		WHEN SUM(Resulta) >0
 																		THEN 1
 																		WHEN SUM(Resulta) <0
