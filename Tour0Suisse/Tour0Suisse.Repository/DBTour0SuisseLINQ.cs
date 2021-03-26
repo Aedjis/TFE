@@ -112,12 +112,69 @@ namespace Tour0Suisse.Repository
             return Retour;
         }
 
+        public List<ViewDotation> ViewDotations()
+        {
+            return _ViewDotations();
+        }
+        public List<ViewDotation> GetDotationsOf(int Id)
+        {
+            return _ViewDotations("WHERE ID_Tournament = " + Id.ToString());
+        }
+
+        private List<ViewDotation> _ViewDotations(string Where = "")
+        {
+            List<ViewDotation> Retour = new List<ViewDotation>();
+
+
+            //DataContext db = new DataContext())
+
+
+
+            try
+            {
+                SqlConnection db = new SqlConnection(_ConnectionString);
+
+                string querry = "SELECT ID_Tournament, [Name], Place, Gain FROM [View_Dotation] " + Where;
+
+                SqlCommand cmd = db.CreateCommand();
+                cmd.CommandText = querry;
+
+                db.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+
+                while (reader.Read())
+                {
+
+                    Retour.Add(new ViewDotation()
+                    {
+                        IdTournament = int.Parse(reader["ID_Tournament"].ToString()),
+                        Name = reader["Name"].ToString(),
+                        Place = int.Parse(reader["Place"].ToString()),
+                        Gain = int.Parse(reader["Gain"].ToString())
+                    });
+                }
+
+
+                reader.Close();
+                db.Close();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            return Retour;
+        }
+
         public List<ViewTournament> ViewTournaments()
         {
             return _ViewTournaments();
         }
         public ViewTournament GetTournament(int Id)
         {
+            
+            
             return _ViewTournaments("WHERE ID_Tournament = " + Id.ToString()).FirstOrDefault();
         }
 
@@ -364,6 +421,11 @@ namespace Tour0Suisse.Repository
             return _ViewResultas("WHERE ID_Tournament = "+IdTournament.ToString());
         }
 
+        public List<ViewResulta> GetResultasOfUser(int IdUser)
+        {
+            return _ViewResultas("WHERE ID_User = " + IdUser.ToString());
+        }
+
         private List<ViewResulta> _ViewResultas(string Where="")
         {
             List<ViewResulta> Retour = new List<ViewResulta>();
@@ -377,7 +439,7 @@ namespace Tour0Suisse.Repository
             {
                 SqlConnection db = new SqlConnection(_ConnectionString);
 
-                string querry = "SELECT ID_Tournament, Name, ID_User, Pseudo, IG_Pseudo, Rank, Score, TieBreaker, AdditionalTieBreaker, AdditionalTieBreakerRules From [View_Resulta] " + Where;
+                string querry = "SELECT ID_Tournament, Name, ID_User, Pseudo, IG_Pseudo, Rank, Gain, Score, TieBreaker, AdditionalTieBreaker, AdditionalTieBreakerRules From [View_Resulta] " + Where;
 
                 SqlCommand cmd = db.CreateCommand();
                 cmd.CommandText = querry;
@@ -398,6 +460,7 @@ namespace Tour0Suisse.Repository
                         Name = reader["Name"].ToString(),
                         Pseudo = reader["Pseudo"].ToString(),
                         IGPseudo = reader["IG_Pseudo"].ToString(),
+                        Gain = int.Parse(reader["Gain"].ToString()),
                         Rank = int.Parse(reader["Rank"].ToString()),
                         Score = int.Parse(reader["Score"].ToString()),
                         TieBreaker = int.Parse(reader["TieBreaker"].ToString())
@@ -635,6 +698,11 @@ namespace Tour0Suisse.Repository
         public List<ViewMatch> ViewMatches()
         {
             return _viewMatches();
+        }
+
+        public List<ViewMatch> GetMatchesOf(int IdTournoi)
+        {
+            return _viewMatches("WHERE ID_Tournament = " + IdTournoi.ToString());
         }
 
         public List<ViewMatch> GetMatchesOfTheRound(int IdTournoi, int IdRound = -1)
@@ -1022,7 +1090,7 @@ namespace Tour0Suisse.Repository
                 cmd.CommandText = "SP_Create_User";
                 cmd.Parameters.AddWithValue("@Pseudo", P.Pseudo);
                 cmd.Parameters.AddWithValue("@Email", P.Email);
-                cmd.Parameters.AddWithValue("@Password", P.HexHashPassword);
+                cmd.Parameters.AddWithValue("@Password", P.HexaPassword);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 
@@ -1066,7 +1134,7 @@ namespace Tour0Suisse.Repository
                 cmd.Parameters.AddWithValue("@Organizer", P.Organizer);
                 cmd.Parameters.AddWithValue("@Pseudo", P.Pseudo);
                 cmd.Parameters.AddWithValue("@Email", P.Email);
-                cmd.Parameters.AddWithValue("@Password", P.HexHashPassword);
+                cmd.Parameters.AddWithValue("@Password", P.HexaPassword);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 
@@ -1106,7 +1174,7 @@ namespace Tour0Suisse.Repository
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 cmd.CommandText = "SP_DeleteUser";
                 cmd.Parameters.AddWithValue("@ID_User", P.IdUser);
-                cmd.Parameters.AddWithValue("@Password", P.HexHashPassword);
+                cmd.Parameters.AddWithValue("@Password", P.HexaPassword);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 
@@ -1248,14 +1316,36 @@ namespace Tour0Suisse.Repository
         }
 
 
-        public bool CreateTournoi(ViewTournament P)
+        public int CreateTournoi(Tournoi P)
         {
             try
             {
+                DataTable Dotation = new DataTable();
+                Dotation.Columns.Add("ID_PlayerOne", typeof(int));
+                Dotation.Columns.Add("ID_PlayerTwo", typeof(int));
+
+                foreach (ViewDotation VD in P.Dotation)
+                {
+                    Dotation.Rows.Add(VD.Place, VD.Gain);
+                }
+
+                DataTable Orga = new DataTable();
+                Orga.Columns.Add("ID", typeof(int));
+
+                foreach (ViewOrga O in P.Organisateurs)
+                {
+                    Orga.Rows.Add(O.IdUser);
+                }
+
+
                 SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
+
+                SqlParameter reussie = new SqlParameter("@Reussie", DbType.Boolean);
+                responseMessage.Direction = System.Data.ParameterDirection.Output;
+
+                SqlParameter retour = new SqlParameter("@ID", DbType.Int32);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
 
@@ -1266,14 +1356,17 @@ namespace Tour0Suisse.Repository
                 cmd.CommandText = "SP_CreateTournoi";
                 cmd.Parameters.AddWithValue("@Name", P.Name);
                 cmd.Parameters.AddWithValue("@Date", P.Date);
-                cmd.Parameters.AddWithValue("@ID_Game", P.IdGame);
+                cmd.Parameters.AddWithValue("@ID_Game", P.jeu.IdGame);
                 cmd.Parameters.AddWithValue("@Description", P.Description);
                 cmd.Parameters.AddWithValue("@MaxNumberPlayer", P.MaxNumberPlayer);
+                cmd.Parameters.AddWithValue("@Dotation", Dotation);
+                cmd.Parameters.AddWithValue("@Orga", Orga);
                 cmd.Parameters.AddWithValue("@DeckListNumber", P.DeckListNumber);
                 cmd.Parameters.AddWithValue("@PPWin", P.Ppwin);
                 cmd.Parameters.AddWithValue("@PPDraw", P.Ppdraw);
                 cmd.Parameters.AddWithValue("@PPLose", P.Pplose);
                 cmd.Parameters.Add(responseMessage);
+                cmd.Parameters.Add(reussie);
                 cmd.Parameters.Add(retour);
 
 
@@ -1284,14 +1377,13 @@ namespace Tour0Suisse.Repository
 
 
                 db.Close();
-                return bool.Parse(retour.Value.ToString());
+                return (bool.Parse(reussie.Value.ToString()))? int.Parse(retour.Value.ToString()):-1;
             }
             catch (Exception ex)
             {
                 throw ex;
-                return false;
+                return -1;
             }
-            return true;
         }
 
 
@@ -1942,6 +2034,47 @@ namespace Tour0Suisse.Repository
         }
 
 
+        public bool EditRound(Round P)
+        {
+            try
+            {
+
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                responseMessage.Direction = System.Data.ParameterDirection.Output;
+
+                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
+                responseMessage.Direction = System.Data.ParameterDirection.Output;
+
+
+                SqlConnection db = new SqlConnection(_ConnectionString);
+
+                SqlCommand cmd = db.CreateCommand();
+                cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                cmd.CommandText = "SP_Edit_Round";
+                cmd.Parameters.AddWithValue("@ID_Tournoi", P.IdTournament);
+                cmd.Parameters.AddWithValue("@RoundNumber", P.RoundNumber);
+                cmd.Parameters.AddWithValue("@Start", P.StartRound);
+                cmd.Parameters.Add(responseMessage);
+                cmd.Parameters.Add(retour);
+
+
+
+                db.Open();
+
+                Console.WriteLine(cmd.ExecuteNonQuery() + " ligne affecté");
+
+
+                db.Close();
+                return bool.Parse(retour.Value.ToString());
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+                return false;
+            }
+            return true;
+        }
+
 
 
         public bool DeleteRound(Round P)
@@ -2075,7 +2208,7 @@ namespace Tour0Suisse.Repository
 
 
 
-        public bool CreateMatchAllParing(Round P, List<PairID> ListPairing)
+        public bool CreateMatchAllParing(Round P, IEnumerable<PairID> ListPairing)
         {
             try
             {

@@ -119,7 +119,7 @@ ID_Tournament INT NOT NULL IDENTITY(1,1),
 [Desciption] TEXT NULL,
 ID_Game INT NOT NULL,
 [MaxNumberPlayer] INT NULL DEFAULT(NULL),
-[DeckListNumber] INT NOT NULL DEFAULT(0),
+[DeckListNumber] INT NOT NULL DEFAULT(3),
 [PPWin] INT NOT NULL DEFAULT(2),
 [PPDraw] INT NOT NULL DEFAULT(1),
 [PPLose] INT NOT NULL DEFAULT(0),
@@ -127,6 +127,17 @@ ID_Game INT NOT NULL,
 [DELETED] date null DEFAULT(null),
 
 CONSTRAINT PK_Tournament__XXXX PRIMARY KEY(ID_Tournament)
+)ON Tournoi
+GO
+
+
+
+CREATE TABLE [Dotation] (
+ID_Tournament INT NOT NULL,
+Place INT NOT NULL,
+Gain INT NOT NULL DEFAULT(0)
+
+CONSTRAINT PK_Dotationt__XXXX PRIMARY KEY(ID_Tournament)
 )ON Tournoi
 GO
 
@@ -152,6 +163,7 @@ CREATE TABLE [Resultat](
 ID_Tournament INT NOT NULL,
 ID_User INT NOT NULL,
 [Rank] INT NOT NULL,
+Gain INT NOT NULL DEFAULT(0),
 Score INT NOT NULL,
 TieBreaker INT NOT NULL,
 AdditionalTieBreaker INT NULL,
@@ -257,6 +269,11 @@ ADD CONSTRAINT FK_Tournoi_Jeu__XXXX	FOREIGN KEY (ID_Game)
 									REFERENCES [Jeu](ID_Game)
 GO
 
+ALTER TABLE [Dotation]
+ADD CONSTRAINT FK_Dotation_Tournoi__XXXX	FOREIGN KEY (ID_Tournament)
+											REFERENCES [Tournoi](ID_Tournament)
+GO
+
 ALTER TABLE [Deck]
 ADD CONSTRAINT FK_Deck_Jeu__XXXX	FOREIGN KEY (ID_Game)
 									REFERENCES [Jeu](ID_Game)
@@ -342,6 +359,16 @@ ADD CONSTRAINT FK_DeckJoueur_Deck__XXXX	FOREIGN KEY (ID_Deck)
 										REFERENCES [Deck](ID_Deck)
 GO
 
+
+
+ALTER TABLE [Tournoi]
+ADD CONSTRAINT CK_Tournoi_Deck__XXX1	CHECK (DeckListNumber >=3)
+GO
+
+ALTER TABLE [Tournoi]
+ADD CONSTRAINT CK_Tournoi_Deck__XXX2	CHECK (DeckListNumber <=5)
+GO
+
 --____________FIN CREATION DES LIEN ENTRE LES TABLES_________________________
 
 --____________________________________________________
@@ -409,7 +436,7 @@ FROM Jeu
 GO
 
 CREATE VIEW [View_Resulta] AS 
-SELECT R.ID_Tournament, T.Name, R.ID_User, VP.Pseudo, VP.IG_Pseudo, R.Rank, R.Score, R.TieBreaker, R.AdditionalTieBreaker, R.AdditionalTieBreakerRules
+SELECT R.ID_Tournament, T.Name, R.ID_User, VP.Pseudo, VP.IG_Pseudo, R.Rank, R.Gain, R.Score, R.TieBreaker, R.AdditionalTieBreaker, R.AdditionalTieBreakerRules
 FROM Resultat as R
 JOIN Tournoi as T
 	ON T.ID_Tournament = R.ID_Tournament
@@ -538,6 +565,13 @@ SELECT R.ID_Tournament, T.[Name], R.RoundNumber, R.StartRound
 FROM [Round] AS R
 JOIN Tournoi AS T
 	ON R.ID_Tournament = T.ID_Tournament
+GO
+
+CREATE VIEW [View_Dotation] AS
+SELECT D.ID_Tournament, T.[Name], D.Place, D.Gain
+FROM [Dotation] AS D
+JOIN Tournoi AS T
+	ON D.ID_Tournament = T.ID_Tournament
 GO
 --____________FIN CREATION DES VUES________________________
 --______________________________________________________________
@@ -875,12 +909,15 @@ CREATE PROCEDURE SP_CreateTournoi
 	@ID_Game INT,
 	@Description TEXT,
 	@MaxNumberPlayer INT,
-	@DeckListNumber INT =0,
+	@Dotation List_Pairing readonly,
+	@Orga ID_List readonly,
+	@DeckListNumber INT =3,
 	@PPWin INT =2,
 	@PPDraw INT =1,
 	@PPLose INT =0,
 	@responseMessage NVARCHAR(250) OUTPUT,
-	@Reussie BIT OUTPUT
+	@Reussie BIT OUTPUT,
+	@ID INT OUTPUT
 AS
 BEGIN
 
@@ -905,6 +942,10 @@ BEGIN
 				BEGIN
 					RAISERROR('Le jeu du tournoi est introuvable',16,1);
 				END
+			if((SELECT COUNT(*) FROM @Orga) <=0)
+				BEGIN
+					RAISERROR('pas de créateur de tournoi enregistré',16,1);
+				END
 			if(@DeckListNumber IS NULL)
 				BEGIN
 					SET @DeckListNumber = 0;
@@ -921,9 +962,19 @@ BEGIN
 				BEGIN
 					SET @PPLose = 0;
 				END
-
+				
+			DECLARE @OP table(id int);
 				INSERT INTO Tournoi ([Name], [Date], [ID_Game], [Desciption], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose])
+					OUTPUT inserted.ID_Tournament INTO @OP
 					VALUES(@Name, @Date, @ID_Game, @Description, @MaxNumberPlayer, @DeckListNumber, @PPWin, @PPDraw, @PPLose) 
+
+				INSERT INTO Organisateur (ID_Tournament, ID_User)
+					SELECT @ID, ID FROM @Orga
+
+				SELECT @ID = id FROM @OP;
+				INSERT INTO Dotation(ID_Tournament, Place, Gain)
+					SELECT @ID, ID_PlayerOne, ID_PlayerTwo FROM @Dotation
+
 
 				SET @responseMessage='le tournoi a été creer';
 			COMMIT;
@@ -943,6 +994,7 @@ CREATE PROCEDURE SP_EditTournoi
 	@ID_Game INT =NULL,
 	@Description TEXT = NULL,
 	@MaxNumberPlayer INT =NULL,
+	@Dotation List_Pairing readonly,
 	@DeckListNumber INT =NULL,
 	@PPWin INT =NULL,
 	@PPDraw INT =NULL,
@@ -980,7 +1032,7 @@ BEGIN
 
 			
 
-			if(@Name is null and @Date is null and @ID_Game is null and @PPWin is null and @PPDraw is null and @PPLose is null and @DeckListNumber is null and @Description is null and @MaxNumberPlayer is null)
+			if(@Name is null and @Date is null and @ID_Game is null and @PPWin is null and @PPDraw is null and @PPLose is null and @DeckListNumber is null and @Description is null and @MaxNumberPlayer is null AND 0<(SELECT COUNT(*) FROM @Dotation))
 				BEGIN
 					RAISERROR('Aucune update',16,1);
 				END
@@ -996,6 +1048,19 @@ BEGIN
 				[PPDraw] = ISNULL(@PPDraw, [PPDraw]),
 				[PPLose] = ISNULL(@PPLose, [PPLose])
 			WHERE @ID_Tournoi = ID_Tournament
+
+			if(0<(SELECT COUNT(*) FROM @Dotation))
+			BEGIN
+				if(0<(SELECT COUNT(*) FROM Dotation WHERE ID_Tournament = @ID_Tournoi))
+					BEGIN
+						DELETE Dotation
+							WHERE ID_Tournament = @ID_Tournoi AND Place IN (SELECT ID_PlayerOne FROM @Dotation)
+					END
+				
+				INSERT INTO Dotation(ID_Tournament, Place, Gain)
+					SELECT @ID_Tournoi, ID_PlayerOne, ID_PlayerTwo FROM @Dotation
+
+			END
 
 				SET @responseMessage='le tournoi a été mis a jour';
 			COMMIT;
@@ -1033,24 +1098,30 @@ BEGIN
 			--(inseré ici la création des résulta du tournoi ou faire un triggeur pour le faire sur le changement de over a 1)
 
 
-			INSERT INTO Resultat ([ID_Tournament], [ID_User], [Score], [TieBreaker], [Rank])
-			SELECT VSCT.ID_Tournament, VSCT.ID_Player, VSCT.Score, SUM(tb.opponentScore) AS TieBreaker, RANK() OVER(ORDER BY VSCT.Score,SUM(tb.opponentScore))  AS [Rank]
-			FROM	(
-						SELECT VM.ID_Tournament, VM.ID_PlayerOne AS player, VM.ID_PlayerTwo AS opponent, VSCT.Score AS opponentScore
-						FROM [View_Match] AS VM
-						JOIN [View_ScoreClassementTemporaire] AS VSCT
-							ON VSCT.ID_Tournament = VM.ID_Tournament and vsct.ID_Player = VM.ID_PlayerTwo
-						WHERE VM.ID_Tournament = @ID_Tournoi
-						union
-						SELECT VM.ID_Tournament, VM.ID_PlayerTwo AS player, VM.ID_PlayerOne AS opponent, VSCT.Score AS opponentScore
-						FROM [View_Match] AS VM
-						JOIN [View_ScoreClassementTemporaire] AS VSCT
-							ON VSCT.ID_Tournament = VM.ID_Tournament and vsct.ID_Player = VM.ID_PlayerOne
-						WHERE VM.ID_Tournament = @ID_Tournoi
-					) AS TB
-			JOIN [View_ScoreClassementTemporaire] AS VSCT
-				ON TB.ID_Tournament = VSCT.ID_Tournament and TB.player = VSCT.ID_Player
-			GROUP BY VSCT.ID_Tournament, VSCT.ID_Player, VSCT.Score
+			INSERT INTO Resultat ([ID_Tournament], [ID_User], [Score], [Gain], [TieBreaker], [Rank])
+			SELECT D.ID_Tournament, ID_Player, Score, D.Gain, TieBreaker, [Rank]
+			FROM
+				(
+				SELECT VSCT.ID_Tournament, VSCT.ID_Player, VSCT.Score, SUM(tb.opponentScore) AS TieBreaker, RANK() OVER(ORDER BY VSCT.Score,SUM(tb.opponentScore))  AS [Rank]
+				FROM	(
+							SELECT VM.ID_Tournament, VM.ID_PlayerOne AS player, VM.ID_PlayerTwo AS opponent, VSCT.Score AS opponentScore
+							FROM [View_Match] AS VM
+							JOIN [View_ScoreClassementTemporaire] AS VSCT
+								ON VSCT.ID_Tournament = VM.ID_Tournament and vsct.ID_Player = VM.ID_PlayerTwo
+							WHERE VM.ID_Tournament = @ID_Tournoi
+							union
+							SELECT VM.ID_Tournament, VM.ID_PlayerTwo AS player, VM.ID_PlayerOne AS opponent, VSCT.Score AS opponentScore
+							FROM [View_Match] AS VM
+							JOIN [View_ScoreClassementTemporaire] AS VSCT
+								ON VSCT.ID_Tournament = VM.ID_Tournament and vsct.ID_Player = VM.ID_PlayerOne
+							WHERE VM.ID_Tournament = @ID_Tournoi
+						) AS TB
+				JOIN [View_ScoreClassementTemporaire] AS VSCT
+					ON TB.ID_Tournament = VSCT.ID_Tournament and TB.player = VSCT.ID_Player
+				GROUP BY VSCT.ID_Tournament, VSCT.ID_Player, VSCT.Score
+				) AS RSG
+			JOIN Dotation AS D
+				ON D.ID_Tournament = RSG.ID_Tournament AND D.Place = RSG.[Rank]
 			ORDER BY [Rank]
 
 			UPDATE Tournoi
@@ -1595,6 +1666,54 @@ GO
 
 CREATE PROCEDURE SP_CREATE_Round
 	@ID_Tournoi INT,
+	@RoundNumber INT = null,
+	@Start DateTime,
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
+AS
+BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
+	BEGIN TRY
+		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+			Begin
+				RAISERROR('Le tournoi est introuvable',16,1);
+			End
+
+		if(((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
+			BEGIN
+				RAISERROR('la round existe déjà', 16, 1);
+			END
+
+		if(@Start is null or @Start < GETDATE())
+			BEGIN
+				RAISERROR('la date de début est incorrecte', 16, 1);
+			END
+
+		if(@RoundNumber IS null or @RoundNumber <1)
+			BEGIN
+				select @RoundNumber = (Max(RoundNumber) +1) from [Round] WHERE [ID_Tournament] = @ID_Tournoi
+			END
+		
+		INSERT INTO [Round]([ID_Tournament], [RoundNumber], [StartRound])
+			VALUES(@ID_Tournoi, @RoundNumber, @Start)
+
+		COMMIT;
+	END TRY
+	BEGIN CATCH
+		SET @responseMessage=ERROR_MESSAGE();
+		SET @Reussie =0;
+		ROLLBACK;
+	END CATCH
+END
+GO
+
+
+
+CREATE PROCEDURE SP_Edit_Round
+	@ID_Tournoi INT,
 	@RoundNumber INT,
 	@Start DateTime,
 	@responseMessage NVARCHAR(250) OUTPUT,
@@ -1611,9 +1730,9 @@ BEGIN
 				RAISERROR('Le tournoi est introuvable',16,1);
 			End
 
-		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
+		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) =1))
 			BEGIN
-				RAISERROR('la round existe déjà', 16, 1);
+				RAISERROR('la round n existe pas déjà', 16, 1);
 			END
 
 		if(@Start is null or @Start < GETDATE())
@@ -2216,6 +2335,9 @@ Grant execute
 	on [dbo].[SP_CREATE_Round] To [API_User]
 GO
 Grant execute 
+	on [dbo].[SP_Edit_Round] To [API_User]
+GO
+Grant execute 
 	on [dbo].[SP_Create_User] To [API_User]
 GO
 Grant execute 
@@ -2457,6 +2579,14 @@ GRANT SELECT ON [dbo].[View_User] TO [API_User]
 GO
 
 
+GRANT VIEW DEFINITION ON [dbo].[View_Dotation] TO [API_User]
+GO
+
+GRANT REFERENCES ON [dbo].[View_Dotation] TO [API_User]
+GO
+
+GRANT SELECT ON [dbo].[View_Dotation] TO [API_User]
+GO
 
 
 --___________________FIN AUTORISATION_______________________________________________

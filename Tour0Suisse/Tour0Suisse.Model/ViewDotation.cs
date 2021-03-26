@@ -4,11 +4,11 @@ using System.Text;
 
 namespace Tour0Suisse.Model
 {
-    class ResultMatchPlayer
+    public partial class ViewDotation
     {
         public int IdTournament { get; set; }
-        public int RoundNumber { get; set; }
-        public int IdPlayer { get; set; }
-        public int? Resulta { get; set; }
+        public string Name { get; set; }
+        public int Place { get; set; }
+        public int Gain { get; set; }
     }
 }

@@ -25,6 +25,8 @@ namespace Tour0Suisse.API.Controllers
             DB_CURD = new DBTour0SuisseLINQ(ConnectionString);
         }
 
+        #region USER
+
         // GET: api/<ViewController>
         [HttpGet]
         public IEnumerable<ViewUser> GetUsers()
@@ -48,13 +50,18 @@ namespace Tour0Suisse.API.Controllers
                     Email = MyUser.Email,
                     Organizer = MyUser.Organizer,
                     Deleted = MyUser.Deleted,
-                    PseudoIgs = DB_CURD.GetPseudosUser(id)
+                    PseudoIgs = DB_CURD.GetPseudosUser(id),
+                    Resultas = DB_CURD.GetResultasOfUser(id)
                 };
             }
 
 
             return Retour;
         }
+
+        #endregion
+        
+        #region Tournoi
 
         // GET: api/<ViewController>
         [HttpGet]
@@ -68,6 +75,7 @@ namespace Tour0Suisse.API.Controllers
             return Retour;
         }
 
+        
         // GET api/<ViewController>/5
         [HttpGet]
         public Tournoi GetTournament([FromQuery] int id)
@@ -79,8 +87,10 @@ namespace Tour0Suisse.API.Controllers
                 IdTournament = t.IdTournament,
                 Name = t.Name,
                 Date = t.Date,
-                Desciption = t.Name,
+                Description = t.Description,
                 jeu = DB_CURD.GetJeu(t.IdGame),
+                Dotation = DB_CURD.GetDotationsOf(t.IdTournament),
+                Resultas = DB_CURD.GetResultasOfTournament(t.IdTournament),
                 Participants = DB_CURD.GetParticipantsOf(t.IdTournament),
                 Organisateurs = DB_CURD.GetOrgasOf(t.IdTournament),
                 DeckListNumber = t.DeckListNumber,
@@ -104,6 +114,9 @@ namespace Tour0Suisse.API.Controllers
             return retour;
         }
 
+        #endregion
+
+        #region Jeu
 
         [HttpGet]
         public IEnumerable<ViewJeu> GetJeus()
@@ -121,6 +134,10 @@ namespace Tour0Suisse.API.Controllers
 
         //getresulta en attente pour le moment (sans doute inutile a voir)
 
+
+        #endregion
+
+        #region Match
 
         [HttpGet]
         public IEnumerable<ViewMatch> GetMatchs()
@@ -151,7 +168,11 @@ namespace Tour0Suisse.API.Controllers
             return retour;
         }
 
+        #endregion
 
+        #region Participant/Deck
+
+        
         [HttpGet]
         public IEnumerable<ViewDeck> GetParticipantsOf([FromQuery] int Idtournoi)
         {
@@ -184,6 +205,10 @@ namespace Tour0Suisse.API.Controllers
             return DB_CURD.GetDecksOfParticipant(IdTournoi, IdUser);
         }
 
+        #endregion
+
+        #region Partie
+
         [HttpGet]
         public IEnumerable<ViewPartie> GetPartiesOfMatch([FromQuery] int IdTournoi, [FromQuery] int IdPlayer, [FromQuery] int RoundNumber = -1)
         {
@@ -196,7 +221,10 @@ namespace Tour0Suisse.API.Controllers
             return DB_CURD.ViewPartieOfMatch(IdTournoi, IdPlayer, PartNumber, RoundNumber);
         }
 
+        #endregion
 
+        #region Round
+        
         [HttpGet]
         public IEnumerable<ViewRound> GetRoundsOfTournament([FromQuery] int IdTournoi)
         {
@@ -220,6 +248,10 @@ namespace Tour0Suisse.API.Controllers
 
             return retour;
         }
+
+        #endregion
+        
+
         //// POST api/<ViewController>
         //[HttpPost]
         //public void Post([FromBody] string value)

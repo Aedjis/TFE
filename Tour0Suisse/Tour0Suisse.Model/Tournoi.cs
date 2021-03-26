@@ -9,7 +9,7 @@ namespace Tour0Suisse.Model
         public int IdTournament { get; set; }
         public string Name { get; set; }
         public DateTime Date { get; set; }
-        public string Desciption { get; set; }
+        public string Description { get; set; }
         public int DeckListNumber { get; set; }
         public int? MaxNumberPlayer { get; set; }
         public int Ppwin { get; set; }
@@ -22,6 +22,8 @@ namespace Tour0Suisse.Model
         public IEnumerable<ViewOrga> Organisateurs { get; set; }
         public IEnumerable<ViewResulta> Resultas { get; set; }
         public IEnumerable<ViewScoreClassementTemporaire> Classement { get; set; }
+        public IEnumerable<ViewDotation> Dotation { get; set; }
+        public IEnumerable<Match> Matchs { get; set; }
 
     }
 }

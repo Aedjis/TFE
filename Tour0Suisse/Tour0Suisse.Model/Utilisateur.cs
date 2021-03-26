@@ -11,24 +11,38 @@ namespace Tour0Suisse.Model
         public int IdUser { get; set; }
         public string Pseudo { get; set; }
         public string Email { get; set; }
-        public string Password { get; set; }
-
-        public string HexHashPassword
-        {
-            get
-            {
-                Byte[] inputBytes = Encoding.UTF8.GetBytes(Password);
-                SHA512 shaM = new SHA512Managed();
-                byte[] retour = shaM.ComputeHash(inputBytes);
-
-                return "0x"+ BitConverter.ToString(retour).Replace("-", "");
-            }
-        }
-
         public bool Organizer { get; set; }
         public DateTime? Deleted { get; set; }
 
+
+        private string _hexaPassword;
+
+        public string Password
+        {
+            set
+            {
+                Byte[] inputBytes = Encoding.UTF8.GetBytes(value);
+                SHA512 shaM = new SHA512Managed();
+                byte[] hexa = shaM.ComputeHash(inputBytes);
+
+                _hexaPassword = "0x" + BitConverter.ToString(hexa).Replace("-", "");
+            }
+        }
+
+        public string HexaPassword
+        {
+            get
+            {
+                return _hexaPassword;
+            }
+            set
+            {
+                _hexaPassword = value;
+            }
+        }
+
         public List<ViewPseudo> PseudoIgs { get; set; }
+        public List<ViewResulta> Resultas { get; set; }
 
     }
 }
