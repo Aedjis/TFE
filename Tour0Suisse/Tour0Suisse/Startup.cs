@@ -10,7 +10,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Tour0Suisse.Web.Data;
 
 namespace Tour0Suisse
 {
@@ -27,7 +26,7 @@ namespace Tour0Suisse
         public void ConfigureServices(IServiceCollection services)
         {
             //modif pour fair fonction apicontext
-            services.AddDbContext<APIcontext>();
+            //services.AddDbContext<APIcontext>();
             //fin modif
 
             //DEBUT MODIF (pour les cookie)

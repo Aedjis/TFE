@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using  Tour0Suisse.Model;
-using Tour0Suisse.Web.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
+using Newtonsoft.Json;
 
 namespace Tour0Suisse.Controllers
 {
@@ -14,12 +16,6 @@ namespace Tour0Suisse.Controllers
     public class UserController : Controller
     {
 
-        private readonly APIcontext _context;
-
-        public UserController(APIcontext context)
-        {
-            _context = context;
-        }
 
         public async Task<IActionResult> Index()
         {
@@ -29,19 +25,62 @@ namespace Tour0Suisse.Controllers
         // GET: Utilisateurs
         public async Task<IActionResult> AllUser()
         {
-            return View(await _context.Utilisateur.ToListAsync());
+            IEnumerable<ViewUser> users = new List<ViewUser>();
+
+            using (var httpClient = new HttpClient())
+            {
+                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetUsers"))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    users = JsonConvert.DeserializeObject<IEnumerable<ViewUser>>(apiResponse);
+                }
+            }
+            
+            return View( users);
         }
 
-        // GET: User
-        public ActionResult LogIn()
+
+        public async Task<ActionResult> LogIn(Utilisateur user = null)
         {
-            return View("~/Views/User/Connexion.cshtml");
+            ViewUser Logged;
+            if (user != null && !string.IsNullOrEmpty(user.Email) && !string.IsNullOrEmpty(user.HexaPassword))
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    using (var response = await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/LogIN", user))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        Logged = JsonConvert.DeserializeObject<ViewUser>(apiResponse);
+                        if (Logged.IdUser >0 && Logged.Pseudo!= null)
+                        {
+                            HttpContext.Session.SetString("UserId", Logged.IdUser.ToString());
+                            HttpContext.Session.SetString("User", Logged.Pseudo.ToString());
+                            return View("~/Views/Home/Index.cshtml");
+                        }
+                    }
+                }
+            }
+           
+            return View("~/Views/User/Connexion.cshtml", user);
         }
 
         // GET: User/Details/5
-        public ActionResult Details(int id)
+        public async Task<ActionResult> Details(int id)
         {
-            return View("~/Views/User/Profil.cshtml");
+
+            Utilisateur user = new Utilisateur();
+
+            using (var httpClient = new HttpClient())
+            {
+                string requestUri = "https://localhost:44321" + "/View" + "/GetUser" + "?id=" + id.ToString();
+                using (var response = await httpClient.GetAsync(requestUri))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    user = JsonConvert.DeserializeObject<Utilisateur>(apiResponse);
+                }
+            }
+
+            return View("~/Views/User/Profil.cshtml", user);
         }
 
         // GET: User/Create
@@ -55,19 +94,24 @@ namespace Tour0Suisse.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdUser,Pseudo,Email,Password,Organizer,Deleted")] Utilisateur utilisateur)
+        public async Task<IActionResult> Create([Bind("IdUser,Pseudo,Email,Password,Organizer,Deleted")] Utilisateur User)
         {
             if (ModelState.IsValid)
             {
-                //todo faire l'appelle a api pour cré un nouvelle utilisateur (encrypté le mdp avant aussi)
+                using (var httpClient = new HttpClient())
+                {
+                    using (var response = await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/CreateUser", User))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        if (JsonConvert.DeserializeObject<bool>(apiResponse))
+                        {
+                            return View("~/Views/User/InscriptionReussie.cshtml");
+                        }
+                    }
+                }
 
-                //_context.Add(utilisateur);
-                //await _context.SaveChangesAsync();
-                //return RedirectToAction(nameof(Index));
-
-                return View("~/Views/User/InscriptionReussie.cshtml");
             }
-            return View("~/Views/User/Inscription.cshtml", utilisateur);
+            return View("~/Views/User/Inscription.cshtml", User);
         }
 
 
@@ -79,7 +123,7 @@ namespace Tour0Suisse.Controllers
                 return NotFound();
             }
 
-            var utilisateur = await _context.Utilisateur.FindAsync(id);
+            ViewUser utilisateur = null;//await _context.Utilisateur.FindAsync(id);
             if (utilisateur == null)
             {
                 return NotFound();
@@ -94,7 +138,7 @@ namespace Tour0Suisse.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdUser,Pseudo,Email,Password,Organizer,Deleted")] Utilisateur utilisateur)
         {
-            if (id != utilisateur.IdUser)
+            if (!int.TryParse(HttpContext.Session.GetString("UserID"), out int SessionId) || id != utilisateur.IdUser || SessionId != utilisateur.IdUser)
             {
                 return NotFound();
             }
@@ -103,23 +147,17 @@ namespace Tour0Suisse.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                using (var httpClient = new HttpClient())
                 {
-                    _context.Update(utilisateur);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!UtilisateurExists(utilisateur.IdUser))
+                    using (var response = await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/EditUser", User))
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        if (JsonConvert.DeserializeObject<bool>(apiResponse))
+                        {
+                            return RedirectToAction("Details", utilisateur.IdUser);
+                        }
                     }
                 }
-                return RedirectToAction(nameof(Index));
             }
 
             return View("~/Views/User/UpdateProfil.cshtml", utilisateur);
@@ -136,15 +174,40 @@ namespace Tour0Suisse.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var utilisateur = await _context.Utilisateur.FindAsync(id);
-            _context.Utilisateur.Remove(utilisateur);
-            await _context.SaveChangesAsync();
+            //var utilisateur = await _context.Utilisateur.FindAsync(id);
+            //_context.Utilisateur.Remove(utilisateur);
+            //await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool UtilisateurExists(int id)
         {
-            return _context.Utilisateur.Any(e => e.IdUser == id);
+            return false;//_context.Utilisateur.Any(e => e.IdUser == id);
         }
+
+        //public async Task<IActionResult> AddGamePseudo(Utilisateur utilisateur)
+        //{
+        //    if (!int.TryParse(HttpContext.Session.GetString("UserID"), out int SessionId) || SessionId != utilisateur.IdUser)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    if (ModelState.IsValid)
+        //    {
+        //        using (var httpClient = new HttpClient())
+        //        {
+        //            using (var response = await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/AddPseudo", ))
+        //            {
+        //                string apiResponse = await response.Content.ReadAsStringAsync();
+        //                if (JsonConvert.DeserializeObject<bool>(apiResponse))
+        //                {
+        //                    return RedirectToAction("Details", utilisateur.IdUser);
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //    return View("~/Views/User/AddGamePseudo.cshtml", utilisateur);
+        //}
     }
 }

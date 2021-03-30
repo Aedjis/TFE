@@ -1,7 +1,12 @@
-﻿@model Tour0Suisse.Model.Utilisateur
+﻿@using Microsoft.AspNetCore.Http
+@using System.Globalization
+@using Tour0Suisse.Model
+@model Tour0Suisse.Model.Utilisateur
 
 @{
     ViewData["Title"] = "Profil";
+    ViewData["Message"] = Model.Pseudo;
+    var LoggedUser = int.TryParse(Context.Session.GetString("UserId"), out int Id) && Id == @Model.IdUser;
 }
 <h2>@ViewData["Title"]</h2>
 <h3>@ViewData["Message"]</h3>
@@ -28,9 +33,78 @@
         <dd>
             @Html.DisplayFor(model => model.Organizer)
         </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PseudoIgs)
+        </dt>
+        <dd>
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayName("Jeu")
+                    </th>
+                    <th>
+                        @Html.DisplayName("Pseudo")
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var item in Model.PseudoIgs)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Game)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.IgPseudo)
+                        </td>
+                    </tr>
+
+                }
+                </tbody>
+            </table>
+            
+            @if (LoggedUser)
+            {
+                <a asp-action="AddGamePseudo" asp-route-id="@Model.IdUser">Ajouté ou modifié des pseudo</a><br/>
+            }
+        </dd>
+        @*<dt>
+            @Html.DisplayFor(model => model.Resultas)
+        </dt>
+        <dd>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.Display("Jeu")
+                        </th>
+                        <th>
+                            @Html.Display("Pseudo")
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.PseudoIgs)
+                    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Game)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IgPseudo)
+            </td>
+        </tr>}
+                </tbody>
+            </table>*@
+        </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.IdUser">Edit</a> 
-    <a asp-action="Index">Back to List</a>
+@if (LoggedUser)
+    {
+        <a asp-action="Edit" asp-route-id="@Model.IdUser">Edit</a><br/>
+    }
+    <a asp-action="AllUser">Back to List</a>
 </div>

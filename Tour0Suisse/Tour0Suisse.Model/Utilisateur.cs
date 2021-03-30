@@ -15,17 +15,31 @@ namespace Tour0Suisse.Model
         public DateTime? Deleted { get; set; }
 
 
-        private string _hexaPassword;
+        private byte[] _Password;
 
         public string Password
         {
             set
             {
-                Byte[] inputBytes = Encoding.UTF8.GetBytes(value);
-                SHA512 shaM = new SHA512Managed();
-                byte[] hexa = shaM.ComputeHash(inputBytes);
+                if (value != null)
+                {
+                    Byte[] inputBytes = Encoding.UTF8.GetBytes(value);
+                    SHA512 shaM = new SHA512Managed();
+                    byte[] hexa = shaM.ComputeHash(inputBytes);
 
-                _hexaPassword = "0x" + BitConverter.ToString(hexa).Replace("-", "");
+                    _Password = hexa;
+                }
+                else
+                {
+                    _Password = null;
+                }
+            }
+
+            get
+            {
+#warning rustine qui doit disparaitre
+                return null;
+
             }
         }
 
@@ -33,11 +47,24 @@ namespace Tour0Suisse.Model
         {
             get
             {
-                return _hexaPassword;
+                if (_Password == null)
+                {
+                    return null;
+                }
+                return "0x" + BitConverter.ToString(_Password).Replace("-", ""); ;
             }
+        }
+
+        public byte[] BinaryPassword
+        {
+            get
+            {
+                return _Password;
+            }
+
             set
             {
-                _hexaPassword = value;
+                _Password = value;
             }
         }
 

@@ -27,9 +27,9 @@ namespace Tour0Suisse.API.Controllers
         #region User
         
         [HttpPost]
-        public int LogIN(string Email, string Password)
+        public ViewUser LogIN(Utilisateur User)
         {
-            return DB_CURD.LogIn(Email, Password); ;
+            return DB_CURD.LogIn(User.Email, User.HexaPassword); ;
         }
 
         [HttpPost]

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Tour0Suisse.Model.Utilisateur>
+﻿@model IEnumerable<Tour0Suisse.Model.ViewUser>
 
 @{
     ViewData["Title"] = "AllUser";
@@ -22,7 +22,7 @@
                 @Html.DisplayFor(modelItem => item.Pseudo)
             </td>
             <td>
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) 
+                @Html.ActionLink("Details", "Details", new {  id=item.IdUser  }) 
             </td>
         </tr>
 }

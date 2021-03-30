@@ -44,10 +44,9 @@ namespace Tour0Suisse.Repository
             return Retour;
         }
 
-        public int LogIn(string Email, string Password)
+        public ViewUser LogIn(string Email, string Password)
         {
-            int Retour = -1;
-
+            
             if (!Password.StartsWith("0x"))
             {
                 Password = "0x" + Password;
@@ -58,10 +57,12 @@ namespace Tour0Suisse.Repository
             var User =  _ViewUsers("WHERE  Email = '" + Email +  "' AND [Password] = "+ Password.Replace("-", ""));
             if (User.Count == 1)
             {
-                Retour = User.First().IdUser;
+                return User.First();
             }
-
-            return Retour;
+            else
+            {
+                return new ViewUser {IdUser = -1};
+            }
         }
 
         private List<ViewUser> _ViewUsers(string Where = "")
@@ -1076,11 +1077,11 @@ namespace Tour0Suisse.Repository
         {
             try
             {
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1090,7 +1091,7 @@ namespace Tour0Suisse.Repository
                 cmd.CommandText = "SP_Create_User";
                 cmd.Parameters.AddWithValue("@Pseudo", P.Pseudo);
                 cmd.Parameters.AddWithValue("@Email", P.Email);
-                cmd.Parameters.AddWithValue("@Password", P.HexaPassword);
+                cmd.Parameters.AddWithValue("@Password", P.BinaryPassword);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 
@@ -1118,11 +1119,11 @@ namespace Tour0Suisse.Repository
         {
             try
             {
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1161,11 +1162,11 @@ namespace Tour0Suisse.Repository
         {
             try
             {
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1201,11 +1202,11 @@ namespace Tour0Suisse.Repository
         {
             try
             {
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
 
@@ -1241,11 +1242,11 @@ namespace Tour0Suisse.Repository
         {
             try
             {
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
 
@@ -1281,11 +1282,11 @@ namespace Tour0Suisse.Repository
         {
             try
             {
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
 
@@ -1338,14 +1339,13 @@ namespace Tour0Suisse.Repository
                 }
 
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
+                SqlParameter reussie = new SqlParameter("@Reussie", SqlDbType.Bit);
+                reussie.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter reussie = new SqlParameter("@Reussie", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
-
-                SqlParameter retour = new SqlParameter("@ID", DbType.Int32);
+                SqlParameter retour = new SqlParameter("@ID", SqlDbType.Int);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
 
@@ -1391,11 +1391,11 @@ namespace Tour0Suisse.Repository
         {
             try
             {
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1439,11 +1439,11 @@ namespace Tour0Suisse.Repository
         {
             try
             {
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1478,11 +1478,11 @@ namespace Tour0Suisse.Repository
         {
             try
             {
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1526,11 +1526,11 @@ namespace Tour0Suisse.Repository
                 }
 
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1568,11 +1568,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1609,11 +1609,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1652,11 +1652,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1694,11 +1694,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1736,11 +1736,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1779,11 +1779,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1821,11 +1821,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1864,11 +1864,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1906,11 +1906,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1954,11 +1954,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -1997,11 +1997,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -2039,11 +2039,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -2082,11 +2082,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -2125,11 +2125,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -2168,11 +2168,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -2221,11 +2221,11 @@ namespace Tour0Suisse.Repository
                     Pairing.Rows.Add(Paire.ID1, Paire.ID2);
                 }
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -2265,11 +2265,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -2312,11 +2312,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -2357,11 +2357,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -2406,11 +2406,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
@@ -2455,11 +2455,11 @@ namespace Tour0Suisse.Repository
             try
             {
 
-                SqlParameter responseMessage = new SqlParameter("@responseMessage", DbType.String);
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250);
                 responseMessage.Direction = System.Data.ParameterDirection.Output;
 
-                SqlParameter retour = new SqlParameter("@responseMessage", DbType.Boolean);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit);
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);
