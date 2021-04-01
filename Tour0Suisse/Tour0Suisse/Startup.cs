@@ -34,7 +34,8 @@ namespace Tour0Suisse
             services.AddSession(options =>
             {
                 options.Cookie.HttpOnly = true;
-                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.Cookie.IsEssential = true;
+                //options.IdleTimeout = TimeSpan.FromSeconds(10);
             });
             //FIN MODIF
             services.Configure<CookiePolicyOptions>(options =>

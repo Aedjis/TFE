@@ -1346,7 +1346,7 @@ namespace Tour0Suisse.Repository
                 reussie.Direction = System.Data.ParameterDirection.Output;
 
                 SqlParameter retour = new SqlParameter("@ID", SqlDbType.Int);
-                responseMessage.Direction = System.Data.ParameterDirection.Output;
+                retour.Direction = System.Data.ParameterDirection.Output;
 
 
                 SqlConnection db = new SqlConnection(_ConnectionString);

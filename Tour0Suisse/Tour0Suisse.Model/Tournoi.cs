@@ -5,7 +5,22 @@ namespace Tour0Suisse.Model
 {
     public partial class Tournoi
     {
+        public Tournoi()
+        {
+            jeu = new ViewJeu();
+            Participants = new List<ViewParticipant>();
+            Organisateurs = new List<ViewOrga>();
+            Resultas = new List<ViewResulta>();
+            Classement = new List<ViewScoreClassementTemporaire>();
+            Dotation = new List<ViewDotation>();
+            Matchs = new List<Match>();
+        }
 
+        public int IdGame
+        {
+            get => jeu.IdGame;
+            set => jeu.IdGame = value;
+        }
         public int IdTournament { get; set; }
         public string Name { get; set; }
         public DateTime Date { get; set; }

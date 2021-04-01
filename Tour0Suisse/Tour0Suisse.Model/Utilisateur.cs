@@ -7,7 +7,11 @@ namespace Tour0Suisse.Model
 {
     public partial class Utilisateur
     {
-
+        public Utilisateur()
+        {
+            PseudoIgs = new List<ViewPseudo>();
+            Resultas = new List<ViewResulta>();
+        }
         public int IdUser { get; set; }
         public string Pseudo { get; set; }
         public string Email { get; set; }

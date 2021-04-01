@@ -5,6 +5,10 @@ namespace Tour0Suisse.Model
 {
     public partial class Round
     {
+        public Round()
+        {
+            Matches = new List<ViewMatch>();
+        }
 
         public int IdTournament { get; set; }
         public string Name { get; set; }

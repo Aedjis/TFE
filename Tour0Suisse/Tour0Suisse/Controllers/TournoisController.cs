@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Tour0Suisse.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
+using Newtonsoft.Json;
 using Tour0Suisse.Controllers;
 
 namespace Tour0Suisse.Web.Controllers
@@ -51,39 +54,75 @@ namespace Tour0Suisse.Web.Controllers
 
         //    return View(tournoi);
         //}
-#warning a refaire
-        //// GET: Tournois/Create
-        //public IActionResult Create()
-        //{
-        //    //List<Jeu> Test = new List<Jeu>();
-        //    //for (int i = 0; i < 5; i++)
-        //    //{
-        //    //    Test.Add( new Jeu
-        //    //    {
-        //    //        IdGame = i,
-        //    //        Name = "jeu numero " + i
-        //    //    });
-        //    //}
-        //    ViewData["IdGame"] = new SelectList(_context.Jeu, "IdGame", "Name");
-        //    return View("~/Views/Tournoi/CreateTournoi.cshtml");
-        //}
-#warning a refaire
-        //// POST: Tournois/Create
-        //// To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        //// more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("IdTournament,Name,Date,Desciption,IdGame,MaxNumberPlayer,DeckListNumber,Ppwin,Ppdraw,Pplose,Over,Deleted")] ViewTournament tournoi)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _context.Add(tournoi);
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["IdGame"] = new SelectList(_context.Jeu, "IdGame", "Name", tournoi.IdGame);
-        //    return View("~/Views/Tournoi/CreateTournoi.cshtml", tournoi);
-        //}
+
+        
+        public async Task<IActionResult> Create()
+        {
+
+            IEnumerable<ViewJeu> Jeus = new List<ViewJeu>();
+
+            using (var httpClient = new HttpClient())
+            {
+                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetJeus"))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    Jeus = JsonConvert.DeserializeObject<IEnumerable<ViewJeu>>(apiResponse);
+                }
+            }
+
+            ViewData["AllGame"] = new SelectList(Jeus, "IdGame", "Name");
+            return View("~/Views/Tournoi/CreateTournoi.cshtml");
+        }
+
+        // POST: Tournois/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("IdTournament,Name,Date,Description,IdGame,MaxNumberPlayer,DeckListNumber,Ppwin,Ppdraw,Pplose,Over,Deleted")] Tournoi tournoi)
+        {
+            if (ModelState.IsValid)
+            {
+                if ((tournoi.Organisateurs == null || tournoi.Organisateurs.Count() == 0) && int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
+                {
+                    tournoi.Organisateurs = new List<ViewOrga>{new ViewOrga{Level = 0, IdUser = IdUser, IdTournament = -1, Name = "", Pseudo = ""}};
+                }
+
+                if (tournoi.Organisateurs != null && tournoi.Organisateurs.Count() != 0)
+                {
+
+                    using (var httpClient = new HttpClient())
+                    {
+                        using (var response =
+                            await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/CreateTournoi",
+                                tournoi))
+                        {
+                            string apiResponse = await response.Content.ReadAsStringAsync();
+                            if (JsonConvert.DeserializeObject<bool>(apiResponse))
+                            {
+                                return RedirectToAction(nameof(Index));
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+            IEnumerable<ViewJeu> Jeus = new List<ViewJeu>();
+
+            using (var httpClient = new HttpClient())
+            {
+                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetJeus"))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    Jeus = JsonConvert.DeserializeObject<IEnumerable<ViewJeu>>(apiResponse);
+                }
+            }
+
+            ViewData["AllGame"] = new SelectList(Jeus, "IdGame", "Name", tournoi.jeu.IdGame);
+            return View("~/Views/Tournoi/CreateTournoi.cshtml", tournoi);
+        }
 #warning a refaire
         //// GET: Tournois/Edit/5
         //public async Task<IActionResult> Edit(int? id)

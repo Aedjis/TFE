@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using  Tour0Suisse.Model;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Tour0Suisse.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Newtonsoft.Json;

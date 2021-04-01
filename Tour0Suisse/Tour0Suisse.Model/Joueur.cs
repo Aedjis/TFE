@@ -5,7 +5,11 @@ namespace Tour0Suisse.Model
 {
     public partial class Joueur
     {
-
+        public Joueur()
+        {
+            User = new ViewUser();
+            Decks = new List<ViewDeck>();
+        }
 
         public int IdTournament { get; set; }
         public ViewUser User { get; set; }

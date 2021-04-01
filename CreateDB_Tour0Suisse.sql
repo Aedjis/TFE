@@ -908,7 +908,7 @@ CREATE PROCEDURE SP_CreateTournoi
 	@Date DATETIME,
 	@ID_Game INT,
 	@Description TEXT,
-	@MaxNumberPlayer INT,
+	@MaxNumberPlayer INT = null,
 	@Dotation List_Pairing readonly,
 	@Orga ID_List readonly,
 	@DeckListNumber INT =3,
@@ -946,9 +946,9 @@ BEGIN
 				BEGIN
 					RAISERROR('pas de créateur de tournoi enregistré',16,1);
 				END
-			if(@DeckListNumber IS NULL)
+			if(@MaxNumberPlayer = 0)
 				BEGIN
-					SET @DeckListNumber = 0;
+					SET @MaxNumberPlayer = NULL;
 				END
 			if(@PPWin IS NULL)
 				BEGIN
@@ -967,11 +967,13 @@ BEGIN
 				INSERT INTO Tournoi ([Name], [Date], [ID_Game], [Desciption], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose])
 					OUTPUT inserted.ID_Tournament INTO @OP
 					VALUES(@Name, @Date, @ID_Game, @Description, @MaxNumberPlayer, @DeckListNumber, @PPWin, @PPDraw, @PPLose) 
+					
+				SELECT @ID = id FROM @OP;
+
 
 				INSERT INTO Organisateur (ID_Tournament, ID_User)
 					SELECT @ID, ID FROM @Orga
 
-				SELECT @ID = id FROM @OP;
 				INSERT INTO Dotation(ID_Tournament, Place, Gain)
 					SELECT @ID, ID_PlayerOne, ID_PlayerTwo FROM @Dotation
 
