@@ -33,15 +33,14 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
-                    <li><a asp-area="" asp-controller="Tournois" asp-action="Create">Test</a></li>
-                    <li><a asp-area="" asp-controller="Tournois" asp-action="ListTournoi">Tournoi</a></li>
+                    <li><a asp-area="" asp-controller="Tournois" asp-action="Index">Tournoi</a></li>
                     @{ if (Context.Session.GetString("UserId") != null)
                         {
                             <li><a asp-area="" asp-controller="User" asp-action="Details" asp-route-id="@Context.Session.GetString("UserId")">@Context.Session.GetString("User")</a></li> }
                         else
                         {
-                            <li><a asp-area="" asp-controller="Home" asp-action="Connexion">Connexion</a></li>
-                            <li><a asp-area="" asp-controller="Home" asp-action="Inscription">Inscription</a></li>
+                            <li><a asp-area="" asp-controller="User" asp-action="LogIn">Connexion</a></li>
+                            <li><a asp-area="" asp-controller="User" asp-action="Create">Inscription</a></li>
                         }
                     }
                     

@@ -1,0 +1,84 @@
+﻿@model Tour0Suisse.Model.Tournoi
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Tournoi</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Date)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Date)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.MaxNumberPlayer)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.MaxNumberPlayer)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.DeckListNumber)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.DeckListNumber)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Ppwin)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Ppwin)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Ppdraw)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Ppdraw)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Pplose)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Pplose)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Over)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Over)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Deleted)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Deleted)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.jeu.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.jeu.Name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.IdTournament">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

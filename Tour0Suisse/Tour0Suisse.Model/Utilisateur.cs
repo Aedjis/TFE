@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -13,9 +14,13 @@ namespace Tour0Suisse.Model
             Resultas = new List<ViewResulta>();
         }
         public int IdUser { get; set; }
+        [Display(Name = "Nom")]
         public string Pseudo { get; set; }
+        [Display(Name = "Email")]
         public string Email { get; set; }
+        [Display(Name = "Organise des tournoi")]
         public bool Organizer { get; set; }
+        [Display(Name = "Date de supression de l'utilisateur")]
         public DateTime? Deleted { get; set; }
 
 
@@ -72,7 +77,9 @@ namespace Tour0Suisse.Model
             }
         }
 
+        [Display(Name = "Liste des pseudo en jeu")]
         public List<ViewPseudo> PseudoIgs { get; set; }
+        [Display(Name = "Liste des resultas")]
         public List<ViewResulta> Resultas { get; set; }
 
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Tour0Suisse.Model
 {
@@ -11,6 +12,7 @@ namespace Tour0Suisse.Model
         }
         public int IdTournament { get; set; }
         public ViewUser User { get; set; }
+        [Display(Name = "Niveau de compétance")]
         public int? Level { get; set; }
 
     }

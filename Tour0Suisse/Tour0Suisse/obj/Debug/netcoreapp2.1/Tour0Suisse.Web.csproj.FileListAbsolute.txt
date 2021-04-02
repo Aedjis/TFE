@@ -31,7 +31,6 @@ E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreap
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Shared\_Layout.cshtml.g.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Shared\_ValidationScriptsPartial.cshtml.g.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Tournoi\CreateTournoi.cshtml.g.cs
-E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Tournoi\ListTournoi.cshtml.g.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\User\AllUser.cshtml.g.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\User\Connexion.cshtml.g.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\User\DeletedCompte.cshtml.g.cs
@@ -42,3 +41,7 @@ E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreap
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\_ViewImports.cshtml.g.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\_ViewStart.cshtml.g.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Tour0Suisse.Web.genruntimeconfig.cache
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Tournoi\Details.cshtml.g.cs
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Tournoi\Index.cshtml.g.cs
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Tournoi\Delete.cshtml.g.cs
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Tournoi\Edit.cshtml.g.cs

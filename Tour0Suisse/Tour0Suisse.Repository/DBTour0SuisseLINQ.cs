@@ -192,7 +192,7 @@ namespace Tour0Suisse.Repository
             {
                 SqlConnection db = new SqlConnection(_ConnectionString);
 
-                string querry = "SELECT ID_Tournament, [Name], ID_Game, [Game], [Date], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose] FROM [View_Tournament] " + Where;
+                string querry = "SELECT ID_Tournament, [Name], ID_Game, [Game], Description, [Date], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose] FROM [View_Tournament] " + Where;
 
                 SqlCommand cmd = db.CreateCommand();
                 cmd.CommandText = querry;
@@ -203,7 +203,6 @@ namespace Tour0Suisse.Repository
 
                 while (reader.Read())
                 {
-                   
                     Retour.Add(new ViewTournament
                     {
                         IdTournament = int.Parse(reader["ID_Tournament"].ToString()),
@@ -211,11 +210,12 @@ namespace Tour0Suisse.Repository
                         Name = reader["Name"].ToString(),
                         Game = reader["Game"].ToString(),
                         Date = DateTime.Parse(reader["Date"].ToString()),
-                        MaxNumberPlayer = int.Parse(reader["MaxNumberPlayer"].ToString()),
+                        MaxNumberPlayer = int.TryParse(reader["MaxNumberPlayer"].ToString(), out int o)? o : (int?)null,
                         DeckListNumber = int.Parse(reader["DeckListNumber"].ToString()),
                         Ppwin = int.Parse(reader["PPWin"].ToString()),
                         Ppdraw = int.Parse(reader["PPDraw"].ToString()),
                         Pplose = int.Parse(reader["PPLose"].ToString()),
+                        Description = reader["Description"].ToString()
                     });
                 }
 

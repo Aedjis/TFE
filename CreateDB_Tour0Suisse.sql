@@ -406,7 +406,7 @@ JOIN Jeu AS J
 GO
 
 CREATE VIEW [View_Tournament] AS
-SELECT ID_Tournament, T.[Name] AS [Name], T.ID_Game AS ID_Game, J.[Name] AS [Game], [Date], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose], T.DELETED
+SELECT ID_Tournament, T.[Name] AS [Name], T.ID_Game AS ID_Game, J.[Name] AS [Game], T.Desciption as [Description], [Date], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose], T.DELETED
 FROM Tournoi AS T
 JOIN Jeu AS J
 	ON T.ID_Game = J.ID_Game
@@ -418,7 +418,7 @@ FROM Organisateur as O
 JOIN Tournoi as T
 	ON O.ID_Tournament = T.ID_Tournament
 JOIN Utilisateur as U
-	ON O.ID_User = u.Pseudo
+	ON O.ID_User = u.ID_User
 GO
 
 CREATE VIEW [View_Participant] AS 
@@ -1015,7 +1015,7 @@ BEGIN
 				BEGIN
 					SET @MaxNumberPlayer = NULL;
 				END
-			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) = 1)
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
 				Begin
 					RAISERROR('Le tournoi est introuvable',16,1);
 				End
