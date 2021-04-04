@@ -92,6 +92,24 @@ namespace Tour0Suisse.API.Controllers
         }
 
         [HttpPost]
+        public bool Register(Joueur Joueur)
+        {
+            return DB_CURD.RegisterTournoi(new DeckJoueur{IdDeck = 0, IdTournament = Joueur.IdTournament, IdUser = Joueur.User.IdUser}, Joueur.Decks.Select(d=>d.DeckList).ToList()); ;
+        }
+
+        [HttpPost]
+        public bool EditDecks(ViewDeck Deck)
+        {
+            return DB_CURD.UpdateDeck(new DeckJoueur{IdDeck = Deck.IdDeck, IdTournament = Deck.IdTournament, IdUser = Deck.IdUser}, Deck.DeckList); ;
+        }
+
+        [HttpPost]
+        public bool Unregister (Joueur Joueur)
+        {
+            return DB_CURD.UnregisterTournoi(new DeckJoueur { IdDeck = 0, IdTournament = Joueur.IdTournament, IdUser = Joueur.User.IdUser }); ;
+        }
+
+        [HttpPost]
         public bool AddAdmin(ViewOrga Orga)
         {
             return DB_CURD.AddAdmin(Orga); ;

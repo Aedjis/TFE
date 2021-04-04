@@ -1,0 +1,38 @@
+﻿
+@model Tour0Suisse.Model.Joueur
+
+<h2>Create</h2>
+
+<h4>Deck</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Register">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input asp-for="@Model.IdTournament" class="control-label" type="hidden"/>
+
+            @{
+                for (int i =0 ; @ViewBag.NbDeck > i;i++)
+                {
+                    <div class="form-group">
+                        <label asp-for="@Model.Deck[i].DeckList" class="control-label"></label>
+                        <textarea asp-for="@Model.Deck[i].DeckList" class="form-control" rows="5"></textarea>
+                        <span asp-validation-for="@Model.Deck[i].DeckList" class="text-danger"></span>
+                    </div>
+                }
+            }
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

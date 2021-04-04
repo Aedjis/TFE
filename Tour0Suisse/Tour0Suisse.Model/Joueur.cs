@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Tour0Suisse.Model
 {
@@ -10,7 +11,11 @@ namespace Tour0Suisse.Model
         public Joueur()
         {
             User = new ViewUser();
-            Decks = new List<ViewDeck>();
+            //_decks = new ViewDeck[10]
+            //{
+            //    new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(),
+            //    new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck()
+            //};
         }
 
         
@@ -24,8 +29,33 @@ namespace Tour0Suisse.Model
         public DateTime? CheckIn { get; set; }
         [Display(Name = "Abandon")]
         public bool Drop { get; set; }
-        [Display(Name = "Liste des decks")]
-        public IEnumerable<ViewDeck> Decks { get; set; }
 
+        [Display(Name = "Liste des decks")]
+        public IEnumerable<ViewDeck> Decks
+        {
+            get
+            {
+                return _decks; //.Where(d=>d!=null && string.IsNullOrEmpty(d.DeckList));
+            }
+            set
+            {
+                _decks = value.ToArray(); //value.Concat(new ViewDeck[10] { new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck() }).Take(10).ToArray();
+            }
+        }
+
+        private ViewDeck[] _decks;
+        public ViewDeck[] Deck 
+        {
+            get
+            {
+                return _decks;
+            }
+            set
+            {
+                _decks = value;
+            }
+        }
     }
+
+    
 }

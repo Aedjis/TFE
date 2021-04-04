@@ -54,7 +54,7 @@ namespace Tour0Suisse.Repository
 
             //string hex = "0x"+ BitConverter.ToString(Password).Replace("-", "");
 
-            var User =  _ViewUsers("WHERE  Email = '" + Email +  "' AND [Password] = "+ Password.Replace("-", ""));
+            var User =  _ViewUsers("WHERE  Email = '" + Email +  "' AND [Password] = "+ Password.Replace("-", "")).Where(u => u.Deleted == null).ToList();
             if (User.Count == 1)
             {
                 return User.First();
@@ -107,6 +107,7 @@ namespace Tour0Suisse.Repository
             }
             catch (Exception ex)
             {
+
                 throw ex;
             }
 
@@ -1135,7 +1136,7 @@ namespace Tour0Suisse.Repository
                 cmd.Parameters.AddWithValue("@Organizer", P.Organizer);
                 cmd.Parameters.AddWithValue("@Pseudo", P.Pseudo);
                 cmd.Parameters.AddWithValue("@Email", P.Email);
-                cmd.Parameters.AddWithValue("@Password", P.HexaPassword);
+                cmd.Parameters.AddWithValue("@Password", P.BinaryPassword);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 
@@ -1175,7 +1176,7 @@ namespace Tour0Suisse.Repository
                 cmd.CommandType = System.Data.CommandType.StoredProcedure;
                 cmd.CommandText = "SP_DeleteUser";
                 cmd.Parameters.AddWithValue("@ID_User", P.IdUser);
-                cmd.Parameters.AddWithValue("@Password", P.HexaPassword);
+                cmd.Parameters.AddWithValue("@Password", P.BinaryPassword);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 

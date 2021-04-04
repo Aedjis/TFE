@@ -261,5 +261,85 @@ namespace Tour0Suisse.Web.Controllers
 
             return RedirectToAction(nameof(Delete), id);
         }
+
+        public async Task<IActionResult> Register(int? id)
+        {
+            if (id == null || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
+            {
+                return NotFound();
+            }
+
+            Tournoi tournoi;
+
+            using (var httpClient = new HttpClient())
+            {
+                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetTournament?id=" + id.ToString()))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    tournoi = JsonConvert.DeserializeObject<Tournoi>(apiResponse);
+                }
+            }
+
+            if (tournoi == null || tournoi.IdTournament < 1)
+            {
+                return NotFound();
+            }
+
+            ViewBag.NbDeck = tournoi.DeckListNumber;
+            ViewData["Title"] = "S'inscire pour " + tournoi.Name;
+            return View("~/Views/Tournoi/Register.cshtml", new Joueur{IdTournament = (int)id});
+        }
+
+        // POST: Decks/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register([Bind("Deck, IdTournament")] Joueur Joueur)
+        {
+            if (Joueur.IdTournament < 1 || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                Joueur.User.IdUser = IdUser;
+
+                using (var httpClient = new HttpClient())
+                {
+                    using (var response =
+                        await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/Register",
+                            Joueur))
+                    {
+                        string apiResponse = await response.Content.ReadAsStringAsync();
+                        if (JsonConvert.DeserializeObject<bool>(apiResponse))
+                        {
+                            return RedirectToAction(nameof(Index));
+                        }
+                    }
+                }
+            }
+
+            Tournoi tournoi;
+
+            using (var httpClient = new HttpClient())
+            {
+                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetTournament?id=" + Joueur.IdTournament.ToString()))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    tournoi = JsonConvert.DeserializeObject<Tournoi>(apiResponse);
+                }
+            }
+
+            if (tournoi == null || tournoi.IdTournament < 1)
+            {
+                return NotFound();
+            }
+
+            ViewBag.NbDeck = tournoi.DeckListNumber;
+            ViewData["Title"] = "S'inscire pour " + tournoi.Name;
+            return View("~/Views/Tournoi/Register.cshtml", Joueur);
+        }
     }
 }

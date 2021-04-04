@@ -10,8 +10,13 @@
 
 <div>
     <form asp-action="Delete">
-        <input type="hidden" asp-for="IdUser" />
-        <input type="submit" value="Delete" class="btn btn-default" /> |
-        <a asp-action="Details">Retourner au profil</a>
+        <div class="form-group">
+            <label asp-for="Password" class="control-label"></label>
+            <input asp-for="Password" class="form-control" type="password" id="Password" required/>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+        <input type="hidden" asp-for="IdUser"/>
+        <input type="submit" value="Delete" class="btn btn-default"/> |
+        <a asp-action="Details" asp-route-id="IdUser">Retourner au profil</a>
     </form>
 </div>

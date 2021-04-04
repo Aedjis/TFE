@@ -41,6 +41,12 @@ namespace Tour0Suisse.Controllers
             return View( users);
         }
 
+        public ActionResult LogOff()
+        {
+            HttpContext.Session.Clear();
+            return View("~/Views/Home/Index.cshtml");
+        }
+
 
         public async Task<ActionResult> LogIn(Utilisateur user = null)
         {
@@ -69,6 +75,10 @@ namespace Tour0Suisse.Controllers
         // GET: User/Details/5
         public async Task<ActionResult> Details(int id)
         {
+            if (id < 1)
+            {
+                return NotFound();
+            }
 
             Utilisateur user = new Utilisateur();
 
@@ -80,6 +90,11 @@ namespace Tour0Suisse.Controllers
                     string apiResponse = await response.Content.ReadAsStringAsync();
                     user = JsonConvert.DeserializeObject<Utilisateur>(apiResponse);
                 }
+            }
+
+            if(user == null || user.IdUser <1)
+            {
+                return NotFound();
             }
 
             return View("~/Views/User/Profil.cshtml", user);
@@ -118,14 +133,25 @@ namespace Tour0Suisse.Controllers
 
 
         // GET: User/Edit/5
-        public async Task<ActionResult> EditAsync(int id)
+        public async Task<ActionResult> Edit(int id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            ViewUser utilisateur = null;//await _context.Utilisateur.FindAsync(id);
+            Utilisateur utilisateur;
+
+            using (var httpClient = new HttpClient())
+            {
+                string requestUri = "https://localhost:44321" + "/View" + "/GetUser" + "?id=" + id.ToString();
+                using (var response = await httpClient.GetAsync(requestUri))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    utilisateur = JsonConvert.DeserializeObject<Utilisateur>(apiResponse);
+                }
+            }
+
             if (utilisateur == null)
             {
                 return NotFound();
@@ -140,7 +166,7 @@ namespace Tour0Suisse.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("IdUser,Pseudo,Email,Password,Organizer,Deleted")] Utilisateur utilisateur)
         {
-            if (!int.TryParse(HttpContext.Session.GetString("UserID"), out int SessionId) || id != utilisateur.IdUser || SessionId != utilisateur.IdUser)
+            if (!int.TryParse(HttpContext.Session.GetString("UserId"), out int SessionId) || id != utilisateur.IdUser || SessionId != utilisateur.IdUser)
             {
                 return NotFound();
             }
@@ -151,12 +177,12 @@ namespace Tour0Suisse.Controllers
             {
                 using (var httpClient = new HttpClient())
                 {
-                    using (var response = await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/EditUser", User))
+                    using (var response = await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/EditUser", utilisateur))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
                         if (JsonConvert.DeserializeObject<bool>(apiResponse))
                         {
-                            return RedirectToAction("Details", utilisateur.IdUser);
+                            return RedirectToAction("Details", new {id = utilisateur.IdUser});
                         }
                     }
                 }
@@ -168,17 +194,29 @@ namespace Tour0Suisse.Controllers
         // GET: User/Delete/5
         public ActionResult Delete(int id)
         {
-            return View("~/Views/User/DeletedCompte.cshtml");
+            return View("~/Views/User/DeletedCompte.cshtml", new Utilisateur{IdUser= id});
         }
 
         // POST: Utilisateurs/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed([Bind("IdUser,Password")] Utilisateur utilisateur)
         {
-            //var utilisateur = await _context.Utilisateur.FindAsync(id);
-            //_context.Utilisateur.Remove(utilisateur);
-            //await _context.SaveChangesAsync();
+            using (var httpClient = new HttpClient())
+            {
+                using (var response = await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/DeleteUser", utilisateur))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    if (!JsonConvert.DeserializeObject<bool>(apiResponse))
+                    {
+                        return RedirectToAction("Delete", new { id = utilisateur.IdUser });
+                    }
+                    else
+                    {
+                        HttpContext.Session.Clear();
+                    }
+                }
+            }
             return RedirectToAction(nameof(Index));
         }
 

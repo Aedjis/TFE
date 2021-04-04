@@ -92,7 +92,7 @@ GO
 --_____________DEBUT CREATION TABLE_______________________
 
 CREATE TABLE [Utilisateur] (
-ID_User INT NOT NULL IDENTITY(0,1),
+ID_User INT NOT NULL IDENTITY(1,1),
 Pseudo VARCHAR(50) NOT NULL, 
 Email VARCHAR(256) NOT NULL,
 [Password] BINARY(64) NOT NULL, -- le mot de passe est haché en SHA2_512 (HASHBYTES('SHA2_512', @pPassword))
@@ -151,7 +151,7 @@ CONSTRAINT PK_Game__XXXX PRIMARY KEY(ID_Game)
 GO
 
 CREATE TABLE [Deck](
-ID_Deck INT NOT NULL IDENTITY(0,1),
+ID_Deck INT NOT NULL IDENTITY(1,1),
 DeckList Text NOT NULL,
 ID_Game INT NOT NULL,
 
@@ -186,9 +186,9 @@ CREATE TABLE [Match](
 ID_Tournament INT NOT NULL,
 RoundNumber INT NOT NULL,
 ID_PlayerOne INT NOT NULL,
-ID_PlayerTwo INT NOT NULL,
+ID_PlayerTwo INT NULL,
 
-CONSTRAINT PK_Match__XXXX PRIMARY KEY(ID_Tournament, RoundNumber, ID_PlayerOne, ID_PlayerTwo) -- besoin de l'id que de un joureur
+CONSTRAINT PK_Match__XXXX PRIMARY KEY(ID_Tournament, RoundNumber, ID_PlayerOne) -- besoin de l'id que de un joureur
 )ON Tournoi
 GO
 
@@ -202,7 +202,7 @@ ID_Deck_PlayerOne INT NOT NULL,
 ID_Deck_PlayerTwo INT NOT NULL,
 ResultPart TINYINT NULL,
 
-CONSTRAINT PK_Part__XXXX PRIMARY KEY(ID_Tournament, RoundNumber, ID_PlayerOne, ID_PlayerTwo, PartNumber) -- besoin de l'id que de un joureur
+CONSTRAINT PK_Part__XXXX PRIMARY KEY(ID_Tournament, RoundNumber, ID_PlayerOne, PartNumber) -- besoin de l'id que de un joureur
 )ON Tournoi
 GO
 
@@ -310,8 +310,8 @@ ADD CONSTRAINT FK_Match_Utilisateur__2XXXX	FOREIGN KEY (ID_PlayerTwo)
 GO
 
 ALTER TABLE [Partie]
-ADD CONSTRAINT FK_Part_Match__XXXX	FOREIGN KEY (ID_Tournament, RoundNumber, ID_PlayerOne, ID_PlayerTwo)
-									REFERENCES [Match](ID_Tournament, RoundNumber, ID_PlayerOne, ID_PlayerTwo)
+ADD CONSTRAINT FK_Part_Match__XXXX	FOREIGN KEY (ID_Tournament, RoundNumber, ID_PlayerOne)
+									REFERENCES [Match](ID_Tournament, RoundNumber, ID_PlayerOne)
 GO
 
 ALTER TABLE [Partie]
@@ -375,16 +375,11 @@ GO
 
 --_____________DEBUT DE CREATION D'UTILISATEUR, JEU, DECK VIDE______________________
 
-INSERT INTO Utilisateur ([Pseudo], [Email], [Password], [Organizer], [DELETED])
-	VALUES('Bye', 'NaN@NaN.NaN', HASHBYTES('SHA2_512',''), 0, GETDATE())
+--INSERT INTO Utilisateur ([Pseudo], [Email], [Password], [Organizer], [DELETED])
+--	VALUES('Bye', '0@00.00', HASHBYTES('SHA2_512',''), 0, GETDATE())
 
-INSERT INTO Jeu([Name])
-	VALUES('Autre')
-
-INSERT INTO Deck([ID_Game], DeckList)
-	VALUES(1, '')
-
-GO
+--INSERT INTO Jeu([Name])
+--GO
 
 --_____________FIN DE CREATION D'UTILISATEUR, JEU, DECK VIDE______________________
 
@@ -397,9 +392,9 @@ FROM Utilisateur
 GO
 
 CREATE VIEW [View_Pseudo] AS
-SELECT P.ID_User AS ID_User, U.Pseudo AS Pseudo, P.ID_Game AS ID_Game, J.[Name] AS [Game], IG_Pseudo
-FROM PseudoIG AS P
-JOIN Utilisateur AS U
+SELECT U.ID_User AS ID_User, U.Pseudo AS Pseudo, P.ID_Game AS ID_Game, J.[Name] AS [Game], IG_Pseudo
+FROM Utilisateur AS U
+JOIN PseudoIG AS P
 	ON P.ID_User = U.ID_User
 JOIN Jeu AS J
 	ON P.ID_Game = J.ID_Game
@@ -422,12 +417,14 @@ JOIN Utilisateur as U
 GO
 
 CREATE VIEW [View_Participant] AS 
-SELECT DISTINCT J.ID_Tournament, t.[Name], J.ID_User, VP.Pseudo, VP.IG_Pseudo, J.RegisterDate, J.CheckIn, J.[Drop]
+SELECT J.ID_Tournament, t.[Name], J.ID_User, U.Pseudo, P.IG_Pseudo, J.RegisterDate, J.CheckIn, J.[Drop]
 FROM Joueur as J
 JOIN Tournoi as T
 	ON J.ID_Tournament = T.ID_Tournament
-JOIN View_Pseudo as VP
-	ON J.ID_User = VP.ID_User and T.ID_Game = VP.ID_Game
+JOIN Utilisateur AS U
+	ON U.ID_User = J.ID_User
+LEFT JOIN PseudoIG AS P
+	ON P.ID_User = U.ID_User AND P.ID_Game = T.ID_Game
 GO
 
 CREATE VIEW [View_Jeu] AS
@@ -436,27 +433,33 @@ FROM Jeu
 GO
 
 CREATE VIEW [View_Resulta] AS 
-SELECT R.ID_Tournament, T.Name, R.ID_User, VP.Pseudo, VP.IG_Pseudo, R.Rank, R.Gain, R.Score, R.TieBreaker, R.AdditionalTieBreaker, R.AdditionalTieBreakerRules
+SELECT R.ID_Tournament, T.Name, R.ID_User, U.Pseudo, P.IG_Pseudo, R.Rank, R.Gain, R.Score, R.TieBreaker, R.AdditionalTieBreaker, R.AdditionalTieBreakerRules
 FROM Resultat as R
 JOIN Tournoi as T
 	ON T.ID_Tournament = R.ID_Tournament
-JOIN View_Pseudo as VP
-	ON R.ID_User = VP.ID_User and T.ID_Game = VP.ID_Game
+JOIN Utilisateur AS U
+	ON U.ID_User = R.ID_User
+LEFT JOIN PseudoIG AS P
+	ON P.ID_User = U.ID_User AND P.ID_Game = T.ID_Game
 GO
 
 CREATE VIEW [View_Partie] AS 
-SELECT P.ID_Tournament, T.Name, P.RoundNumber, P.PartNumber, P.ResultPart, P.ID_PlayerOne, VPOne.Pseudo AS [PlayerOne], VPOne.IG_Pseudo AS[IGPseudoOne], P.ID_Deck_PlayerOne, DOne.DeckList AS [DeckOne], P.ID_PlayerTwo, VPTwo.Pseudo AS [PlayerTwo], VPTwo.IG_Pseudo AS[IGPseudoTwo], P.ID_Deck_PlayerTwo, DTwo.DeckList AS [DeckTwo]
+SELECT P.ID_Tournament, T.Name, P.RoundNumber, P.PartNumber, P.ResultPart, P.ID_PlayerOne, U1.Pseudo AS [PlayerOne], P1.IG_Pseudo AS[IGPseudoOne], P.ID_Deck_PlayerOne, DOne.DeckList AS [DeckOne], P.ID_PlayerTwo, U2.Pseudo AS [PlayerTwo], P2.IG_Pseudo AS[IGPseudoTwo], P.ID_Deck_PlayerTwo, DTwo.DeckList AS [DeckTwo]
 FROM Partie as P
 JOIN Tournoi as T
 	ON T.ID_Tournament = p.ID_Tournament
-JOIN View_Pseudo as VPOne
-	ON VPOne.ID_User = P.ID_PlayerOne
-JOIN View_Pseudo as VPTwo
-	ON VPTwo.ID_User = P.ID_PlayerTwo
 JOIN Deck as DOne
 	ON DOne.ID_Deck = P.ID_Deck_PlayerOne
 JOIN Deck as DTwo
 	ON DTwo.ID_Deck = P.ID_Deck_PlayerTwo
+JOIN Utilisateur AS U1
+	ON U1.ID_User = P.ID_PlayerOne
+LEFT JOIN PseudoIG AS P1
+	ON P1.ID_User = U1.ID_User AND P1.ID_Game = T.ID_Game
+JOIN Utilisateur AS U2
+	ON U2.ID_User = P.ID_PlayerTwo
+LEFT JOIN PseudoIG AS P2
+	ON P2.ID_User = U2.ID_User AND P2.ID_Game = T.ID_Game
 GO
 
 CREATE VIEW[View_Deck] AS
@@ -469,11 +472,11 @@ JOIN Tournoi AS T
 JOIN Utilisateur AS U
 	ON U.ID_User = DJ.ID_User
 JOIN Jeu AS J
-	ON J.ID_Game = T.ID_Game
+	ON J.ID_Game = D.ID_Game
 GO
 
 CREATE VIEW [View_ResultPartPlayer] AS
-SELECT P.ID_Tournament, RoundNumber, PartNumber, ID_PlayerOne AS ID_Player, VP.Pseudo, VP.IG_Pseudo,	CASE ResultPart
+SELECT P.ID_Tournament, RoundNumber, PartNumber, ID_PlayerOne AS ID_Player, U.Pseudo, Ps.IG_Pseudo,	CASE ResultPart
 																											WHEN 2
 																											THEN -1
 																											ELSE ResultPart
@@ -481,11 +484,13 @@ SELECT P.ID_Tournament, RoundNumber, PartNumber, ID_PlayerOne AS ID_Player, VP.P
 FROM Partie AS P
 JOIN Tournoi AS T
 	ON T.ID_Tournament = P.ID_Tournament
-JOIN View_Pseudo AS VP
-	ON VP.ID_User = P.ID_PlayerOne AND VP.ID_Game = T.ID_Game
+JOIN Utilisateur AS U
+	ON U.ID_User = P.ID_PlayerOne
+LEFT JOIN PseudoIG AS Ps
+	ON Ps.ID_User = U.ID_User AND Ps.ID_Game = T.ID_Game
 WHERE P.ID_Tournament IN (SELECT ID_Tournament FROM Tournoi WHERE [Over] = 0)
 union
-SELECT P.ID_Tournament, RoundNumber, PartNumber, ID_PlayerTWO AS ID_Player, VP.Pseudo, VP.IG_Pseudo,	CASE ResultPart
+SELECT P.ID_Tournament, RoundNumber, PartNumber, ID_PlayerTWO AS ID_Player, U.Pseudo, Ps.IG_Pseudo,	CASE ResultPart
 																											WHEN 2
 																											THEN 1
 																											WHEN null
@@ -495,20 +500,26 @@ SELECT P.ID_Tournament, RoundNumber, PartNumber, ID_PlayerTWO AS ID_Player, VP.P
 FROM Partie AS P
 JOIN Tournoi AS T
 	ON T.ID_Tournament = P.ID_Tournament
-JOIN View_Pseudo AS VP
-	ON VP.ID_User = P.ID_PlayerTWO AND VP.ID_Game = T.ID_Game
+JOIN Utilisateur AS U
+	ON U.ID_User = P.ID_PlayerTwo
+LEFT JOIN PseudoIG AS Ps
+	ON Ps.ID_User = U.ID_User AND Ps.ID_Game = T.ID_Game
 WHERE P.ID_Tournament IN (SELECT ID_Tournament FROM Tournoi WHERE [Over] = 0)
 GO
 
 CREATE VIEW [View_Match] AS
-SELECT M.[ID_Tournament], [RoundNumber], [ID_PlayerOne], VPO.Pseudo AS [PlayerOne], VPO.IG_Pseudo AS [PseudoPlayerOne], [ID_PlayerTwo], VPT.Pseudo AS [PlayerTow], VPT.IG_Pseudo AS [PseudoPlayerTow]
+SELECT M.[ID_Tournament], [RoundNumber], [ID_PlayerOne], U1.Pseudo AS [PlayerOne], P1.IG_Pseudo AS [PseudoPlayerOne], [ID_PlayerTwo], U2.Pseudo AS [PlayerTow], P2.IG_Pseudo AS [PseudoPlayerTow]
 FROM [Match] AS M
 JOIN Tournoi AS T
 	ON T.ID_Tournament = M.ID_Tournament
-JOIN View_Pseudo AS VPO
-	ON VPO.ID_User = M.ID_PlayerOne AND VPO.ID_Game = T.ID_Game
-JOIN View_Pseudo AS VPT
-	ON VPT.ID_User = M.ID_PlayerTwo AND VPT.ID_Game = T.ID_Game
+JOIN Utilisateur AS U1
+	ON U1.ID_User = M.ID_PlayerOne
+LEFT JOIN PseudoIG AS P1
+	ON P1.ID_User = U1.ID_User AND P1.ID_Game = T.ID_Game
+LEFT JOIN Utilisateur AS U2
+	ON U2.ID_User = M.ID_PlayerTwo
+LEFT JOIN PseudoIG AS P2
+	ON P2.ID_User = U2.ID_User AND P2.ID_Game = T.ID_Game
 GO
 
 CREATE VIEW [View_ResultMatchPlayer] AS
@@ -528,7 +539,7 @@ GROUP BY ID_Tournament, RoundNumber, ID_Player, Pseudo, IG_Pseudo
 UNION
 SELECT ID_Tournament, RoundNumber, ID_PlayerOne AS ID_Player, [PlayerOne] AS Pseudo, [PseudoPlayerOne] AS IG_Pseudo ,	1 AS Resulta
 FROM [View_Match]
-WHERE ID_PlayerTwo = 0
+WHERE ID_PlayerTwo IS NULL
 GROUP BY ID_Tournament, RoundNumber, ID_PlayerOne, [PlayerOne], [PseudoPlayerOne]
 GO
 
@@ -871,6 +882,7 @@ GO
 
 CREATE PROCEDURE SP_DeleteUser
 	@ID_User INT ,
+	@Password BINARY(64), --soit varcahr(50) si passé en claire soit binary (64) si haché
 	@responseMessage NVARCHAR(250) OUTPUT,
 	@Reussie BIT OUTPUT
 AS
@@ -885,10 +897,14 @@ BEGIN
 				Begin
 					RAISERROR('Le utilisateur est introuvable',16,1);
 				End
+			if( (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and Password = @Password and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Mauvais mot de passe',16,1);
+				End
 
 			UPDATE Utilisateur
 			SET DELETED = CAST( GETDATE() AS Date )
-			WHERE ID_User = @ID_User
+			WHERE ID_User = @ID_User AND Password = @Password
 			
 			COMMIT;
 
@@ -1818,10 +1834,10 @@ BEGIN
 				RAISERROR('la round n existe pas', 16, 1);
 			END
 
-		IF((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) =0)
-			BEGIN
-				RAISERROR('Il n existe pas match pour cette round', 16, 1);
-			END
+		--IF((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) =0)
+		--	BEGIN
+		--		RAISERROR('Il n existe pas match pour cette round', 16, 1);
+		--	END
 
 		DELETE [Match] 
 			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
@@ -1870,18 +1886,16 @@ BEGIN
 
 		if(@ID_PlayerTwo is null or @ID_PlayerTwo = 0)
 			BEGIN
-				INSERT INTO [Match] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo])
-					VALUES(@ID_Tournoi, @RoundNumber, @ID_PlayerOne, 0)
+				SET @ID_PlayerTwo = null;
 			END
 		else if((SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerTwo)) <> 1 )
 			BEGIN
 				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
 			END
-		else
-			BEGIN
-				INSERT INTO [Match] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo])
-					VALUES(@ID_Tournoi, @RoundNumber, @ID_PlayerOne, @ID_PlayerTwo)
-			END
+		
+		INSERT INTO [Match] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo])
+			VALUES(@ID_Tournoi, @RoundNumber, @ID_PlayerOne, @ID_PlayerTwo)
+			
 
 
 		COMMIT;
@@ -1954,8 +1968,9 @@ BEGIN
 				RAISERROR('le pairing est incorrect, le nombre de joueur ne correspond pas', 16, 1);
 			END
 
+
 		INSERT INTO [Match] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo])
-			SELECT @ID_Tournoi, @RoundNumber, ID_PlayerOne, ID_PlayerTwo
+			SELECT @ID_Tournoi, @RoundNumber, ID_PlayerOne, CASE WHEN ID_PlayerTwo = 0 THEN NULL ELSE ID_PlayerTwo END
 			FROM @Pairing
 
 		COMMIT;
@@ -2004,7 +2019,7 @@ BEGIN
 				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
 			END
 
-		if((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and RoundNumber = @RoundNumber and ID_PlayerOne = @ID_PlayerOne and ID_PlayerTwo = @ID_PlayerTwo)) <> 1)
+		if((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and RoundNumber = @RoundNumber and ID_PlayerOne = @ID_PlayerOne)) <> 1)
 			BEGIN
 				RAISERROR('le match est introuvable', 16, 1);
 			END
@@ -2017,7 +2032,7 @@ BEGIN
 		UPDATE [Match]
 			SET ID_PlayerOne = ISNULL(@ID_NewPone, ID_PlayerOne),
 				ID_PlayerTwo = ISNULL(@ID_NewPTwo, ID_PlayerTwo)
-			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber and [ID_PlayerOne] = @ID_PlayerOne and [ID_PlayerTwo] = @ID_PlayerTwo
+			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber and [ID_PlayerOne] = @ID_PlayerOne
 
 
 		COMMIT;
@@ -2054,14 +2069,14 @@ BEGIN
 				RAISERROR('la round existe déjà', 16, 1);
 			END
 
-		if((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and RoundNumber = @RoundNumber and ID_PlayerOne = @ID_PlayerOne and ID_PlayerTwo = @ID_PlayerTwo)) <> 1)
+		if((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and RoundNumber = @RoundNumber and ID_PlayerOne = @ID_PlayerOne)) <> 1)
 			BEGIN
 				RAISERROR('le match est introuvable', 16, 1);
 			END
 
 
 		DELETE [Match]
-			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber and [ID_PlayerOne] = @ID_PlayerOne and [ID_PlayerTwo] = @ID_PlayerTwo
+			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber and [ID_PlayerOne] = @ID_PlayerOne 
 
 
 		COMMIT;

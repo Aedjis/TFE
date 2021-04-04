@@ -34,9 +34,12 @@
                 <ul class="nav navbar-nav">
                     <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
                     <li><a asp-area="" asp-controller="Tournois" asp-action="Index">Tournoi</a></li>
-                    @{ if (Context.Session.GetString("UserId") != null)
+                    @{ if (int.TryParse(Context.Session.GetString("UserId"), out int Uid))
                         {
-                            <li><a asp-area="" asp-controller="User" asp-action="Details" asp-route-id="@Context.Session.GetString("UserId")">@Context.Session.GetString("User")</a></li> }
+                            <li><a asp-area="" asp-controller="User" asp-action="Details" asp-route-id="@Uid">@Context.Session.GetString("User")</a></li> 
+                            <li><a asp-area="" asp-controller="User" asp-action="LogOff">Log Off</a></li>
+
+                        }
                         else
                         {
                             <li><a asp-area="" asp-controller="User" asp-action="LogIn">Connexion</a></li>
