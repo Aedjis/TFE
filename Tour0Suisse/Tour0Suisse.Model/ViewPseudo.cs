@@ -4,7 +4,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tour0Suisse.Model
 {
-    public partial class ViewPseudo
+    public interface IViewPseudo
+    {
+        int IdUser { get; set; }
+        int IdGame { get; set; }
+        string Game { get; set; }
+        string IgPseudo { get; set; }
+    }
+
+    public class ViewPseudo : IViewPseudo
     {
         public int IdUser { get; set; }
         public int IdGame { get; set; }

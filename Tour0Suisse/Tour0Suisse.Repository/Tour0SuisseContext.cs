@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Tour0Suisse.Repository
 {
-    public partial class Tour0SuisseContext : DbContext
+    public class Tour0SuisseContext : DbContext
     {
         public Tour0SuisseContext()
         {

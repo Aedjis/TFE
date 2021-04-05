@@ -15,7 +15,7 @@ namespace Tour0Suisse.API.Controllers
     [ApiController]
     public class ViewController : ControllerBase
     {
-        static private DBTour0SuisseLINQ DB_CURD;
+        private static readonly DBTour0SuisseLINQ DB_CURD;
 
         static ViewController()
         {
@@ -67,7 +67,7 @@ namespace Tour0Suisse.API.Controllers
         [HttpGet]
         public IEnumerable<ViewTournament> GetTournaments()
         {
-            List<ViewTournament> Retour = new List<ViewTournament>();
+            List<ViewTournament> Retour = new();
             Retour.Clear();
 
             Retour = DB_CURD.ViewTournaments();
@@ -82,7 +82,7 @@ namespace Tour0Suisse.API.Controllers
         {
             var t = DB_CURD.GetTournament(id);
 
-            Tournoi retour = new Tournoi
+            Tournoi retour = new()
             {
                 IdTournament = t.IdTournament,
                 Name = t.Name,
@@ -157,12 +157,12 @@ namespace Tour0Suisse.API.Controllers
         {
             var m = DB_CURD.GetMatcheForPlayerOfTheRound(IdTournoi, IdPlayer, RoundNumber);
 
-            Match retour = new Match
+            Match retour = new()
             {
                 Tournament = DB_CURD.GetTournament(m.IdTournament),
                 RoundNumber = m.RoundNumber,
-                Player1 = DB_CURD.GetParticipant(m.IdPlayer1, m.IdTournament),
-                Player2 = DB_CURD.GetParticipant(m.IdPlayer2, m.IdTournament)
+                P1 = DB_CURD.GetParticipant(m.IdPlayer1, m.IdTournament),
+                P2 = DB_CURD.GetParticipant(m.IdPlayer2, m.IdTournament)
             };
 
             return retour;
@@ -185,7 +185,7 @@ namespace Tour0Suisse.API.Controllers
         {
             ViewParticipant j = DB_CURD.GetParticipant(IdPlayer, Idtournoi);
 
-            Joueur retour = new Joueur
+            Joueur retour = new()
             {
                 IdTournament = j.IdTournament,
                 User = DB_CURD.GetUser(j.IdUser),
@@ -237,7 +237,7 @@ namespace Tour0Suisse.API.Controllers
         {
             var r =  DB_CURD.GetRoundOf(IdTournoi, RoundNumber);
 
-            Round retour = new Round
+            Round retour = new()
             {
                 IdTournament = r.IdTournament,
                 Name = r.Name,

@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace Tour0Suisse.Model
 {
-    public partial class Jeu
+    public class Jeu : IViewJeu
     {
 
         public int IdGame { get; set; }

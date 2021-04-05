@@ -4,7 +4,18 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tour0Suisse.Model
 {
-    public partial class ViewClassementTemporaire
+    public interface IViewClassementTemporaire
+    {
+        int IdTournament { get; set; }
+        int IdPlayer { get; set; }
+        int Victoire { get; set; }
+        int Egaliter { get; set; }
+        int Defaite { get; set; }
+        string IGPseudo { get; set; }
+        string Pseudo { get; set; }
+    }
+
+    public class ViewClassementTemporaire : IViewClassementTemporaire
     {
         public int IdTournament { get; set; }
         public int IdPlayer { get; set; }

@@ -5,8 +5,9 @@
 
 @{
     ViewData["Title"] = "Profil";
-    ViewData["Message"] = (Model==null)? "": (Model.Pseudo == null) ? "" : Model.Pseudo;
-    var LoggedUser = int.TryParse(Context.Session.GetString("UserId"), out int Id) && Id == @Model.IdUser;
+    ViewData["Message"] = (Model==null)? "": Model.Pseudo ?? "";
+    System.Diagnostics.Debug.Assert(Model != null, nameof(Model) + " != null");
+    var LoggedUser = int.TryParse(Context.Session.GetString("UserId"), out int Id) && Id == Model.IdUser;
 }
 <h2>@ViewData["Title"]</h2>
 <h3>@ViewData["Message"]</h3>
@@ -40,35 +41,32 @@
         <dd>
             <table class="table">
                 <thead>
-                <tr>
-                    <th>
-                        @Html.DisplayName("Jeu")
-                    </th>
-                    <th>
-                        @Html.DisplayName("Pseudo")
-                    </th>
-                </tr>
+                    <tr>
+                        <th>
+                            @Html.DisplayName("Jeu")
+                        </th>
+                        <th>
+                            @Html.DisplayName("Pseudo")
+                        </th>
+                    </tr>
                 </thead>
                 <tbody>
-                @foreach (var item in Model.PseudoIgs)
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.Game)
-                        </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.IgPseudo)
-                        </td>
-                    </tr>
-
-                }
+                    @foreach (var item in Model.PseudoIgs)
+                    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Game)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IgPseudo)
+            </td>
+        </tr>}
                 </tbody>
             </table>
-            
-            @*@if (LoggedUser)
+
+            @if (LoggedUser)
             {
-                <a asp-action="AddGamePseudo" asp-route-id="@Model.IdUser">Ajouté ou modifié des pseudo</a><br/>
-            }*@
+    <a asp-action="AddGamePseudo" asp-route-id="@Model.IdUser">Ajouté ou modifié des pseudo</a><br />            }
         </dd>
         @*<dt>
             @Html.DisplayFor(model => model.Resultas)
@@ -97,8 +95,8 @@
             </td>
         </tr>}
                 </tbody>
-            </table>*@
-        </dd>
+            </table>
+        </dd>*@
     </dl>
 </div>
 <div>

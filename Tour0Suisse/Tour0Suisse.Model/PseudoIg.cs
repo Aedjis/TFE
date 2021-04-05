@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tour0Suisse.Model
 {
-    public partial class PseudoIg
+    public class PseudoIg : IViewPseudo
     {
         public int IdUser { get; set; }
         public int IdGame { get; set; }

@@ -6,21 +6,17 @@ using System.Linq;
 
 namespace Tour0Suisse.Model
 {
-    public partial class Joueur
+    public class Joueur : IViewParticipant
     {
         public Joueur()
         {
             User = new ViewUser();
-            //_decks = new ViewDeck[10]
-            //{
-            //    new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(),
-            //    new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck()
-            //};
+           
         }
 
         
-        public int IdTournament { get; set; }
-        public ViewUser User { get; set; }
+        public IViewTournament Tournament { get; set; }
+        public IViewUser User { get; set; }
         [Display(Name = "Pseudo dans le jeu")]
         public string IGPseudo { get; set; }
         [Display(Name = "Date d'inscription au tournoi")]
@@ -33,28 +29,21 @@ namespace Tour0Suisse.Model
         [Display(Name = "Liste des decks")]
         public IEnumerable<ViewDeck> Decks
         {
-            get
-            {
-                return _decks; //.Where(d=>d!=null && string.IsNullOrEmpty(d.DeckList));
-            }
-            set
-            {
-                _decks = value.ToArray(); //value.Concat(new ViewDeck[10] { new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck(), new ViewDeck() }).Take(10).ToArray();
-            }
+            get => _decks;
+            set => _decks = value.ToArray();
         }
 
         private ViewDeck[] _decks;
         public ViewDeck[] Deck 
         {
-            get
-            {
-                return _decks;
-            }
-            set
-            {
-                _decks = value;
-            }
+            get => _decks;
+            set => _decks = value;
         }
+
+        public int IdTournament { get => Tournament.IdTournament; set => Tournament.IdTournament = value; }
+        public string Name { get => Tournament.Name; set => Tournament.Name = value; }
+        public int IdUser { get => User.IdUser; set => User.IdUser = value; }
+        public string Pseudo { get => User.Pseudo; set => User.Pseudo = value; }
     }
 
     

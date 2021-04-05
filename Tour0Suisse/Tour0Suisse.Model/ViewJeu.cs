@@ -4,7 +4,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tour0Suisse.Model
 {
-    public partial class ViewJeu
+    public interface IViewJeu
+    {
+        int IdGame { get; set; }
+        string Name { get; set; }
+        bool? Deleted { get; set; }
+    }
+
+    public class ViewJeu : IViewJeu
     {
         public int IdGame { get; set; }
         [Display(Name = "Nom dujeu")]

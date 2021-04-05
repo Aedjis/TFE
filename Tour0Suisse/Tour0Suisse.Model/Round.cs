@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tour0Suisse.Model
 {
-    public partial class Round
+    public class Round : IViewRound
     {
         public Round()
         {
@@ -18,6 +18,8 @@ namespace Tour0Suisse.Model
         public int RoundNumber { get; set; }
         [Display(Name = "Debut de la round")]
         public DateTime StartRound { get; set; }
+        [Display(Name = "Fin de la round")]
+        public DateTime EndRound { get; set; }
         [Display(Name = "Liste des matchs")]
         public IEnumerable<ViewMatch> Matches { get; set; }
 

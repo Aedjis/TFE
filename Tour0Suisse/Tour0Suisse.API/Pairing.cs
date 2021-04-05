@@ -8,31 +8,35 @@ namespace Tour0Suisse.API
 {
     public static class AlgoPairing
     {
-        /// <summary>
-        ///
-        ///fonction qui va faire automatiquement le pairing entre les joueurs
-        ///
+        ///  <summary>
         /// 
-        /// --1 on crée des groupes basés sur le nombre de victoire 
+        /// fonction qui va faire automatiquement le pairing entre les joueurs
         /// 
-        /// --pour chaque groupe (en commençant par celui avec le plus de victoire) 
-        /// --2 on les tri (ASC) en fonction du nombre d'adversaire de leur qu'ils n'ont pas déjà rencontré. S’il y a des joueurs qui ont déjà rencontré tous les autres du groupe on le report dans le groupe suivant
-        /// --3 en commençant par le joueur reporté du groupe d'avant, dans l'ordre on leur attribue un adversaire (au hasard) qu'ils n'ont pas encore rencontré, si ce n'est pas possible on met le joueur en attente
-        /// --4 s’il n'y a que 1 joueur en attente on le report au group suivant,
-        /// --sinon on cherche une paire de joueur déjà appareillé qui pourrais correspondre à des joueurs en attente. et on répète le processus jusqu'à ne plus en trouvé.
-        /// -- s’il reste encore des joueurs en attente on les reports au groupe suivant.
-        /// 
-        /// --5 pour le dernier groupe s’il n'y a qu’un joueur reporté on lui donne un bail (victoire gratuite).
-        /// -- sinon on recommence depuis le début mais en commençant par le groupe avec le moins de victoire.
-        /// 
-        /// </summary>
-        /// <param name="Players">Liste des joueur encore dans le tournoi</param>
-        /// <param name="classements">classement de tout les joueurs du tournoi</param>
-        /// <param name="matches">liste de tout les match joué dans le tournoi</param>
-        /// <returns></returns>
+        ///  
+        ///  --1 on crée des groupes basés sur le nombre de victoire 
+        ///  
+        ///  --pour chaque groupe (en commençant par celui avec le plus de victoire) 
+        ///  --2 on les tri (ASC) en fonction du nombre d'adversaire de leur qu'ils n'ont pas déjà rencontré. S’il y a des joueurs qui ont déjà rencontré tous les autres du groupe on le report dans le groupe suivant
+        ///  --3 en commençant par le joueur reporté du groupe d'avant, dans l'ordre on leur attribue un adversaire (au hasard) qu'ils n'ont pas encore rencontré, si ce n'est pas possible on met le joueur en attente
+        ///  --4 s’il n'y a que 1 joueur en attente on le report au group suivant,
+        ///  --sinon on cherche une paire de joueur déjà appareillé qui pourrais correspondre à des joueurs en attente. et on répète le processus jusqu'à ne plus en trouvé.
+        ///  -- s’il reste encore des joueurs en attente on les reports au groupe suivant.
+        ///  
+        ///  --5 pour le dernier groupe s’il n'y a qu’un joueur reporté on lui donne un bail (victoire gratuite).
+        ///  -- sinon on recommence depuis le début mais en commençant par le groupe avec le moins de victoire.
+        ///  
+        ///  </summary>
+        ///  <param name="Players">Liste des joueur encore dans le tournoi</param>
+        ///  <param name="classements">classement de tout les joueurs du tournoi</param>
+        ///  <param name="matches">liste de tout les match joué dans le tournoi</param>
+        ///  <param name="RoundNumber">le numero de round</param>
+        ///  <param name="PPV">le nombre de point par victoire</param>
+        ///  <param name="PPE">le nombre de point par egaliter</param>
+        ///  <param name="PPD">le nombre de point par defaite</param>
+        ///  <returns></returns>
         public static List<PairID> Pairing(List<int> Players, List<ViewScoreClassementTemporaire> classements, List<ViewMatch> matches, int RoundNumber, int PPV = 2, int PPE = 1, int PPD = 0)
         {
-            List<PairID> retour = new List<PairID>(); // crée la variable qui se verra atrivué la liste de pairing qui doit être retourné.
+            List<PairID> retour = new(); // crée la variable qui se verra atrivué la liste de pairing qui doit être retourné.
             retour.Clear();
             List<ViewScoreClassementTemporaire> PlayerClassement = classements.Where(c => Players.Contains(c.IdPlayer)).ToList(); // ne prend en considération plus que les joueur encore en list
 
@@ -64,7 +68,7 @@ namespace Tour0Suisse.API
             List<int> NoPairedPlayer = players.Where(pl => !pairing.Exists(pa => pa.ID1 == pl || pa.ID2 == pl)).ToList();//crée la liste de tout les joueur non pairé
             retour = pairing;
 
-            List<int> tempOutReportedPlayer = new List<int>();
+            List<int> tempOutReportedPlayer = new();
             tempOutReportedPlayer.AddRange(NoPairedPlayer);//crée un doublons de la list des joueur reporté
             foreach (var Player in tempOutReportedPlayer)//pour tout les joueur reporté
             {
@@ -80,7 +84,7 @@ namespace Tour0Suisse.API
                             if (ListNewOpponent.Any())//on regard si il reste un adversaire potentielle
                             {
                                 var rng = new Random();
-                                var NewOpponent = ListNewOpponent.ElementAt(rng.Next(0, ListNewOpponent.Count()));//on choisie alléatoirement un adversaire parmi les adversaire potentielle
+                                var NewOpponent = ListNewOpponent.ElementAt(rng.Next(0, ListNewOpponent.Count));//on choisie alléatoirement un adversaire parmi les adversaire potentielle
 
                                 var pairPlayer1 = new PairID//on crée une nouveelle pair
                                 {
@@ -132,11 +136,10 @@ namespace Tour0Suisse.API
             }
 
 
-            List<int> InReportedPlayer = new List<int>();//création de la liste des joueur qui sont été réporté
-            List<int> OutReportedPlayer = new List<int>();//création de la liste des jouer qui vont être reporté
+            List<int> InReportedPlayer = new();//création de la liste des joueur qui sont été réporté
             foreach (var Group in GroupPlayer)
             {
-                retour.AddRange(PairingInGroup(Group, playerOpponentList, out OutReportedPlayer, InReportedPlayer));//on fait le pairing de chaque groupe et on le rajoute au pairing existant
+                retour.AddRange(PairingInGroup(Group, playerOpponentList, out List<int> OutReportedPlayer, InReportedPlayer));//on fait le pairing de chaque groupe et on le rajoute au pairing existant
                 InReportedPlayer.Clear();
                 InReportedPlayer.AddRange(OutReportedPlayer);//on transmet la liste es joueur reporté
                 OutReportedPlayer.Clear();
@@ -171,11 +174,11 @@ namespace Tour0Suisse.API
         /// <returns>liste de pairing de joueur effectué pour ce groupe</returns>
         private static List<PairID> PairingInGroup(List<int> Players, Dictionary<int, List<int>> PlayerOpponentList, out List<int> OutReportedPlayer, List<int> InReportedPlayer = null)
         {
-            List<PairID> retour = new List<PairID>(); // crée la variable qui se verra atrivué la liste de pairing qui doit être retourné.
+            List<PairID> retour = new(); // crée la variable qui se verra atrivué la liste de pairing qui doit être retourné.
             OutReportedPlayer = new List<int>(); //initilaization du paramtre out OutreportedPlayer
             OutReportedPlayer.Clear();// on s'assure que le parametre out est bien vide
 
-            List<int> AllRemainingPlayer = new List<int>();
+            List<int> AllRemainingPlayer = new();
             AllRemainingPlayer.Clear();
             AllRemainingPlayer.AddRange(Players);
 
@@ -226,7 +229,7 @@ namespace Tour0Suisse.API
 
             if (OutReportedPlayer.Count > 1)// si il y a plus d'un joueur reporté on verifie que en faisant des permutation on ne peu pas les appareillé quand même
             {
-                List<int> tempOutReportedPlayer = new List<int>();
+                List<int> tempOutReportedPlayer = new();
                 tempOutReportedPlayer.AddRange(OutReportedPlayer);//crée un doublons de la list des joueur reporté
                 foreach (var Player in tempOutReportedPlayer)//pour tout les joueur reporté
                 {
@@ -242,7 +245,7 @@ namespace Tour0Suisse.API
                                 if (ListNewOpponent.Any())//on regard si il reste un adversaire potentielle
                                 {
                                     var rng = new Random();
-                                    var NewOpponent = ListNewOpponent.ElementAt(rng.Next(0, ListNewOpponent.Count()));//on choisie alléatoirement un adversaire parmi les adversaire potentielle
+                                    var NewOpponent = ListNewOpponent.ElementAt(rng.Next(0, ListNewOpponent.Count));//on choisie alléatoirement un adversaire parmi les adversaire potentielle
 
                                     var pairPlayer1 = new PairID//on crée une nouveelle pair
                                     {
@@ -311,12 +314,12 @@ namespace Tour0Suisse.API
         /// <returns></returns>
         private static Dictionary<int, List<int>> CreatePlayerOpponentList(List<int> Players, List<ViewMatch> matches)
         {
-            Dictionary<int, List<int>> Retour = new Dictionary<int, List<int>>(); // création d'un dictonaire pour retrouvé a liste des adversaire d'un joueur 
+            Dictionary<int, List<int>> Retour = new(); // création d'un dictonaire pour retrouvé a liste des adversaire d'un joueur 
 
             Retour.Clear();
             foreach (var Player in Players)
             {
-                List<int> OpponentList = new List<int>(); //Crée la list des adversaire du joueur 'player'
+                List<int> OpponentList = new(); //Crée la list des adversaire du joueur 'player'
                 OpponentList.Clear();
                 OpponentList.AddRange(matches.Where(m => m.IdPlayer1 == Player).Select(m => m.IdPlayer2).ToList());//ajoute a la liste tout les adversaire que le 'player' a eu en tant que 'PlayerOne.
                 OpponentList.AddRange(matches.Where(m => m.IdPlayer2 == Player).Select(m => m.IdPlayer1).ToList());//ajoute a la liste tout les adversaire que le 'player' a eu en tant que 'PlayerTwo.

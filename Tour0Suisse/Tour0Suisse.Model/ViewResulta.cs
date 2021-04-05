@@ -4,7 +4,22 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tour0Suisse.Model
 {
-    public partial class ViewResulta
+    public interface IViewResulta
+    {
+        int IdTournament { get; set; }
+        string Name { get; set; }
+        int IdUser { get; set; }
+        string Pseudo { get; set; }
+        string IGPseudo { get; set; }
+        int Rank { get; set; }
+        int Gain { get; set; }
+        int Score { get; set; }
+        int TieBreaker { get; set; }
+        int? AdditionalTieBreaker { get; set; }
+        string AdditionalTieBreakerRules { get; set; }
+    }
+
+    public class ViewResulta : IViewResulta
     {
         public int IdTournament { get; set; }
         [Display(Name = "Nom du tournoi")]

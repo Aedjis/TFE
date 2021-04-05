@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tour0Suisse.Model
 {
-    public partial class Partie
+    public class Partie
     {
         public int IdTournament { get; set; }
         [Display(Name = "Round Numero")]

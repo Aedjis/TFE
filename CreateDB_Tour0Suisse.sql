@@ -176,7 +176,8 @@ GO
 CREATE TABLE [Round](
 ID_Tournament INT NOT NULL,
 RoundNumber INT NOT NULL,
-StartRound DATETIME NOT NULL,
+StartRound DATETIME NULL,
+EndRound DATETIME NULL,
 
 CONSTRAINT PK_Round__XXXX PRIMARY KEY(ID_Tournament, RoundNumber)
 )ON Tournoi
@@ -432,6 +433,13 @@ SELECT ID_Game, [Name], DELETED
 FROM Jeu 
 GO
 
+CREATE VIEW [View_Round] AS
+SELECT R.ID_Tournament, T.[Name], R.RoundNumber, R.StartRound, R.EndRound
+FROM [Round] AS R
+JOIN Tournoi AS T
+	ON R.ID_Tournament = T.ID_Tournament
+GO
+
 CREATE VIEW [View_Resulta] AS 
 SELECT R.ID_Tournament, T.Name, R.ID_User, U.Pseudo, P.IG_Pseudo, R.Rank, R.Gain, R.Score, R.TieBreaker, R.AdditionalTieBreaker, R.AdditionalTieBreakerRules
 FROM Resultat as R
@@ -508,10 +516,12 @@ WHERE P.ID_Tournament IN (SELECT ID_Tournament FROM Tournoi WHERE [Over] = 0)
 GO
 
 CREATE VIEW [View_Match] AS
-SELECT M.[ID_Tournament], [RoundNumber], [ID_PlayerOne], U1.Pseudo AS [PlayerOne], P1.IG_Pseudo AS [PseudoPlayerOne], [ID_PlayerTwo], U2.Pseudo AS [PlayerTow], P2.IG_Pseudo AS [PseudoPlayerTow]
+SELECT M.[ID_Tournament], M.[RoundNumber], R.StartRound, [ID_PlayerOne], U1.Pseudo AS [PlayerOne], P1.IG_Pseudo AS [PseudoPlayerOne], [ID_PlayerTwo], U2.Pseudo AS [PlayerTow], P2.IG_Pseudo AS [PseudoPlayerTow]
 FROM [Match] AS M
 JOIN Tournoi AS T
 	ON T.ID_Tournament = M.ID_Tournament
+JOIN [Round] AS R
+	ON R.ID_Tournament = M.ID_Tournament AND R.RoundNumber = M.RoundNumber
 JOIN Utilisateur AS U1
 	ON U1.ID_User = M.ID_PlayerOne
 LEFT JOIN PseudoIG AS P1
@@ -569,13 +579,6 @@ SELECT	V.ID_Tournament,
 FROM [View_ClassementTemporaire] as V
 JOIN Tournoi as T
 	ON T.ID_Tournament = V.ID_Tournament
-GO
-
-CREATE VIEW [View_Round] AS
-SELECT R.ID_Tournament, T.[Name], R.RoundNumber, R.StartRound
-FROM [Round] AS R
-JOIN Tournoi AS T
-	ON R.ID_Tournament = T.ID_Tournament
 GO
 
 CREATE VIEW [View_Dotation] AS
@@ -1047,7 +1050,10 @@ BEGIN
 				BEGIN
 					RAISERROR('Le jeu du tournoi est introuvable',16,1);
 				END
-
+			if((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi)) > 0)
+				BEGIN
+					RAISERROR('Le tournoi a déjà commencé',16,1);
+				END
 			
 
 			if(@Name is null and @Date is null and @ID_Game is null and @PPWin is null and @PPDraw is null and @PPLose is null and @DeckListNumber is null and @Description is null and @MaxNumberPlayer is null AND 0<(SELECT COUNT(*) FROM @Dotation))
@@ -1112,7 +1118,16 @@ BEGIN
 				BEGIN
 					RAISERROR('Le tournoi est déjà fini',16,1);
 				END
+				
+			if((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi)) = 0)
+				BEGIN
+					RAISERROR('Le tournoi n a pas encore commencé supprimer le au lieu de le terminer',16,1);
+				END
 
+			if((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and EndRound IS NULL AND StartRound IS NOT NULL)) > 0)
+				BEGIN
+					RAISERROR('La derniere round du tournoi n a pas encore fini, terminer la avant de finir le tournoi',16,1);
+				END
 			--(inseré ici la création des résulta du tournoi ou faire un triggeur pour le faire sur le changement de over a 1)
 
 
@@ -1222,6 +1237,10 @@ BEGIN
 				Begin
 					RAISERROR('trop de deck on été soumis',16,1);
 				End
+			if((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi)) > 0)
+				BEGIN
+					RAISERROR('Le tournoi a déjà commencé, vous ne pouvez plus vous inscrire',16,1);
+				END
 
 			SELECT @IDGame = [ID_Game] 
 			FROM Tournoi
@@ -1290,6 +1309,10 @@ BEGIN
 				Begin
 					RAISERROR('L utilisateur est introuvable',16,1);
 				End
+			if((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi)) > 0)
+				BEGIN
+					RAISERROR('Le tournoi n a commencé abandonné plutot que de ce désinscrire',16,1);
+				END
 			
 			DELETE DeckJoueur
 			WHERE [ID_Tournament] = @ID_Tournoi AND [ID_User] = @ID_User
@@ -1335,6 +1358,10 @@ BEGIN
 			Begin
 				RAISERROR('Le deck est introuvable',16,1);
 			End
+		if(GETDATE() > (SELECT Date FROM Tournoi WHERE ID_Tournament = @ID_Tournoi))
+			BEGIN
+				RAISERROR('Le tournoi a déjà commencé les decks ne peuvent plus être modifié',16,1);
+			END
 
 		if(@ID_Deck <> 0)
 			BEGIN

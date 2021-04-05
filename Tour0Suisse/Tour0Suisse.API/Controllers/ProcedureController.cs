@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Tour0Suisse.Model;
 using Tour0Suisse.Repository;
 
@@ -14,9 +12,9 @@ namespace Tour0Suisse.API.Controllers
     [ApiController]
     public class ProcedureController : ControllerBase
     {
-        static private DBTour0SuisseLINQ DB_CURD;
+        private static readonly DBTour0SuisseLINQ DB_CURD;
 
-        static  ProcedureController()
+        static ProcedureController()
         {
             string ConnectionString =
                 "Server=DESKTOP-BNVQBMF;Database=Tour0Suisse;user id=API_User;password=1234@Test;";
@@ -25,48 +23,80 @@ namespace Tour0Suisse.API.Controllers
         }
 
         #region User
-        
+
         [HttpPost]
-        public ViewUser LogIN(Utilisateur User)
+        public ViewUser LogIN(Utilisateur Utilisateur)
         {
-            return DB_CURD.LogIn(User.Email, User.HexaPassword); ;
+            return DB_CURD.LogIn(Utilisateur.Email, Utilisateur.HexaPassword);
         }
 
         [HttpPost]
-        public bool CreateUser(Utilisateur User)
+        public RetourAPI CreateUser(Utilisateur Utilisateur)
         {
-            return DB_CURD.CreateUser(User); ;
+            return DB_CURD.CreateUser(Utilisateur);
         }
 
         [HttpPost]
-        public bool EditUser(Utilisateur User)
+        public RetourAPI EditUser(Utilisateur Utilisateur)
         {
-            return DB_CURD.EditUser(User); ;
+            return DB_CURD.EditUser(Utilisateur);
         }
 
         [HttpPost]
-        public bool DeleteUser(Utilisateur User)
+        public RetourAPI DeleteUser(Utilisateur Utilisateur)
         {
-            return DB_CURD.DeleteUser(User); ;
+            return DB_CURD.DeleteUser(Utilisateur);
         }
 
         [HttpPost]
-        public bool AddPseudo(PseudoIg Pseudo)
+        public RetourAPI UpdateUserIgPseudo(Utilisateur Utilisateur)
         {
-            return DB_CURD.AddPseudoIG(Pseudo); ;
+            List<ViewPseudo> ListPseudo = DB_CURD.GetPseudosUser(Utilisateur.IdUser);
+
+            int count = 0;
+            int reussite = 0;
+
+            foreach (ViewPseudo pseudo in Utilisateur.PseudoIgs)
+                if (!ListPseudo.Contains(pseudo))
+                {
+                    count++;
+                    if (ListPseudo.Any(p => p.IdGame == pseudo.IdGame))
+                    {
+                        if (string.IsNullOrWhiteSpace(pseudo.IgPseudo) && DB_CURD.DeletePseudoIG(pseudo).Succes)
+                            reussite++;
+                        else if (DB_CURD.EditPseudoIG(pseudo).Succes) reussite++;
+                    }
+                    else if (string.IsNullOrEmpty(pseudo.IgPseudo))
+                    {
+                        count--;
+                    }
+                    else if (DB_CURD.AddPseudoIG(pseudo).Succes)
+                    {
+                        reussite++;
+                    }
+                }
+
+            return new RetourAPI(reussite == count,
+                reussite + " Pseudo sur " + count + " on ete mis a jours");
         }
 
-        [HttpPost]
-        public bool EditPseudo(PseudoIg Pseudo)
-        {
-            return DB_CURD.EditPseudoIG(Pseudo); ;
-        }
+        //[HttpPost]
+        //public RetourAPI AddPseudo(PseudoIg Pseudo)
+        //{
+        //    return DB_CURD.AddPseudoIG(Pseudo); ;
+        //}
 
-        [HttpPost]
-        public bool DeletePseudo(PseudoIg Pseudo)
-        {
-            return DB_CURD.DeletePseudoIG(Pseudo); ;
-        }
+        //[HttpPost]
+        //public RetourAPI EditPseudo(PseudoIg Pseudo)
+        //{
+        //    return DB_CURD.EditPseudoIG(Pseudo); ;
+        //}
+
+        //[HttpPost]
+        //public RetourAPI DeletePseudo(PseudoIg Pseudo)
+        //{
+        //    return DB_CURD.DeletePseudoIG(Pseudo); ;
+        //}
 
         #endregion
 
@@ -74,143 +104,145 @@ namespace Tour0Suisse.API.Controllers
         #region Tournoi
 
         [HttpPost]
-        public int CreateTournoi(Tournoi Tournoi)
+        public RetourAPI CreateTournoi(Tournoi Tournoi)
         {
-            return DB_CURD.CreateTournoi(Tournoi); ;
+            return DB_CURD.CreateTournoi(Tournoi);
         }
 
         [HttpPost]
-        public bool EditTournoi(ViewTournament Tournoi)
+        public RetourAPI EditTournoi(ViewTournament Tournoi)
         {
-            return DB_CURD.EditTournoi(Tournoi); ;
+            return DB_CURD.EditTournoi(Tournoi);
         }
 
         [HttpPost]
-        public bool DeleteTournoi(int id)
+        public RetourAPI DeleteTournoi(int id)
         {
-            return DB_CURD.DeleteTournoi(new Tournoi{IdTournament = id}); ;
+            return DB_CURD.DeleteTournoi(new Tournoi {IdTournament = id});
         }
 
         [HttpPost]
-        public bool Register(Joueur Joueur)
+        public RetourAPI Register(Joueur Joueur)
         {
-            return DB_CURD.RegisterTournoi(new DeckJoueur{IdDeck = 0, IdTournament = Joueur.IdTournament, IdUser = Joueur.User.IdUser}, Joueur.Decks.Select(d=>d.DeckList).ToList()); ;
+            return DB_CURD.RegisterTournoi(
+                new DeckJoueur {IdDeck = 0, IdTournament = Joueur.IdTournament, IdUser = Joueur.User.IdUser},
+                Joueur.Decks.Select(d => d.DeckList).ToList());
         }
 
         [HttpPost]
-        public bool EditDecks(ViewDeck Deck)
+        public RetourAPI EditDecks(ViewDeck Deck)
         {
-            return DB_CURD.UpdateDeck(new DeckJoueur{IdDeck = Deck.IdDeck, IdTournament = Deck.IdTournament, IdUser = Deck.IdUser}, Deck.DeckList); ;
+            return DB_CURD.UpdateDeck(
+                new DeckJoueur {IdDeck = Deck.IdDeck, IdTournament = Deck.IdTournament, IdUser = Deck.IdUser},
+                Deck.DeckList);
         }
 
         [HttpPost]
-        public bool Unregister (Joueur Joueur)
+        public RetourAPI Unregister(Joueur Joueur)
         {
-            return DB_CURD.UnregisterTournoi(new DeckJoueur { IdDeck = 0, IdTournament = Joueur.IdTournament, IdUser = Joueur.User.IdUser }); ;
+            return DB_CURD.UnregisterTournoi(new DeckJoueur
+                {IdDeck = 0, IdTournament = Joueur.IdTournament, IdUser = Joueur.User.IdUser});
         }
 
         [HttpPost]
-        public bool AddAdmin(ViewOrga Orga)
+        public RetourAPI AddAdmin(ViewOrga Orga)
         {
-            return DB_CURD.AddAdmin(Orga); ;
+            return DB_CURD.AddAdmin(Orga);
         }
 
         [HttpPost]
-        public bool EditAdmin(ViewOrga Orga)
+        public RetourAPI EditAdmin(ViewOrga Orga)
         {
-            return DB_CURD.EditAdmin(Orga); ;
+            return DB_CURD.EditAdmin(Orga);
         }
 
         [HttpPost]
-        public bool DeleteAdmin(ViewOrga Orga)
+        public RetourAPI DeleteAdmin(ViewOrga Orga)
         {
-            return DB_CURD.DeleteAdmin(Orga); ;
+            return DB_CURD.DeleteAdmin(Orga);
         }
 
         [HttpPost]
-        public bool CreateRound(Round Round)
+        public RetourAPI CreateRound(Round Round)
         {
-            return DB_CURD.CreateRound(Round); ;
+            return DB_CURD.CreateRound(Round);
         }
 
         [HttpPost]
-        public bool EditRound(Round Round)
+        public RetourAPI EditRound(Round Round)
         {
-            return DB_CURD.EditRound(Round); ;
+            return DB_CURD.EditRound(Round);
         }
 
         [HttpPost]
-        public bool DeleteRound(Round Round)
+        public RetourAPI DeleteRound(Round Round)
         {
-            return DB_CURD.DeleteRound(Round); ;
+            return DB_CURD.DeleteRound(Round);
         }
 
         [HttpPost]
-        public bool DeleteRoundAndMatch(Round Round)
+        public RetourAPI DeleteRoundAndMatch(Round Round)
         {
-            return DB_CURD.DeleteRoundAndMatch(Round); ;
+            return DB_CURD.DeleteRoundAndMatch(Round);
         }
 
         [HttpPost]
-        public bool CreateMatch(ViewMatch Match)
+        public RetourAPI CreateMatch(ViewMatch Match)
         {
-            return DB_CURD.CreateMatch(Match); ;
+            return DB_CURD.CreateMatch(Match);
         }
 
         [HttpPost]
-        public bool CreateMatchAllPairing(Round Round)
+        public RetourAPI CreateMatchAllPairing(Round Round)
         {
-            var Players = new List<int>();
-            foreach (var p in DB_CURD.GetParticipantsOf(Round.IdTournament))
-            {
+            List<int> Players = new();
+            foreach (ViewParticipant p in DB_CURD.GetParticipantsOf(Round.IdTournament))
                 if (!p.Drop)
-                {
                     Players.Add(p.IdUser);
-                }
-            }
 
-            var Classements = DB_CURD.GetScoreClassementTemporairesOfTournamnent(Round.IdTournament);
-            var Matches = DB_CURD.GetMatchesOf(Round.IdTournament);
-            var Tournoi = DB_CURD.GetTournament(Round.IdTournament);
+            List<ViewScoreClassementTemporaire> Classements =
+                DB_CURD.GetScoreClassementTemporairesOfTournamnent(Round.IdTournament);
+            List<ViewMatch> Matches = DB_CURD.GetMatchesOf(Round.IdTournament);
+            ViewTournament Tournoi = DB_CURD.GetTournament(Round.IdTournament);
 
-            List<PairID> PairingList = AlgoPairing.Pairing(Players, Classements, Matches, Round.RoundNumber, Tournoi.Ppwin, Tournoi.Ppdraw, Tournoi.Pplose);
+            List<PairID> PairingList = AlgoPairing.Pairing(Players, Classements, Matches, Round.RoundNumber,
+                Tournoi.Ppwin, Tournoi.Ppdraw, Tournoi.Pplose);
 
-            return DB_CURD.CreateMatchAllParing(Round, PairingList); ;
+            return DB_CURD.CreateMatchAllParing(Round, PairingList);
         }
 
         [HttpPost]
-        public bool EditMatch(ViewMatch Match, int P1, int P2)
+        public RetourAPI EditMatch(ViewMatch Match, int P1, int P2)
         {
-            return DB_CURD.EditMatch(Match, new PairID{ID1 = P1, ID2 = P2}); ;
+            return DB_CURD.EditMatch(Match, new PairID {ID1 = P1, ID2 = P2});
         }
 
         [HttpPost]
-        public bool DeleteMatch(ViewMatch Match)
+        public RetourAPI DeleteMatch(ViewMatch Match)
         {
-            return DB_CURD.DeleteMatch(Match); ;
+            return DB_CURD.DeleteMatch(Match);
         }
-
 
         #endregion
 
         #region Jeu
 
         [HttpPost]
-        public bool CreateJeu(Jeu Jeu)
+        public RetourAPI CreateJeu(Jeu Jeu)
         {
-            return DB_CURD.AddGame(Jeu); ;
+            return DB_CURD.AddGame(Jeu);
         }
 
         [HttpPost]
-        public bool EditJeu(Jeu Jeu)
+        public RetourAPI EditJeu(Jeu Jeu)
         {
-            return DB_CURD.EditGame(Jeu); ;
+            return DB_CURD.EditGame(Jeu);
         }
 
         [HttpPost]
-        public bool DeleteJeu(Jeu Jeu)
+        public RetourAPI DeleteJeu(Jeu Jeu)
         {
-            return DB_CURD.DeleteGame(Jeu); ;
+            return DB_CURD.DeleteGame(Jeu);
         }
 
         #endregion

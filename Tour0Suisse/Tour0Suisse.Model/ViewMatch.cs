@@ -4,7 +4,19 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tour0Suisse.Model
 {
-    public partial class ViewMatch
+    public interface IViewMatch
+    {
+        int RoundNumber { get; set; }
+        int IdPlayer1 { get; set; }
+        int IdPlayer2 { get; set; }
+        int IdTournament { get; set; }
+        string Player1 { get; set; }
+        string Pseudo1 { get; set; }
+        string Player2 { get; set; }
+        string Pseudo2 { get; set; }
+    }
+
+    public class ViewMatch : IViewMatch
     {
         [Display(Name = "Round numero")]
         public int RoundNumber { get; set; }

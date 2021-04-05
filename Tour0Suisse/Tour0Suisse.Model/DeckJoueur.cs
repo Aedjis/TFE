@@ -4,7 +4,7 @@ using System.ComponentModel;
 
 namespace Tour0Suisse.Model
 {
-    public partial class DeckJoueur
+    public class DeckJoueur
     {
         public int IdTournament { get; set; }
         public int IdUser { get; set; }

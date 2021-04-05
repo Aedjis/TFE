@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 using Tour0Suisse.Controllers;
+using Tour0Suisse.Web.Procedure;
 
 namespace Tour0Suisse.Web.Controllers
 {
@@ -63,17 +64,7 @@ namespace Tour0Suisse.Web.Controllers
 
         public async Task<IActionResult> Create()
         {
-
-            IEnumerable<ViewJeu> Jeus = new List<ViewJeu>();
-
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetJeus"))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    Jeus = JsonConvert.DeserializeObject<IEnumerable<ViewJeu>>(apiResponse);
-                }
-            }
+            var Jeus = await CallAPI.GetAllJeus();
 
             ViewData["AllGame"] = new SelectList(Jeus, "IdGame", "Name");
             return View("~/Views/Tournoi/CreateTournoi.cshtml");
@@ -88,7 +79,7 @@ namespace Tour0Suisse.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                if ((tournoi.Organisateurs == null || tournoi.Organisateurs.Count() == 0) && int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
+                if ((tournoi.Organisateurs == null || !tournoi.Organisateurs.Any()) && int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
                 {
                     tournoi.Organisateurs = new List<ViewOrga>{new ViewOrga{Level = 0, IdUser = IdUser, IdTournament = -1, Name = "", Pseudo = ""}};
                 }
@@ -103,9 +94,10 @@ namespace Tour0Suisse.Web.Controllers
                                 tournoi))
                         {
                             string apiResponse = await response.Content.ReadAsStringAsync();
-                            if (JsonConvert.DeserializeObject<bool>(apiResponse))
+                            RetourAPI retourApi = JsonConvert.DeserializeObject<RetourAPI>(apiResponse);
+                            if (retourApi.Succes)
                             {
-                                return RedirectToAction(nameof(Index));
+                                return RedirectToAction("Details", new {id = retourApi.CreateID});
                             }
                         }
                     }
@@ -114,7 +106,7 @@ namespace Tour0Suisse.Web.Controllers
 
 
 
-            IEnumerable<ViewJeu> Jeus = new List<ViewJeu>();
+            IEnumerable<ViewJeu> Jeus;
 
             using (var httpClient = new HttpClient())
             {
@@ -191,9 +183,10 @@ namespace Tour0Suisse.Web.Controllers
                             tournoi))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
-                        if (JsonConvert.DeserializeObject<bool>(apiResponse))
+                        RetourAPI retourApi = JsonConvert.DeserializeObject<RetourAPI>(apiResponse);
+                        if (retourApi.Succes)
                         {
-                            return RedirectToAction(nameof(Index));
+                            return RedirectToAction("Details", new{id = tournoi.IdTournament});
                         }
                     }
                 }
@@ -252,7 +245,8 @@ namespace Tour0Suisse.Web.Controllers
                         id))
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
-                    if (JsonConvert.DeserializeObject<bool>(apiResponse))
+                    RetourAPI retourApi = JsonConvert.DeserializeObject<RetourAPI>(apiResponse);
+                    if (retourApi.Succes)
                     {
                         return RedirectToAction(nameof(Index));
                     }
@@ -313,7 +307,8 @@ namespace Tour0Suisse.Web.Controllers
                             Joueur))
                     {
                         string apiResponse = await response.Content.ReadAsStringAsync();
-                        if (JsonConvert.DeserializeObject<bool>(apiResponse))
+                        RetourAPI retourApi = JsonConvert.DeserializeObject<RetourAPI>(apiResponse);
+                        if (retourApi.Succes)
                         {
                             return RedirectToAction(nameof(Index));
                         }

@@ -12,7 +12,7 @@
                 <input asp-for="@Model.IdTournament" class="control-label" type="hidden"/>
 
             @{
-                for (int i =0 ; @ViewBag.NbDeck > i;i++)
+                for (int i =0 ; ViewBag.NbDeck > i;i++)
                 {
                     <div class="form-group">
                         <label asp-for="@Model.Deck[i].DeckList" class="control-label"></label>

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tour0Suisse.Model
 {
-    public partial class Tournoi
+    public class Tournoi : IViewTournament
     {
         public Tournoi()
         {
@@ -14,7 +14,7 @@ namespace Tour0Suisse.Model
             Resultas = new List<ViewResulta>();
             Classement = new List<ViewScoreClassementTemporaire>();
             Dotation = new List<ViewDotation>();
-            Matchs = new List<Match>();
+            Matchs = new List<ViewMatch>();
         }
 
         public int IdGame
@@ -44,7 +44,7 @@ namespace Tour0Suisse.Model
         [Display(Name = "Date d'annulation du tournoi")]
         public DateTime? Deleted { get; set; }
         [Display(Name = "Jeu")]
-        public ViewJeu jeu { get; set; }
+        public IViewJeu jeu { get; set; }
         [Display(Name = "Liste des participants")]
         public IEnumerable<ViewParticipant> Participants { get; set; }
         [Display(Name = "Liste des organisateur")]
@@ -54,9 +54,10 @@ namespace Tour0Suisse.Model
         [Display(Name = "Classement temporaire")]
         public IEnumerable<ViewScoreClassementTemporaire> Classement { get; set; }
         [Display(Name = "Liste de la dotation")]
-        public IEnumerable<ViewDotation> Dotation { get; set; }
+        public IEnumerable<IViewDotation> Dotation { get; set; }
         [Display(Name = "Liste des matches")]
-        public IEnumerable<Match> Matchs { get; set; }
-
+        public IEnumerable<ViewMatch> Matchs { get; set; }
+        [Display(Name = "Jeu")]
+        public string Game { get => jeu.Name; set => jeu.Name = value; }
     }
 }

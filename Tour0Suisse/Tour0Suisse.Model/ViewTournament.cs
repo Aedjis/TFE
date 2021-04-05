@@ -4,7 +4,24 @@ using  System.ComponentModel.DataAnnotations;
 
 namespace Tour0Suisse.Model
 {
-    public partial class ViewTournament
+    public interface IViewTournament
+    {
+        int IdTournament { get; set; }
+        int IdGame { get; set; }
+        string Name { get; set; }
+        string Game { get; set; }
+        string Description { get; set; }
+        DateTime Date { get; set; }
+        int? MaxNumberPlayer { get; set; }
+        int DeckListNumber { get; set; }
+        int Ppwin { get; set; }
+        int Ppdraw { get; set; }
+        int Pplose { get; set; }
+        DateTime? Deleted { get; set; }
+        bool Over { get; set; }
+    }
+
+    public class ViewTournament : IViewTournament
     {
         public int IdTournament { get; set; }
         public int IdGame { get; set; }
