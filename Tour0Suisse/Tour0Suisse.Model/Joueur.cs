@@ -15,8 +15,8 @@ namespace Tour0Suisse.Model
         }
 
         
-        public IViewTournament Tournament { get; set; }
-        public IViewUser User { get; set; }
+        public ViewTournament Tournament { get; set; }
+        public ViewUser User { get; set; }
         [Display(Name = "Pseudo dans le jeu")]
         public string IGPseudo { get; set; }
         [Display(Name = "Date d'inscription au tournoi")]

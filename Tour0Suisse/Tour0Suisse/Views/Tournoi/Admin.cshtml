@@ -1,0 +1,105 @@
+﻿@using Microsoft.AspNetCore.Http
+@using Tour0Suisse.Model
+@model IEnumerable<Tour0Suisse.Model.Round>
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Tournoi</h4>
+    <hr />
+    
+</div>
+@{
+    if (!Model.Any())
+    {
+        <div class="form-group">
+            <form asp-action="Start" asp-route-id="@(((Tournoi)ViewData["Tournoi"]).IdTournament)">
+                <input type="submit" value="Commencer le tournoi" class="btn btn-default"/>
+            </form>
+        </div>
+    }
+    else
+    {
+        <div class="form-group">
+            
+                @foreach (var round in Model)
+                {
+                    <div id="@("Round"+round.RoundNumber)">
+                        <button id="@("ButtonRound"+round.RoundNumber)" class="btn btn" data-toggle="collapse" data-target="@("#collapseRound"+round.RoundNumber)" aria-expanded="true" aria-controls="@("collapseRound"+round.RoundNumber)">
+                            <label class="control-label">@("Round "+round.RoundNumber)</label>
+                        </button>
+
+                        <div id="@("collapseRound" + round.RoundNumber)" class="collapse">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>
+                                        @Html.DisplayName("Début de round")
+                                    </th>
+                                    <th>
+                                        @Html.DisplayName("Fin de round")
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td>
+                                        @(round.StartRound.ToLocalTime())
+                                    </td>
+                                    <td>
+                                        @{ string End = (round.EndRound < round.StartRound) ? "" : round.EndRound.ToLocalTime().ToString();} @(End)
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            @if (round.Matches.Any())
+                            {
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>
+                                            @Html.DisplayName("Joueur 1")
+                                        </th>
+                                        <th>
+                                            @Html.DisplayName("Joueur 2")
+                                        </th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach (var item in round.Matches)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Player1)<br/>
+                                                Pseudo en jeu : @Html.DisplayFor(modelItem => item.Pseudo1)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Player2)<br/>
+                                                Pseudo en jeu : @Html.DisplayFor(modelItem => item.Pseudo2)
+                                            </td>
+                                        </tr>}
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <form asp-action="Pairing" asp-route-id="@(((Tournoi)ViewData["Tournoi"]).IdTournament)" asp-route-round="@(round.RoundNumber)">
+                                    <input type="submit" value="crée tout les matchs" class="btn btn-default"/>
+                                </form>
+                            }
+                            
+                        </div>
+                    </div>
+                }
+            
+        </div>
+    }
+}
+<div>
+    <a asp-action="Details" asp-route-id="@(((Tournoi)ViewData["Tournoi"]).IdTournament)">Retour</a>
+    | <a asp-action="Index">Back to List</a>
+</div>

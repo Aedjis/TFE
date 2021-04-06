@@ -44,7 +44,7 @@ namespace Tour0Suisse.Model
         [Display(Name = "Date d'annulation du tournoi")]
         public DateTime? Deleted { get; set; }
         [Display(Name = "Jeu")]
-        public IViewJeu jeu { get; set; }
+        public ViewJeu jeu { get; set; }
         [Display(Name = "Liste des participants")]
         public IEnumerable<ViewParticipant> Participants { get; set; }
         [Display(Name = "Liste des organisateur")]

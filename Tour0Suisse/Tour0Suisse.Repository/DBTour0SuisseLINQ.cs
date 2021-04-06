@@ -1030,7 +1030,7 @@ namespace Tour0Suisse.Repository
                         IdTournament = int.Parse(reader["ID_Tournament"].ToString()),
                         Name = reader["Name"].ToString(),
                         RoundNumber = int.Parse(reader["RoundNumber"].ToString()),
-                        StartRound = DateTime.Parse(reader["Victoire"].ToString())
+                        StartRound = DateTime.Parse(reader["StartRound"].ToString())
                     });
 
 
@@ -2271,7 +2271,10 @@ namespace Tour0Suisse.Repository
                 Pairing.Columns.Add("ID_PlayerOne", typeof(int));
                 Pairing.Columns.Add("ID_PlayerTwo", typeof(int));
 
-                foreach (PairID Paire in ListPairing) Pairing.Rows.Add(Paire.ID1, Paire.ID2);
+                foreach (PairID Paire in ListPairing)
+                {
+                    Pairing.Rows.Add(Paire.ID1, Paire.ID2);
+                }
 
                 SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250)
                 {

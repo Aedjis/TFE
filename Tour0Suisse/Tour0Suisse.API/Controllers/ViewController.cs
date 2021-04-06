@@ -31,7 +31,7 @@ namespace Tour0Suisse.API.Controllers
         [HttpGet]
         public IEnumerable<ViewUser> GetUsers()
         {
-            return DB_CURD.ViewUsers().Where(u=>u.Deleted == null);
+            return DB_CURD.ViewUsers().Where(u => u.Deleted == null);
         }
 
         // GET api/<ViewController>/5
@@ -99,7 +99,8 @@ namespace Tour0Suisse.API.Controllers
                 Ppdraw = t.Ppdraw,
                 Pplose = t.Pplose,
                 Over = t.Over,
-                Deleted = t.Deleted
+                Deleted = t.Deleted,
+                Matchs = GetMatchsOfTournament(t.IdTournament)
             };
             if (retour.Over)
             {
@@ -143,6 +144,12 @@ namespace Tour0Suisse.API.Controllers
         public IEnumerable<ViewMatch> GetMatchs()
         {
             return DB_CURD.ViewMatches();
+        }
+
+        [HttpGet]
+        public IEnumerable<ViewMatch> GetMatchsOfTournament([FromQuery] int IdTournoi)
+        {
+            return DB_CURD.GetMatchesOf(IdTournoi);
         }
 
         [HttpGet]

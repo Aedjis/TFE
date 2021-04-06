@@ -10,8 +10,8 @@ namespace Tour0Suisse.Model
         {
             User = new ViewUser();
         }
-        public IViewTournament Tournament { get; set; }
-        public IViewUser User { get; set; }
+        public ViewTournament Tournament { get; set; }
+        public ViewUser User { get; set; }
         [Display(Name = "Niveau de compétance")]
         public int? Level { get; set; }
         public string Name { get => Tournament.Name; set => Tournament.Name = value; }

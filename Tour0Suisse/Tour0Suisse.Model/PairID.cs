@@ -8,5 +8,7 @@ namespace Tour0Suisse.Model
     {
         public int ID1;
         public int ID2;
+
+#warning  convertir tout les date qui sont enregistré dans les modele en utc 
     }
 }

@@ -127,22 +127,45 @@ namespace Tour0Suisse.API
         /// <returns>signal si le pairing est complete</returns>
         public static bool DescPairing(List<int> players, Dictionary<int, List<int>> playerOpponentList, List<ViewScoreClassementTemporaire> playerClassement, int roundNumber, out List<PairID> retour, int PPV = 2, int PPE = 1, int PPD = 0)
         {
+            int MPP = (PPV < PPE) ? 
+                        (PPE < PPD) ? 
+                            PPD : PPE : (PPV < PPD) ? 
+                                            PPD : PPV;
+
             retour = new List<PairID>();//inisialisation de la liste de pairing qui sera retourné
-            List<int>[] GroupPlayer = new List<int>[roundNumber * PPV];//création d'un tableau pour crée les group de liste de joueur 
-
-            for (int i = 0; i < roundNumber * PPV; i++)//atribution des joueur a chaque group leur correspondant en fonction de leur parcours
-            {
-                GroupPlayer[i] = playerClassement.Where(p => (p.Victoire * PPV + p.Egaliter * PPE + p.Defaite * PPD) == i).Select(s => s.IdPlayer).ToList();
-            }
-
-
             List<int> InReportedPlayer = new();//création de la liste des joueur qui sont été réporté
-            foreach (var Group in GroupPlayer)
+
+            if ((roundNumber - 1) == 0)
             {
-                retour.AddRange(PairingInGroup(Group, playerOpponentList, out List<int> OutReportedPlayer, InReportedPlayer));//on fait le pairing de chaque groupe et on le rajoute au pairing existant
-                InReportedPlayer.Clear();
-                InReportedPlayer.AddRange(OutReportedPlayer);//on transmet la liste es joueur reporté
-                OutReportedPlayer.Clear();
+                retour.AddRange(PairingInGroup(players, playerOpponentList, out List<int> OutReportedPlayer, InReportedPlayer));//on fait le pairing de chaque groupe et on le rajoute au pairing existant
+            }
+            else
+            {
+
+                List<int>[]
+                    GroupPlayer =
+                        new List<int>[(roundNumber - 1) *
+                                      PPV]; //création d'un tableau pour crée les group de liste de joueur 
+
+
+                for (int i = 0;
+                    i < (roundNumber - 1) * PPV;
+                    i++) //atribution des joueur a chaque group leur correspondant en fonction de leur parcours
+                {
+                    GroupPlayer[i] = playerClassement
+                        .Where(p => (p.Victoire * PPV + p.Egaliter * PPE + p.Defaite * PPD) == i)
+                        .Select(s => s.IdPlayer).ToList();
+                }
+
+
+                foreach (var Group in GroupPlayer)
+                {
+                    retour.AddRange(PairingInGroup(Group, playerOpponentList, out List<int> OutReportedPlayer,
+                        InReportedPlayer)); //on fait le pairing de chaque groupe et on le rajoute au pairing existant
+                    InReportedPlayer.Clear();
+                    InReportedPlayer.AddRange(OutReportedPlayer); //on transmet la liste es joueur reporté
+                    OutReportedPlayer.Clear();
+                }
             }
 
             switch (InReportedPlayer.Count)//en fonction du nombre de joueur qui n'ont pas pu etre pairé on : 

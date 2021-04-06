@@ -219,7 +219,7 @@ GO
 CREATE TABLE [Joueur](  --fait doublons avec le tablme deck joueur
 ID_Tournament INT NOT NULL,
 ID_User INT NOT NULL,
-RegisterDate DateTime DEFAULT(GETDATE()),
+RegisterDate DateTime DEFAULT(GETUTCDATE()),
 CheckIn DateTime NULL,
 [Drop] BIT NOT NULL DEFAULT(0),
 
@@ -377,7 +377,7 @@ GO
 --_____________DEBUT DE CREATION D'UTILISATEUR, JEU, DECK VIDE______________________
 
 --INSERT INTO Utilisateur ([Pseudo], [Email], [Password], [Organizer], [DELETED])
---	VALUES('Bye', '0@00.00', HASHBYTES('SHA2_512',''), 0, GETDATE())
+--	VALUES('Bye', '0@00.00', HASHBYTES('SHA2_512',''), 0, GETUTCDATE())
 
 --INSERT INTO Jeu([Name])
 --GO
@@ -516,7 +516,7 @@ WHERE P.ID_Tournament IN (SELECT ID_Tournament FROM Tournoi WHERE [Over] = 0)
 GO
 
 CREATE VIEW [View_Match] AS
-SELECT M.[ID_Tournament], M.[RoundNumber], R.StartRound, [ID_PlayerOne], U1.Pseudo AS [PlayerOne], P1.IG_Pseudo AS [PseudoPlayerOne], [ID_PlayerTwo], U2.Pseudo AS [PlayerTow], P2.IG_Pseudo AS [PseudoPlayerTow]
+SELECT M.[ID_Tournament], M.[RoundNumber], R.StartRound, [ID_PlayerOne], U1.Pseudo AS [PlayerOne], P1.IG_Pseudo AS [PseudoPlayerOne], [ID_PlayerTwo], U2.Pseudo AS [PlayerTwo], P2.IG_Pseudo AS [PseudoPlayerTwo]
 FROM [Match] AS M
 JOIN Tournoi AS T
 	ON T.ID_Tournament = M.ID_Tournament
@@ -906,7 +906,7 @@ BEGIN
 				End
 
 			UPDATE Utilisateur
-			SET DELETED = CAST( GETDATE() AS Date )
+			SET DELETED = CAST( GETUTCDATE() AS Date )
 			WHERE ID_User = @ID_User AND Password = @Password
 			
 			COMMIT;
@@ -953,7 +953,7 @@ BEGIN
 				BEGIN
 					RAISERROR('Le nom du tournoi est vide',16,1);
 				END
-			if(@Date IS NULL OR @Date < GETDATE())
+			if(@Date IS NULL OR @Date < GETUTCDATE())
 				BEGIN
 					RAISERROR('La date du tournoi est incorrect',16,1);
 				END
@@ -1042,7 +1042,7 @@ BEGIN
 				BEGIN
 					SET @Name = NULL;
 				END
-			if(@Date < GETDATE())
+			if(@Date < GETUTCDATE())
 				BEGIN
 					RAISERROR('La date du tournoi est incorrect',16,1);
 				END
@@ -1192,7 +1192,7 @@ BEGIN
 				End
 
 			UPDATE Tournoi
-			SET DELETED = CAST( GETDATE() AS Date )
+			SET DELETED = CAST( GETUTCDATE() AS Date )
 			WHERE ID_Tournament = @ID_Tournoi
 			
 			COMMIT;
@@ -1225,7 +1225,7 @@ BEGIN
 
 	BEGIN TRANSACTION
 		BEGIN TRY
-			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null and [Date]> GETDATE())) <> 1)
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null and [Date]> GETUTCDATE())) <> 1)
 				Begin
 					RAISERROR('Le tournoi est introuvable',16,1);
 				End
@@ -1301,7 +1301,7 @@ BEGIN
 
 	BEGIN TRANSACTION
 		BEGIN TRY
-			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and [Date]> GETDATE())) <> 1)
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and [Date]> GETUTCDATE())) <> 1)
 				Begin
 					RAISERROR('Le tournoi est introuvable',16,1);
 				End
@@ -1344,56 +1344,56 @@ BEGIN
 
 	SET @responseMessage = '';
 	SET @Reussie = 1;
-
-	BEGIN TRY
-		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null and [Date]> GETDATE())) <> 1)
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null and [Date]> GETUTCDATE())) <> 1)
+					Begin
+						RAISERROR('Le tournoi est introuvable',16,1);
+					End
+			if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
 				Begin
-					RAISERROR('Le tournoi est introuvable',16,1);
+					RAISERROR('L utilisateur est introuvable',16,1);
 				End
-		if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
-			Begin
-				RAISERROR('L utilisateur est introuvable',16,1);
-			End
-		if( @ID_Deck IS NULL OR (SELECT COUNT(*) FROM Deck WHERE (ID_Deck = @ID_Deck )) <> 1)
-			Begin
-				RAISERROR('Le deck est introuvable',16,1);
-			End
-		if(GETDATE() > (SELECT Date FROM Tournoi WHERE ID_Tournament = @ID_Tournoi))
-			BEGIN
-				RAISERROR('Le tournoi a déjà commencé les decks ne peuvent plus être modifié',16,1);
-			END
+			if( @ID_Deck IS NULL OR (SELECT COUNT(*) FROM Deck WHERE (ID_Deck = @ID_Deck )) <> 1)
+				Begin
+					RAISERROR('Le deck est introuvable',16,1);
+				End
+			if(GETUTCDATE() > (SELECT Date FROM Tournoi WHERE ID_Tournament = @ID_Tournoi))
+				BEGIN
+					RAISERROR('Le tournoi a déjà commencé les decks ne peuvent plus être modifié',16,1);
+				END
 
-		if(@ID_Deck <> 0)
-			BEGIN
-				DELETE DeckJoueur
-				WHERE [ID_Tournament] = @ID_Tournoi AND [ID_User] = @ID_User  AND [ID_Deck] = @ID_Deck
-			END
-		ELSE IF ((SELECT COUNT(*) FROM DeckJoueur WHERE ID_Tournament = @ID_Tournoi and ID_User = @ID_User) >= (SELECT [DeckListNumber] FROM Tournoi WHERE ID_Tournament = @ID_Tournoi))
-			BEGIN
-				RAISERROR('trop de deck on été soumis',16,1);
-			END
+			if(@ID_Deck <> 0)
+				BEGIN
+					DELETE DeckJoueur
+					WHERE [ID_Tournament] = @ID_Tournoi AND [ID_User] = @ID_User  AND [ID_Deck] = @ID_Deck
+				END
+			ELSE IF ((SELECT COUNT(*) FROM DeckJoueur WHERE ID_Tournament = @ID_Tournoi and ID_User = @ID_User) >= (SELECT [DeckListNumber] FROM Tournoi WHERE ID_Tournament = @ID_Tournoi))
+				BEGIN
+					RAISERROR('trop de deck on été soumis',16,1);
+				END
 		
-		SELECT @IDGame = [ID_Game] 
-			FROM Tournoi
-			WHERE ID_Tournament = @ID_Tournoi
+			SELECT @IDGame = [ID_Game] 
+				FROM Tournoi
+				WHERE ID_Tournament = @ID_Tournoi
 
-		INSERT INTO Deck ([DeckList], [ID_Game])
-			OUTPUT inserted.ID_Deck INTO @ListID
-			VALUES(@DeckList, @IDGame)
+			INSERT INTO Deck ([DeckList], [ID_Game])
+				OUTPUT inserted.ID_Deck INTO @ListID
+				VALUES(@DeckList, @IDGame)
 
-		SELECT ID = @IDDeck 
-			FROM @ListID
+			SELECT ID = @IDDeck 
+				FROM @ListID
 		
-		INSERT INTO DeckJoueur ([ID_Tournament], [ID_User], [ID_Deck])
-			VALUES(@ID_Tournoi, @ID_User, @IDDeck)
+			INSERT INTO DeckJoueur ([ID_Tournament], [ID_User], [ID_Deck])
+				VALUES(@ID_Tournoi, @ID_User, @IDDeck)
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie = 0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1409,26 +1409,27 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1;
 
-	BEGIN TRY
-		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+					Begin
+						RAISERROR('Le tournoi est introuvable',16,1);
+					End
+			if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
 				Begin
-					RAISERROR('Le tournoi est introuvable',16,1);
+					RAISERROR('L utilisateur est introuvable',16,1);
 				End
-		if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
-			Begin
-				RAISERROR('L utilisateur est introuvable',16,1);
-			End
 		
-		INSERT INTO Organisateur ([ID_Tournament], [ID_User], [Level])
-			VALUES(@ID_Tournoi, @ID_User, @Level)
+			INSERT INTO Organisateur ([ID_Tournament], [ID_User], [Level])
+				VALUES(@ID_Tournoi, @ID_User, @Level)
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie = 0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1443,33 +1444,33 @@ BEGIN
 
 	SET @responseMessage = '';
 	SET @Reussie = 1;
-
-	BEGIN TRY
-		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+					Begin
+						RAISERROR('Le tournoi est introuvable',16,1);
+					End
+			if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
 				Begin
-					RAISERROR('Le tournoi est introuvable',16,1);
+					RAISERROR('L utilisateur est introuvable',16,1);
 				End
-		if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
-			Begin
-				RAISERROR('L utilisateur est introuvable',16,1);
-			End
 
-		if(@Level is null or @Level <0)
-			BEGIN
-				RAISERROR('Niveau d admin incorrecte',16,1);
-			END
+			if(@Level is null or @Level <0)
+				BEGIN
+					RAISERROR('Niveau d admin incorrecte',16,1);
+				END
 		
-		UPDATE Organisateur
-			SET [Level] = @Level
-			WHERE [ID_User] = @ID_User AND [ID_Tournament] = @ID_Tournoi
+			UPDATE Organisateur
+				SET [Level] = @Level
+				WHERE [ID_User] = @ID_User AND [ID_Tournament] = @ID_Tournoi
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie = 0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1484,26 +1485,27 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1;
 
-	BEGIN TRY
-		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+					Begin
+						RAISERROR('Le tournoi est introuvable',16,1);
+					End
+			if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
 				Begin
-					RAISERROR('Le tournoi est introuvable',16,1);
-				End
-		if( @ID_User IS NULL OR (SELECT COUNT(*) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
-			Begin
-				RAISERROR('L utilisateur est introuvable',16,1);
-			END
+					RAISERROR('L utilisateur est introuvable',16,1);
+				END
 
-		DELETE Organisateur
-			WHERE [ID_User] = @ID_User AND [ID_Tournament] = @ID_Tournoi
+			DELETE Organisateur
+				WHERE [ID_User] = @ID_User AND [ID_Tournament] = @ID_Tournoi
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie = 0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1517,23 +1519,24 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1;
 
-	BEGIN TRY
-		if( @Name IS NULL OR TRIM(@Name) ='')
-				Begin
-					RAISERROR('Le Nom du jeu est vide',16,1);
-				End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @Name IS NULL OR TRIM(@Name) ='')
+					Begin
+						RAISERROR('Le Nom du jeu est vide',16,1);
+					End
 
 		
-		INSERT INTO Jeu ([Name])
-			VALUES(@Name)
+			INSERT INTO Jeu ([Name])
+				VALUES(@Name)
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie = 0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1548,30 +1551,30 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Game IS NULL OR (SELECT COUNT(*) FROM Jeu WHERE (ID_Game = @ID_Game)) <> 1)
+					Begin
+						RAISERROR('Le Nom du jeu est vide',16,1);
+					End
 
-		if( @ID_Game IS NULL OR (SELECT COUNT(*) FROM Jeu WHERE (ID_Game = @ID_Game)) <> 1)
-				Begin
-					RAISERROR('Le Nom du jeu est vide',16,1);
-				End
-
-		if( @Name IS NULL OR TRIM(@Name) ='')
-				Begin
-					RAISERROR('Le Nom du jeu est vide',16,1);
-				End
+			if( @Name IS NULL OR TRIM(@Name) ='')
+					Begin
+						RAISERROR('Le Nom du jeu est vide',16,1);
+					End
 
 		
-		UPDATE  Jeu 
-			SET [Name] = (@Name)
-			WHERE ID_Game = @ID_Game
+			UPDATE  Jeu 
+				SET [Name] = (@Name)
+				WHERE ID_Game = @ID_Game
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie = 0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1585,26 +1588,26 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
-
-		if( @ID_Game IS NULL OR (SELECT COUNT(*) FROM Jeu WHERE (ID_Game = @ID_Game)) <> 1)
-				Begin
-					RAISERROR('Le Nom du jeu est vide',16,1);
-				End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Game IS NULL OR (SELECT COUNT(*) FROM Jeu WHERE (ID_Game = @ID_Game)) <> 1)
+					Begin
+						RAISERROR('Le Nom du jeu est vide',16,1);
+					End
 
 
 		
-		UPDATE  Jeu 
-			SET DELETED = 1
-			WHERE ID_Game = @ID_Game
+			UPDATE  Jeu 
+				SET DELETED = 1
+				WHERE ID_Game = @ID_Game
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie = 0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1624,45 +1627,45 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_User IS NULL )
+				Begin
+					RAISERROR('Le champs  utilisateur est vide',16,1);
+				End
+
+			if( @ID_Tournament IS NULL)
+				Begin
+					RAISERROR('Le champs tournoi est vide',16,1);
+				End
+
+			if ((SELECT COUNT(*) FROM Resultat WHERE (ID_User = @ID_User AND ID_Tournament = @ID_Tournament)) <> 1)
+				BEGIN
+					RAISERROR('La combinaison tournoi utilisateur est invalide',16,1);
+				END
+
+			if( @Rank is null AND @Score is null AND @TieBreaker is null AND @AddTieBreaker is null AND @AddTieBreakerRules is null)
+				BEGIN
+					RAISERROR('Aucune modification', 16, 1)
+				END
+
 		
-		if( @ID_User IS NULL )
-			Begin
-				RAISERROR('Le champs  utilisateur est vide',16,1);
-			End
-
-		if( @ID_Tournament IS NULL)
-			Begin
-				RAISERROR('Le champs tournoi est vide',16,1);
-			End
-
-		if ((SELECT COUNT(*) FROM Resultat WHERE (ID_User = @ID_User AND ID_Tournament = @ID_Tournament)) <> 1)
-			BEGIN
-				RAISERROR('La combinaison tournoi utilisateur est invalide',16,1);
-			END
-
-		if( @Rank is null AND @Score is null AND @TieBreaker is null AND @AddTieBreaker is null AND @AddTieBreakerRules is null)
-			BEGIN
-				RAISERROR('Aucune modification', 16, 1)
-			END
-
-		
-		UPDATE  Resultat 
-			SET [Rank] = ISNULL(@Rank, [Rank]),
-				[Score] = ISNULL(@Score, [Score]),
-				[TieBreaker] = ISNULL(@TieBreaker, [TieBreaker]),
-				[AdditionalTieBreakerRules] = ISNULL(@AddTieBreakerRules, [AdditionalTieBreakerRules]),
-				[AdditionalTieBreaker] = ISNULL(@AddTieBreaker, [AdditionalTieBreaker])
-			WHERE ID_Tournament = @ID_Tournament AND ID_User = @ID_User
+			UPDATE  Resultat 
+				SET [Rank] = ISNULL(@Rank, [Rank]),
+					[Score] = ISNULL(@Score, [Score]),
+					[TieBreaker] = ISNULL(@TieBreaker, [TieBreaker]),
+					[AdditionalTieBreakerRules] = ISNULL(@AddTieBreakerRules, [AdditionalTieBreakerRules]),
+					[AdditionalTieBreaker] = ISNULL(@AddTieBreaker, [AdditionalTieBreaker])
+				WHERE ID_Tournament = @ID_Tournament AND ID_User = @ID_User
 				
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie = 0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1677,35 +1680,36 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
-		if( @ID_Tournament IS NULL)
-			Begin
-				RAISERROR('Le champs tournoi est vide',16,1);
-			End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournament IS NULL)
+				Begin
+					RAISERROR('Le champs tournoi est vide',16,1);
+				End
 
-		if ( @ID_User IS NOT NULL AND (SELECT COUNT(*) FROM Resultat WHERE (ID_User = @ID_User AND ID_Tournament = @ID_Tournament)) <> 1)
-			BEGIN
-				RAISERROR('La combinaison tournoi utilisateur est invalide',16,1);
-			END
-		if(@ID_User IS NOT NULL)
-			BEGIN
-				DELETE  Resultat 
-					WHERE ID_Tournament = @ID_Tournament AND ID_User = @ID_User
-			END
-		else
-			BEGIN
-				DELETE  Resultat 
-					WHERE ID_Tournament = @ID_Tournament
-			END
+			if ( @ID_User IS NOT NULL AND (SELECT COUNT(*) FROM Resultat WHERE (ID_User = @ID_User AND ID_Tournament = @ID_Tournament)) <> 1)
+				BEGIN
+					RAISERROR('La combinaison tournoi utilisateur est invalide',16,1);
+				END
+			if(@ID_User IS NOT NULL)
+				BEGIN
+					DELETE  Resultat 
+						WHERE ID_Tournament = @ID_Tournament AND ID_User = @ID_User
+				END
+			else
+				BEGIN
+					DELETE  Resultat 
+						WHERE ID_Tournament = @ID_Tournament
+				END
 				
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie =0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie =0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1721,37 +1725,38 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
-		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
-			Begin
-				RAISERROR('Le tournoi est introuvable',16,1);
-			End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
 
-		if(((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
-			BEGIN
-				RAISERROR('la round existe déjà', 16, 1);
-			END
+			if(((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
+				BEGIN
+					RAISERROR('la round existe déjà', 16, 1);
+				END
 
-		if(@Start is null or @Start < GETDATE())
-			BEGIN
-				RAISERROR('la date de début est incorrecte', 16, 1);
-			END
+			if(@Start is null or @Start < DATEADD(MINUTE, -5, GETUTCDATE()))
+				BEGIN
+					RAISERROR('la date de début est incorrecte', 16, 1);
+				END
 
-		if(@RoundNumber IS null or @RoundNumber <1)
-			BEGIN
-				select @RoundNumber = (Max(RoundNumber) +1) from [Round] WHERE [ID_Tournament] = @ID_Tournoi
-			END
+			if(@RoundNumber IS null or @RoundNumber <1)
+				BEGIN
+					select @RoundNumber = (Max(RoundNumber) +1) from [Round] WHERE [ID_Tournament] = @ID_Tournoi
+				END
 		
-		INSERT INTO [Round]([ID_Tournament], [RoundNumber], [StartRound])
-			VALUES(@ID_Tournoi, @RoundNumber, @Start)
+			INSERT INTO [Round]([ID_Tournament], [RoundNumber], [StartRound])
+				VALUES(@ID_Tournoi, @RoundNumber, @Start)
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie =0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie =0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1769,33 +1774,34 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
-		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
-			Begin
-				RAISERROR('Le tournoi est introuvable',16,1);
-			End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
 
-		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) =1))
-			BEGIN
-				RAISERROR('la round n existe pas déjà', 16, 1);
-			END
+			if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) =1))
+				BEGIN
+					RAISERROR('la round n existe pas déjà', 16, 1);
+				END
 
-		if(@Start is null or @Start < GETDATE())
-			BEGIN
-				RAISERROR('la date de début est incorrecte', 16, 1);
-			END
+			if(@Start is null or @Start < GETUTCDATE())
+				BEGIN
+					RAISERROR('la date de début est incorrecte', 16, 1);
+				END
 
 		
-		INSERT INTO [Round]([ID_Tournament], [RoundNumber], [StartRound])
-			VALUES(@ID_Tournoi, @RoundNumber, @Start)
+			INSERT INTO [Round]([ID_Tournament], [RoundNumber], [StartRound])
+				VALUES(@ID_Tournoi, @RoundNumber, @Start)
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie =0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie =0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1810,32 +1816,33 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
-		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi)) <> 1)
-			Begin
-				RAISERROR('Le tournoi est introuvable',16,1);
-			End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
 
-		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) <>1))
-			BEGIN
-				RAISERROR('la round n existe pas', 16, 1);
-			END
+			if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) <>1))
+				BEGIN
+					RAISERROR('la round n existe pas', 16, 1);
+				END
 
-		IF((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0)
-			BEGIN
-				RAISERROR('Il existe des match pour cette round', 16, 1);
-			END
+			IF((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0)
+				BEGIN
+					RAISERROR('Il existe des match pour cette round', 16, 1);
+				END
 		
-		DELETE [Round]
-			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
+			DELETE [Round]
+				WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie =0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie =0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1850,35 +1857,36 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
-		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi)) <> 1)
-			Begin
-				RAISERROR('Le tournoi est introuvable',16,1);
-			End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
 
-		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) <>1))
-			BEGIN
-				RAISERROR('la round n existe pas', 16, 1);
-			END
+			if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) <>1))
+				BEGIN
+					RAISERROR('la round n existe pas', 16, 1);
+				END
 
-		--IF((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) =0)
-		--	BEGIN
-		--		RAISERROR('Il n existe pas match pour cette round', 16, 1);
-		--	END
+			--IF((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) =0)
+			--	BEGIN
+			--		RAISERROR('Il n existe pas match pour cette round', 16, 1);
+			--	END
 
-		DELETE [Match] 
-			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
+			DELETE [Match] 
+				WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
 		
-		DELETE [Round]
-			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
+			DELETE [Round]
+				WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie =0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie =0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1895,43 +1903,44 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
-		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
-			Begin
-				RAISERROR('Le tournoi est introuvable',16,1);
-			End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
 
-		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
-			BEGIN
-				RAISERROR('la round existe déjà', 16, 1);
-			END
+			if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
+				BEGIN
+					RAISERROR('la round existe déjà', 16, 1);
+				END
 
-		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerOne)) <> 1 )
-			BEGIN
-				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
-			END
+			if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerOne)) <> 1 )
+				BEGIN
+					RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
+				END
 
-		if(@ID_PlayerTwo is null or @ID_PlayerTwo = 0)
-			BEGIN
-				SET @ID_PlayerTwo = null;
-			END
-		else if((SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerTwo)) <> 1 )
-			BEGIN
-				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
-			END
+			if(@ID_PlayerTwo is null or @ID_PlayerTwo = 0)
+				BEGIN
+					SET @ID_PlayerTwo = null;
+				END
+			else if((SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerTwo)) <> 1 )
+				BEGIN
+					RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
+				END
 		
-		INSERT INTO [Match] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo])
-			VALUES(@ID_Tournoi, @RoundNumber, @ID_PlayerOne, @ID_PlayerTwo)
+			INSERT INTO [Match] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo])
+				VALUES(@ID_Tournoi, @RoundNumber, @ID_PlayerOne, @ID_PlayerTwo)
 			
 
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie=0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie=0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -1949,64 +1958,60 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
-		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
-			Begin
-				RAISERROR('Le tournoi est introuvable',16,1);
-			End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
 
-		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
-			BEGIN
-				RAISERROR('la round existe déjà', 16, 1);
-			END
+			if((SELECT COUNT(*) FROM @Pairing) =0)
+				BEGIN
+					RAISERROR('le pairing est vide', 16, 1);
+				END
 
-		if((SELECT COUNT(*) FROM @Pairing) =0)
-			BEGIN
-				RAISERROR('le pairing est vide', 16, 1);
-			END
+			if	(
+					CEILING((SELECT COUNT(distinct [ID_User])
+					FROM Joueur
+					WHERE [ID_Tournament] = @ID_Tournoi and [Drop] = 0)
+					*0.5)
+					!=
+					(SELECT COUNT(*)
+					FROM @Pairing)
+				)
+				BEGIN
+					RAISERROR('le pairing est incorrect, le nombre de joueur ne correspond pas par rapport au nombre de match' , 16, 1);
+				END
 
-		if	(
-				CEILING((SELECT COUNT(distinct [ID_User])
-				FROM Joueur
-				WHERE [ID_Tournament] = @ID_Tournoi and [Drop] = 0)
-				*0.5)
-				=
-				(SELECT COUNT(*)
-				FROM @Pairing)
-			)
-			BEGIN
-				RAISERROR('le pairing est incorrect, le nombre de joueur ne correspond pas par rapport au nombre de match', 16, 1);
-			END
-
-		if	(
-				(SELECT count(distinct [ID_User])
-				FROM Joueur
-				WHERE [ID_Tournament] = @ID_Tournoi and [Drop] = 0 AND  EXISTS(	SELECT ID_PlayerOne
-																				FROM @Pairing
-																				UNION
-																				SELECT ID_PlayerTwo
-																				FROM @Pairing))
-				=
-				(SELECT count(distinct [ID_User])
-				FROM Joueur
-				WHERE [ID_Tournament] = @ID_Tournoi and [Drop] = 0 )
-			)
-			BEGIN
-				RAISERROR('le pairing est incorrect, le nombre de joueur ne correspond pas', 16, 1);
-			END
+			if	(
+					(SELECT count(distinct [ID_User])
+					FROM Joueur
+					WHERE [ID_Tournament] = @ID_Tournoi and [Drop] = 0 AND  EXISTS(	SELECT ID_PlayerOne
+																					FROM @Pairing
+																					UNION
+																					SELECT ID_PlayerTwo
+																					FROM @Pairing))
+					!=
+					(SELECT count(distinct [ID_User])
+					FROM Joueur
+					WHERE [ID_Tournament] = @ID_Tournoi and [Drop] = 0 )
+				)
+				BEGIN
+					RAISERROR('le pairing est incorrect, le nombre de joueur ne correspond pas', 16, 1);
+				END
 
 
-		INSERT INTO [Match] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo])
-			SELECT @ID_Tournoi, @RoundNumber, ID_PlayerOne, CASE WHEN ID_PlayerTwo = 0 THEN NULL ELSE ID_PlayerTwo END
-			FROM @Pairing
+			INSERT INTO [Match] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo])
+				SELECT @ID_Tournoi, @RoundNumber, ID_PlayerOne, CASE WHEN ID_PlayerTwo = 0 THEN NULL ELSE ID_PlayerTwo END
+				FROM @Pairing
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie =0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie =0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -2025,50 +2030,51 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
-		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
-			Begin
-				RAISERROR('Le tournoi est introuvable',16,1);
-			End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
 
-		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
-			BEGIN
-				RAISERROR('la round existe déjà', 16, 1);
-			END
+			if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
+				BEGIN
+					RAISERROR('la round existe déjà', 16, 1);
+				END
 
-		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerOne)) <> 1 )
-			BEGIN
-				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
-			END
+			if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerOne)) <> 1 )
+				BEGIN
+					RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
+				END
 
-		if((SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerTwo)) <> 1 )
-			BEGIN
-				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
-			END
+			if((SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournoi and ID_User = @ID_PlayerTwo)) <> 1 )
+				BEGIN
+					RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
+				END
 
-		if((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and RoundNumber = @RoundNumber and ID_PlayerOne = @ID_PlayerOne)) <> 1)
-			BEGIN
-				RAISERROR('le match est introuvable', 16, 1);
-			END
+			if((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and RoundNumber = @RoundNumber and ID_PlayerOne = @ID_PlayerOne)) <> 1)
+				BEGIN
+					RAISERROR('le match est introuvable', 16, 1);
+				END
 
-		if(@ID_NewPone is null and @ID_NewPTwo is null)
-			BEGIN
-				RAISERROR('pas de modification', 16, 1);
-			END
+			if(@ID_NewPone is null and @ID_NewPTwo is null)
+				BEGIN
+					RAISERROR('pas de modification', 16, 1);
+				END
 
-		UPDATE [Match]
-			SET ID_PlayerOne = ISNULL(@ID_NewPone, ID_PlayerOne),
-				ID_PlayerTwo = ISNULL(@ID_NewPTwo, ID_PlayerTwo)
-			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber and [ID_PlayerOne] = @ID_PlayerOne
+			UPDATE [Match]
+				SET ID_PlayerOne = ISNULL(@ID_NewPone, ID_PlayerOne),
+					ID_PlayerTwo = ISNULL(@ID_NewPTwo, ID_PlayerTwo)
+				WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber and [ID_PlayerOne] = @ID_PlayerOne
 
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie =0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie =0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -2085,34 +2091,35 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
-		if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
-			Begin
-				RAISERROR('Le tournoi est introuvable',16,1);
-			End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
 
-		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
-			BEGIN
-				RAISERROR('la round existe déjà', 16, 1);
-			END
+			if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) >0))
+				BEGIN
+					RAISERROR('la round existe déjà', 16, 1);
+				END
 
-		if((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and RoundNumber = @RoundNumber and ID_PlayerOne = @ID_PlayerOne)) <> 1)
-			BEGIN
-				RAISERROR('le match est introuvable', 16, 1);
-			END
-
-
-		DELETE [Match]
-			WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber and [ID_PlayerOne] = @ID_PlayerOne 
+			if((SELECT COUNT(*) FROM [Match] WHERE (ID_Tournament = @ID_Tournoi and RoundNumber = @RoundNumber and ID_PlayerOne = @ID_PlayerOne)) <> 1)
+				BEGIN
+					RAISERROR('le match est introuvable', 16, 1);
+				END
 
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie =0;
-		ROLLBACK;
-	END CATCH
+			DELETE [Match]
+				WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber and [ID_PlayerOne] = @ID_PlayerOne 
+
+
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie =0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -2134,51 +2141,52 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
-		if( @ID_Tournament IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournament and DELETED is null)) <> 1)
-			Begin
-				RAISERROR('Le tournoi est introuvable',16,1);
-			End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournament IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournament and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
 
-		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournament and @RoundNumber = RoundNumber)) <> 1))
-			BEGIN
-				RAISERROR('la round n existe pas', 16, 1);
-			END
+			if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournament and @RoundNumber = RoundNumber)) <> 1))
+				BEGIN
+					RAISERROR('la round n existe pas', 16, 1);
+				END
 
-		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
-			BEGIN
-				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
-			END
+			if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
+				BEGIN
+					RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
+				END
 
-		if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
-			BEGIN
-				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
-			END
+			if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
+				BEGIN
+					RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
+				END
 
-		if(@ID_Deck_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerOne and ID_User = @ID_PlayerOne and ID_Tournament = @ID_Tournament))>0)
-			BEGIN
-				RAISERROR('le deck1 nes pas bon', 16, 1);
-			END
+			if(@ID_Deck_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerOne and ID_User = @ID_PlayerOne and ID_Tournament = @ID_Tournament))>0)
+				BEGIN
+					RAISERROR('le deck1 nes pas bon', 16, 1);
+				END
 
-		if(@ID_Deck_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerTwo and ID_User = @ID_PlayerTwo and ID_Tournament = @ID_Tournament))>0)
-			BEGIN
-				RAISERROR('le deck2 nes pas bon', 16, 1);
-			END
-		if(@ResultPart is not null AND(@ResultPart <0 or @ResultPart > 2))
-			BEGIN
-				RAISERROR('le resulta est incorect', 16, 1);
-			END
+			if(@ID_Deck_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerTwo and ID_User = @ID_PlayerTwo and ID_Tournament = @ID_Tournament))>0)
+				BEGIN
+					RAISERROR('le deck2 nes pas bon', 16, 1);
+				END
+			if(@ResultPart is not null AND(@ResultPart <0 or @ResultPart > 2))
+				BEGIN
+					RAISERROR('le resulta est incorect', 16, 1);
+				END
 
-		INSERT INTO [Partie] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo], [PartNumber], [ID_Deck_PlayerOne], [ID_Deck_PlayerTwo], [ResultPart])
-			VALUES(@ID_Tournament, @RoundNumber, @ID_PlayerOne, @ID_PlayerTwo, @PartNumber, @ID_Deck_PlayerOne, @ID_Deck_PlayerTwo, @ResultPart)
+			INSERT INTO [Partie] ([ID_Tournament], [RoundNumber], [ID_PlayerOne], [ID_PlayerTwo], [PartNumber], [ID_Deck_PlayerOne], [ID_Deck_PlayerTwo], [ResultPart])
+				VALUES(@ID_Tournament, @RoundNumber, @ID_PlayerOne, @ID_PlayerTwo, @PartNumber, @ID_Deck_PlayerOne, @ID_Deck_PlayerTwo, @ResultPart)
 
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie =0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie =0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -2202,58 +2210,59 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
-		if( @ID_Tournament IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournament and DELETED is null)) <> 1)
-			Begin
-				RAISERROR('Le tournoi est introuvable',16,1);
-			End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournament IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournament and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
 
-		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournament and @RoundNumber = RoundNumber)) <> 1))
-			BEGIN
-				RAISERROR('la round n existe pas', 16, 1);
-			END
+			if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournament and @RoundNumber = RoundNumber)) <> 1))
+				BEGIN
+					RAISERROR('la round n existe pas', 16, 1);
+				END
 
-		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
-			BEGIN
-				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
-			END
+			if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
+				BEGIN
+					RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
+				END
 
-		if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
-			BEGIN
-				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
-			END
+			if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
+				BEGIN
+					RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
+				END
 
-		if(@ID_Deck_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerOne and ID_User = @ID_PlayerOne and ID_Tournament = @ID_Tournament))>0)
-			BEGIN
-				RAISERROR('le deck1 nes pas bon', 16, 1);
-			END
+			if(@ID_Deck_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerOne and ID_User = @ID_PlayerOne and ID_Tournament = @ID_Tournament))>0)
+				BEGIN
+					RAISERROR('le deck1 nes pas bon', 16, 1);
+				END
 
-		if(@ID_Deck_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerTwo and ID_User = @ID_PlayerTwo and ID_Tournament = @ID_Tournament))>0)
-			BEGIN
-				RAISERROR('le deck2 nes pas bon', 16, 1);
-			END
-		if(@ResultPart IS NULL OR (@ResultPart <0 or @ResultPart > 2))
-			BEGIN
-				RAISERROR('le resulta est incorect', 16, 1);
-			END
-		if((SELECT COUNT(*) FROM [Partie] WHERE ([ID_Tournament] = @ID_Tournament AND [RoundNumber] = @RoundNumber AND [ID_PlayerOne] = @ID_PlayerOne AND [ID_PlayerTwo] = @ID_PlayerTwo AND [PartNumber] = @PartNumber)) <> 1)
-			BEGIN
-				RAISERROR('Partie introuvable', 16, 1);
-			END
+			if(@ID_Deck_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerTwo and ID_User = @ID_PlayerTwo and ID_Tournament = @ID_Tournament))>0)
+				BEGIN
+					RAISERROR('le deck2 nes pas bon', 16, 1);
+				END
+			if(@ResultPart IS NULL OR (@ResultPart <0 or @ResultPart > 2))
+				BEGIN
+					RAISERROR('le resulta est incorect', 16, 1);
+				END
+			if((SELECT COUNT(*) FROM [Partie] WHERE ([ID_Tournament] = @ID_Tournament AND [RoundNumber] = @RoundNumber AND [ID_PlayerOne] = @ID_PlayerOne AND [ID_PlayerTwo] = @ID_PlayerTwo AND [PartNumber] = @PartNumber)) <> 1)
+				BEGIN
+					RAISERROR('Partie introuvable', 16, 1);
+				END
 
-		UPDATE [Partie]
-			SET [ResultPart] = @ResultPart,
-				[ID_Deck_PlayerOne] = @ID_Deck_PlayerOne,
-				[ID_Deck_PlayerTwo] = @ID_Deck_PlayerTwo
-			WHERE ([ID_Tournament] = @ID_Tournament AND [RoundNumber] = @RoundNumber AND [ID_PlayerOne] = @ID_PlayerOne AND [ID_PlayerTwo] = @ID_PlayerTwo AND [PartNumber] = @PartNumber)
+			UPDATE [Partie]
+				SET [ResultPart] = @ResultPart,
+					[ID_Deck_PlayerOne] = @ID_Deck_PlayerOne,
+					[ID_Deck_PlayerTwo] = @ID_Deck_PlayerTwo
+				WHERE ([ID_Tournament] = @ID_Tournament AND [RoundNumber] = @RoundNumber AND [ID_PlayerOne] = @ID_PlayerOne AND [ID_PlayerTwo] = @ID_PlayerTwo AND [PartNumber] = @PartNumber)
 		
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie =0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie =0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 
@@ -2271,37 +2280,38 @@ BEGIN
 	SET @responseMessage = '';
 	SET @Reussie = 1; 
 
-	BEGIN TRY
-		if( @ID_Tournament IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournament and DELETED is null)) <> 1)
-			Begin
-				RAISERROR('Le tournoi est introuvable',16,1);
-			End
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournament IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournament and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
 
-		if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournament and @RoundNumber = RoundNumber)) <> 1))
-			BEGIN
-				RAISERROR('la round n existe pas', 16, 1);
-			END
+			if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournament and @RoundNumber = RoundNumber)) <> 1))
+				BEGIN
+					RAISERROR('la round n existe pas', 16, 1);
+				END
 
-		if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
-			BEGIN
-				RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
-			END
+			if(@ID_PlayerOne is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerOne)) <> 1 )
+				BEGIN
+					RAISERROR('la le joueur 1 nest pas trouvé parli les participant', 16, 1);
+				END
 
-		if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
-			BEGIN
-				RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
-			END
+			if((@ID_PlayerTwo is null or (SELECT COUNT(*) FROM [Joueur] WHERE (ID_Tournament = @ID_Tournament and ID_User = @ID_PlayerTwo)) <> 1) AND (@ID_PlayerTwo <>0) )
+				BEGIN
+					RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
+				END
 
-		DELETE [Partie]
-			WHERE ([ID_Tournament] = @ID_Tournament AND [RoundNumber] = @RoundNumber AND [ID_PlayerOne] = @ID_PlayerOne AND [ID_PlayerTwo] = @ID_PlayerTwo AND [PartNumber] = @PartNumber)
+			DELETE [Partie]
+				WHERE ([ID_Tournament] = @ID_Tournament AND [RoundNumber] = @RoundNumber AND [ID_PlayerOne] = @ID_PlayerOne AND [ID_PlayerTwo] = @ID_PlayerTwo AND [PartNumber] = @PartNumber)
 		
-		COMMIT;
-	END TRY
-	BEGIN CATCH
-		SET @responseMessage=ERROR_MESSAGE();
-		SET @Reussie =0;
-		ROLLBACK;
-	END CATCH
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie =0;
+			ROLLBACK;
+		END CATCH
 END
 GO
 

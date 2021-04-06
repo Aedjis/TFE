@@ -10,7 +10,6 @@ using Tour0Suisse.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
-using Tour0Suisse.Controllers;
 using Tour0Suisse.Web.Procedure;
 
 namespace Tour0Suisse.Web.Controllers
@@ -20,18 +19,9 @@ namespace Tour0Suisse.Web.Controllers
         // GET: Tournois
         public async Task<IActionResult> Index()
         {
-            List<ViewTournament> ListTournois;
+            List<ViewTournament> listTournois = (await CallAPI.GetAllTournaments()).ToList();
 
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetTournaments"))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    ListTournois = JsonConvert.DeserializeObject<IEnumerable<ViewTournament>>(apiResponse).ToList();
-                }
-            }
-
-            return View("~/Views/Tournoi/Index.cshtml", ListTournois);
+            return View("~/Views/Tournoi/Index.cshtml", listTournois);
         }
 
         // GET: Tournois/Details/5
@@ -44,14 +34,7 @@ namespace Tour0Suisse.Web.Controllers
 
             Tournoi tournoi;
 
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetTournament?id=" + id.ToString()))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    tournoi = JsonConvert.DeserializeObject<Tournoi>(apiResponse);
-                }
-            }
+            tournoi = await CallAPI.GetTournoiById((int)id);
 
             if (tournoi == null || tournoi.IdTournament <1)
             {
@@ -75,7 +58,8 @@ namespace Tour0Suisse.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdTournament,Name,Date,Description,IdGame,MaxNumberPlayer,DeckListNumber,Ppwin,Ppdraw,Pplose,Over,Deleted")] Tournoi tournoi)
+        public async Task<IActionResult> Create([Bind("IdTournament,Name,Date,Description,IdGame,MaxNumberPlayer,DeckListNumber,Ppwin,Ppdraw,Pplose,Over,Deleted")]
+            Tournoi tournoi)
         {
             if (ModelState.IsValid)
             {
@@ -86,36 +70,16 @@ namespace Tour0Suisse.Web.Controllers
 
                 if (tournoi.Organisateurs != null && tournoi.Organisateurs.Count() != 0)
                 {
-
-                    using (var httpClient = new HttpClient())
+                    var retourApi = await CallAPI.InsertTournoi(tournoi);
+                    if (retourApi.Succes)
                     {
-                        using (var response =
-                            await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/CreateTournoi",
-                                tournoi))
-                        {
-                            string apiResponse = await response.Content.ReadAsStringAsync();
-                            RetourAPI retourApi = JsonConvert.DeserializeObject<RetourAPI>(apiResponse);
-                            if (retourApi.Succes)
-                            {
-                                return RedirectToAction("Details", new {id = retourApi.CreateID});
-                            }
-                        }
+                        return RedirectToAction("Details", new {id = retourApi.CreateID});
                     }
                 }
             }
 
 
-
-            IEnumerable<ViewJeu> Jeus;
-
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetJeus"))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    Jeus = JsonConvert.DeserializeObject<IEnumerable<ViewJeu>>(apiResponse);
-                }
-            }
+            IEnumerable<ViewJeu> Jeus = await CallAPI.GetAllJeus();
 
             ViewData["AllGame"] = new SelectList(Jeus, "IdGame", "Name", tournoi.jeu.IdGame);
             return View("~/Views/Tournoi/CreateTournoi.cshtml", tournoi);
@@ -131,31 +95,14 @@ namespace Tour0Suisse.Web.Controllers
                 return NotFound();
             }
 
-            Tournoi tournoi;
-
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetTournament?id=" + id.ToString()))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    tournoi = JsonConvert.DeserializeObject<Tournoi>(apiResponse);
-                }
-            }
+            Tournoi tournoi = await CallAPI.GetTournoiById((int)id);
 
             if (tournoi == null || tournoi.IdTournament < 1)
             {
                 return NotFound();
             }
-            IEnumerable<ViewJeu> Jeus;
 
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetJeus"))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    Jeus = JsonConvert.DeserializeObject<IEnumerable<ViewJeu>>(apiResponse);
-                }
-            }
+            IEnumerable<ViewJeu> Jeus = await CallAPI.GetAllJeus();
 
             ViewData["AllGame"] = new SelectList(Jeus, "IdGame", "Name", tournoi.jeu.IdGame);
             return View("~/Views/Tournoi/Edit.cshtml", tournoi);
@@ -166,7 +113,8 @@ namespace Tour0Suisse.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdTournament,Name,Date,Description,IdGame,MaxNumberPlayer,DeckListNumber,Ppwin,Ppdraw,Pplose,Over,Deleted")] Tournoi tournoi)
+        public async Task<IActionResult> Edit(int id, [Bind("IdTournament,Name,Date,Description,IdGame,MaxNumberPlayer,DeckListNumber,Ppwin,Ppdraw,Pplose,Over,Deleted")]
+            Tournoi tournoi)
         {
             if (id != tournoi.IdTournament)
             {
@@ -175,32 +123,14 @@ namespace Tour0Suisse.Web.Controllers
 
             if (ModelState.IsValid)
             {
-
-                using (var httpClient = new HttpClient())
+                RetourAPI retourApi = await CallAPI.UpdateTournoi(tournoi);
+                if (retourApi.Succes)
                 {
-                    using (var response =
-                        await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/EditTournoi",
-                            tournoi))
-                    {
-                        string apiResponse = await response.Content.ReadAsStringAsync();
-                        RetourAPI retourApi = JsonConvert.DeserializeObject<RetourAPI>(apiResponse);
-                        if (retourApi.Succes)
-                        {
-                            return RedirectToAction("Details", new{id = tournoi.IdTournament});
-                        }
-                    }
+                    return RedirectToAction("Details", new{id = tournoi.IdTournament});
                 }
             }
-            IEnumerable<ViewJeu> Jeus;
 
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetJeus"))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    Jeus = JsonConvert.DeserializeObject<IEnumerable<ViewJeu>>(apiResponse);
-                }
-            }
+            IEnumerable<ViewJeu> Jeus = await CallAPI.GetAllJeus();
 
             ViewData["AllGame"] = new SelectList(Jeus, "IdGame", "Name", tournoi.jeu.IdGame);
             return View("~/Views/Tournoi/Edit.cshtml", tournoi);
@@ -214,16 +144,7 @@ namespace Tour0Suisse.Web.Controllers
                 return NotFound();
             }
 
-            Tournoi tournoi;
-
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetTournament?id=" + id.ToString()))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    tournoi = JsonConvert.DeserializeObject<Tournoi>(apiResponse);
-                }
-            }
+            Tournoi tournoi = await CallAPI.GetTournoiById((int)id);
 
             if (tournoi == null || tournoi.IdTournament < 1)
             {
@@ -240,20 +161,14 @@ namespace Tour0Suisse.Web.Controllers
         {
             using (var httpClient = new HttpClient())
             {
-                using (var response =
-                    await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/DeleteTournoi",
-                        id))
+                RetourAPI retourApi = await CallAPI.DeleteTournoi(id);
+                if (retourApi.Succes)
                 {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    RetourAPI retourApi = JsonConvert.DeserializeObject<RetourAPI>(apiResponse);
-                    if (retourApi.Succes)
-                    {
-                        return RedirectToAction(nameof(Index));
-                    }
+                    return RedirectToAction(nameof(Index));
                 }
-            }
 
-            return RedirectToAction(nameof(Delete), id);
+                return RedirectToAction(nameof(Delete), id);
+            }
         }
 
         public async Task<IActionResult> Register(int? id)
@@ -263,16 +178,7 @@ namespace Tour0Suisse.Web.Controllers
                 return NotFound();
             }
 
-            Tournoi tournoi;
-
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetTournament?id=" + id.ToString()))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    tournoi = JsonConvert.DeserializeObject<Tournoi>(apiResponse);
-                }
-            }
+            Tournoi tournoi = await CallAPI.GetTournoiById((int)id);
 
             if (tournoi == null || tournoi.IdTournament < 1)
             {
@@ -289,43 +195,26 @@ namespace Tour0Suisse.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Register([Bind("Deck, IdTournament")] Joueur Joueur)
+        public async Task<IActionResult> Register([Bind("Deck, IdTournament")] Joueur joueur)
         {
-            if (Joueur.IdTournament < 1 || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
+            if (joueur.IdTournament < 1 || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
             {
                 return NotFound();
             }
 
             if (ModelState.IsValid)
             {
-                Joueur.User.IdUser = IdUser;
+                joueur.User.IdUser = IdUser;
 
-                using (var httpClient = new HttpClient())
+
+                RetourAPI retourApi = await CallAPI.RegisterTournoi(joueur);
+                if (retourApi.Succes)
                 {
-                    using (var response =
-                        await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/Register",
-                            Joueur))
-                    {
-                        string apiResponse = await response.Content.ReadAsStringAsync();
-                        RetourAPI retourApi = JsonConvert.DeserializeObject<RetourAPI>(apiResponse);
-                        if (retourApi.Succes)
-                        {
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
+                    return RedirectToAction(nameof(Index));
                 }
             }
 
-            Tournoi tournoi;
-
-            using (var httpClient = new HttpClient())
-            {
-                using (var response = await httpClient.GetAsync("https://localhost:44321/View/GetTournament?id=" + Joueur.IdTournament.ToString()))
-                {
-                    string apiResponse = await response.Content.ReadAsStringAsync();
-                    tournoi = JsonConvert.DeserializeObject<Tournoi>(apiResponse);
-                }
-            }
+            Tournoi tournoi = await CallAPI.GetTournoiById(joueur.IdTournament);
 
             if (tournoi == null || tournoi.IdTournament < 1)
             {
@@ -334,7 +223,92 @@ namespace Tour0Suisse.Web.Controllers
 
             ViewBag.NbDeck = tournoi.DeckListNumber;
             ViewData["Title"] = "S'inscire pour " + tournoi.Name;
-            return View("~/Views/Tournoi/Register.cshtml", Joueur);
+            return View("~/Views/Tournoi/Register.cshtml", joueur);
+        }
+
+        public async Task<ActionResult> Admin(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Tournoi tournoi = await CallAPI.GetTournoiById((int)id);
+
+            if (tournoi == null || tournoi.IdTournament < 1 ||tournoi.Deleted != null)
+            {
+                return NotFound();
+            }
+
+            if (tournoi.Over)
+            {
+                return RedirectToAction();
+            }
+
+            ViewData["Tournoi"] = tournoi;
+            List<Round> rounds = new List<Round>();
+            foreach (var vr in await CallAPI.GetRounds(tournoi.IdTournament))
+            {
+                rounds.Add(vr.CreateRoundFromView(tournoi.Matchs));
+            }
+
+            return View("~/Views/Tournoi/Admin.cshtml", rounds);
+        }
+
+        public async Task<IActionResult> Start(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Tournoi tournoi = await CallAPI.GetTournoiById((int)id);
+
+            if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
+            {
+                return NotFound();
+            }
+
+            if (tournoi.Over)
+            {
+                return NotFound();
+            }
+
+            RetourAPI retour = await CallAPI.StartTournoi(tournoi);
+            if (!retour.Succes)
+            {
+
+            }
+
+            return RedirectToAction("Admin", new { id = id });
+        }
+
+        public async Task<IActionResult> Pairing(int id, int round)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Tournoi tournoi = await CallAPI.GetTournoiById((int)id);
+
+            if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
+            {
+                return NotFound();
+            }
+
+            if (tournoi.Over)
+            {
+                return NotFound();
+            }
+
+            RetourAPI retour = await CallAPI.PairingRound(new Round{IdTournament = id, RoundNumber = round});
+            if (!retour.Succes)
+            {
+
+            }
+
+            return RedirectToAction("Admin", new { id = id });
         }
     }
 }
