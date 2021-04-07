@@ -119,6 +119,11 @@ namespace Tour0Suisse.Web.Procedure
             }
         }
 
+        public static async Task<IEnumerable<ViewTournament>> GetTournamentsWHereOrga(int id)
+        {
+            return await _GetT<IEnumerable<ViewTournament>>("/View/GetTournamentsWHereOrga?id=" + id.ToString());
+        }
+
         private static async Task<T> _GetT<T>(string endRequestUri, int? id = null)
         {
             using (var httpClient = new HttpClient())
@@ -128,6 +133,45 @@ namespace Tour0Suisse.Web.Procedure
                 {
                     string apiResponse = await response.Content.ReadAsStringAsync();
                     return JsonConvert.DeserializeObject<T>(apiResponse);
+                }
+            }
+        }
+
+        public static async Task<Match> GetMatch(int idT, int rn, int idP1)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                string requestUri = _BaseUri + "/View/GetMatchOfPlayerForTournamentForRound?IdTournoi=" + idT + "&IdPlayer=" + idP1 + "&RoundNumber=" + rn;
+                using (var response = await httpClient.GetAsync(requestUri))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<Match>(apiResponse);
+                }
+            }
+        }
+
+        public static async Task<Joueur> GetJoueur(int idT, int idP1)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                string requestUri = _BaseUri + "/View/GetParticipant?IdTournoi=" + idT + "&IdPlayer=" + idP1;
+                using (var response = await httpClient.GetAsync(requestUri))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<Joueur>(apiResponse);
+                }
+            }
+        }
+
+        public static async Task<IEnumerable<ViewDeck>> GetDeckOfPlayer(int idT, int idP1)
+        {
+            using (var httpClient = new HttpClient())
+            {
+                string requestUri = _BaseUri + "/View/GetDeckOfPlayer?IdTournoi=" + idT + "&IdUser=" + idP1;
+                using (var response = await httpClient.GetAsync(requestUri))
+                {
+                    string apiResponse = await response.Content.ReadAsStringAsync();
+                    return JsonConvert.DeserializeObject<IEnumerable<ViewDeck>>(apiResponse);
                 }
             }
         }

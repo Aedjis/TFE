@@ -115,6 +115,19 @@ namespace Tour0Suisse.API.Controllers
             return retour;
         }
 
+        [HttpGet]
+        public IEnumerable<ViewTournament> GetTournamentsWHereOrga(int id)
+        {
+            List<ViewTournament> Retour = new();
+            Retour.Clear();
+
+            var ListId = DB_CURD.ViewIdWhereOrgas(id).Select(o=>o.IdTournament);
+
+            Retour = DB_CURD.ViewTournaments(ListId);
+
+            return Retour;
+        }
+
         #endregion
 
         #region Jeu
@@ -153,7 +166,7 @@ namespace Tour0Suisse.API.Controllers
         }
 
         [HttpGet]
-        public IEnumerable<ViewMatch> GetMatchsOfTournamentForRound([FromQuery]int IdTournoi, [FromQuery] int RoundNumber = -1)
+        public IEnumerable<ViewMatch> GetMatchsOfTournamentForRound([FromQuery] int IdTournoi, [FromQuery] int RoundNumber = -1)
         {
             return DB_CURD.GetMatchesOfTheRound(IdTournoi, RoundNumber);
         }
@@ -163,16 +176,22 @@ namespace Tour0Suisse.API.Controllers
         public Match GetMatchOfPlayerForTournamentForRound([FromQuery] int IdTournoi, [FromQuery] int IdPlayer, [FromQuery] int RoundNumber = -1)
         {
             var m = DB_CURD.GetMatcheForPlayerOfTheRound(IdTournoi, IdPlayer, RoundNumber);
-
-            Match retour = new()
+            if (m != null)
             {
-                Tournament = DB_CURD.GetTournament(m.IdTournament),
-                RoundNumber = m.RoundNumber,
-                P1 = DB_CURD.GetParticipant(m.IdPlayer1, m.IdTournament),
-                P2 = DB_CURD.GetParticipant(m.IdPlayer2, m.IdTournament)
-            };
-
-            return retour;
+                Match retour = new()
+                {
+                    Tournament = DB_CURD.GetTournament(m.IdTournament),
+                    RoundNumber = m.RoundNumber,
+                    P1 = DB_CURD.GetParticipant(m.IdPlayer1, m.IdTournament),
+                    P2 = DB_CURD.GetParticipant(m.IdPlayer2, m.IdTournament),
+                    Parties = DB_CURD.ViewPartiesOfMatch(m.IdTournament, m.IdPlayer1, m.RoundNumber)
+                };
+                return retour;
+            }
+            else
+            {
+                return new Match();
+            }
         }
 
         #endregion
@@ -181,9 +200,9 @@ namespace Tour0Suisse.API.Controllers
 
         
         [HttpGet]
-        public IEnumerable<ViewDeck> GetParticipantsOf([FromQuery] int Idtournoi)
+        public IEnumerable<ViewParticipant> GetParticipantsOf([FromQuery] int Idtournoi)
         {
-            return DB_CURD.GetDecksOfTournament(Idtournoi);
+            return DB_CURD.GetParticipantsOf(Idtournoi);
         }
 
 

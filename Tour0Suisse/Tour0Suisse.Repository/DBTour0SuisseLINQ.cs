@@ -148,6 +148,13 @@ namespace Tour0Suisse.Repository
             return _ViewTournaments();
         }
 
+        public List<ViewTournament> ViewTournaments(IEnumerable<int> IdEnmu)
+        {
+            string listeId = string.Join(", ", IdEnmu);
+
+            return _ViewTournaments("WHERE ID_Tournament in (" + listeId + ")");
+        }
+
         public ViewTournament GetTournament(int Id)
         {
             return _ViewTournaments("WHERE ID_Tournament = " + Id).FirstOrDefault();
@@ -262,6 +269,11 @@ namespace Tour0Suisse.Repository
         public List<ViewOrga> ViewOrgas()
         {
             return _ViewOrgas();
+        }
+
+        public List<ViewOrga> ViewIdWhereOrgas(int id)
+        {
+            return _ViewOrgas("WHERE ID_User = " + id.ToString());
         }
 
         public List<ViewOrga> GetOrgasOf(int idTournoi)

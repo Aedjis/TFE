@@ -41,6 +41,7 @@ namespace Tour0Suisse.Web.Controllers
                 {
                     HttpContext.Session.SetString("UserId", Logged.IdUser.ToString());
                     HttpContext.Session.SetString("User", Logged.Pseudo);
+                    HttpContext.Session.SetString("Orga", Logged.Organizer.ToString());
                     return View("~/Views/Home/Index.cshtml");
                 }
             }
