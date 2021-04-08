@@ -38,7 +38,7 @@
                         {
                             @if (bool.TryParse(Context.Session.GetString("Orga"), out bool Orga) && Orga)
                             {
-                                <li><a asp-area="" asp-controller="Admin" asp-action="Index" asp-route-id="@Uid">@Context.Session.GetString("User")</a></li>
+                                <li><a asp-area="" asp-controller="Admin" asp-action="Index" asp-route-id="@Uid">Admin</a></li>
                             }
                             <li><a asp-area="" asp-controller="User" asp-action="Details" asp-route-id="@Uid">@Context.Session.GetString("User")</a></li> 
                             <li><a asp-area="" asp-controller="User" asp-action="LogOff">Log Off</a></li>

@@ -102,5 +102,10 @@ namespace Tour0Suisse.Web.Procedure
         {
             return await _PostT("/Procedure/CreateMatchAllPairing", Round);
         }
+
+        public static async Task<RetourAPI> CreateOrUpdatePartie(ViewPartie Partie)
+        {
+            return await _PostT("/Procedure/CreateOrUpdatePartie", Partie);
+        }
     }
 }

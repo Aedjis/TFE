@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tour0Suisse.Model
 {
-    public interface IViewPartie
+    public interface IViewPartie : IPartie
     {
         int IdTournament { get; set; }
         string Name { get; set; }
@@ -34,6 +34,21 @@ namespace Tour0Suisse.Model
         public int PartNumber { get; set; }
         [Display(Name = "Gagnant")]
         public byte? ResultPart { get; set; }
+        public sbyte? sResultPart 
+        {
+            get => ResultPart == null ? (sbyte?)-1 : (sbyte?)ResultPart;
+            set
+            {
+                if (value < 0)
+                {
+                    ResultPart = null;
+                }
+                else
+                {
+                    ResultPart = (byte?)value;
+                }
+            }
+        }
         public int IdPlayer1 { get; set; }
         [Display(Name = "Joueur 1")]
         public string Player1 { get; set; }

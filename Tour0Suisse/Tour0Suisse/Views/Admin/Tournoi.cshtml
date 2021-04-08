@@ -67,24 +67,27 @@
                                         <th>
                                             @Html.DisplayName("Joueur 2")
                                         </th>
+                                        <th>
+
+                                        </th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     @foreach (var item in round.Matches)
                                     {
                                         <tr>
-                                            <a asp-action="UpdateMatch" asp-route-IdT="@item.IdTournament" asp-route-rn="@item.RoundNumber" asp-route-idP1="@item.IdPlayer1">
-                                                
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.Player1)<br />
-                                                    Pseudo en jeu : @Html.DisplayFor(modelItem => item.Pseudo1)
-                                                </td>
-                                                <td>
-                                                    @Html.DisplayFor(modelItem => item.Player2)<br />
-                                                    Pseudo en jeu : @Html.DisplayFor(modelItem => item.Pseudo2)
-                                                </td>
-                                            </a>
-</tr>}
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Player1)<br />
+                                                Pseudo en jeu : @Html.DisplayFor(modelItem => item.Pseudo1)
+                                            </td>
+                                            <td>
+                                                @Html.DisplayFor(modelItem => item.Player2)<br />
+                                                Pseudo en jeu : @Html.DisplayFor(modelItem => item.Pseudo2)
+                                            </td>
+                                            <td>
+                                                <a asp-action="UpdateMatch" asp-route-IdT="@item.IdTournament" asp-route-rn="@item.RoundNumber" asp-route-idP1="@item.IdPlayer1">modifier resulta</a>
+                                            </td>
+                                        </tr>}
                                     </tbody>
                                 </table>
                             }

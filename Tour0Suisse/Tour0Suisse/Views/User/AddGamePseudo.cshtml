@@ -17,15 +17,15 @@
             <input asp-for="@Model.IdUser" class="control-label" type="hidden"/>
 
 
-            @foreach (ViewPseudo t in Model.PseudoIgs)
+            @for (int i = 0; i<Model.PseudoIgs.Count; i++)
             {
                 <div class="form-group">
-                    <input asp-for="@t.IdGame" class="control-label" type="hidden" />
-                    <input asp-for="@t.Game" class="control-label" type="hidden" />
-                    <input asp-for="@t.IdUser" class="control-label" type="hidden" />
-                    <label asp-for="@t.IgPseudo" class="control-label">Pseudo pour @t.Game </label>
-                    <input asp-for="@t.IgPseudo" class="form-control" />
-                    <span asp-validation-for="@t.IgPseudo" class="text-danger"></span>
+                    <input asp-for="@Model.PseudoIgs[i].IdGame" class="control-label" type="hidden" />
+                    <input asp-for="@Model.PseudoIgs[i].Game" class="control-label" type="hidden" />
+                    <input asp-for="@Model.PseudoIgs[i].IdUser" class="control-label" type="hidden" />
+                    <label asp-for="@Model.PseudoIgs[i].IgPseudo" class="control-label">Pseudo pour @Model.PseudoIgs[i].Game </label>
+                    <input asp-for="@Model.PseudoIgs[i].IgPseudo" class="form-control" />
+                    <span asp-validation-for="@Model.PseudoIgs[i].IgPseudo" class="text-danger"></span>
                 </div>
             }
 

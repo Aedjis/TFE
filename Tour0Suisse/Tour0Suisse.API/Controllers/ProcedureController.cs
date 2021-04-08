@@ -223,6 +223,39 @@ namespace Tour0Suisse.API.Controllers
             return DB_CURD.DeleteMatch(Match);
         }
 
+        [HttpPost]
+        public RetourAPI CreatePartie(ViewPartie Partie)
+        {
+            return DB_CURD.CreatePartie(Partie) ;
+        }
+
+        [HttpPost]
+        public RetourAPI EditPartie(ViewPartie Partie)
+        {
+            return DB_CURD.EditPartie(Partie) ;
+        }
+
+        [HttpPost]
+        public RetourAPI DeletePartie(ViewPartie Partie)
+        {
+            return DB_CURD.DeletePartie(Partie) ;
+        }
+
+        [HttpPost]
+        public RetourAPI CreateOrUpdatePartie(ViewPartie Partie)
+        {
+            var p = DB_CURD.ViewPartieOfMatch(Partie.IdTournament, Partie.IdPlayer1, Partie.PartNumber,
+                Partie.RoundNumber);
+            if (p != null && p.IdTournament == Partie.IdTournament)
+            {
+                return DB_CURD.EditPartie(Partie);
+            }
+            else
+            {
+                return DB_CURD.CreatePartie(Partie);
+            }
+        }
+
         #endregion
 
         #region Jeu

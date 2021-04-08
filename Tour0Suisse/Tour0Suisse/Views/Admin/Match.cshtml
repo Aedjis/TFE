@@ -9,16 +9,18 @@
 <script>
     function ShowDeck(selectObject) {
 
-        var BaseId = "#" + selectObject.id;
-        var value = selectObject.value;
+        //var BaseId = "#" + selectObject.id;
+        //var value = selectObject.value;
 
-        var i;
-        for (i = 0; i < selectObject.length; i++) {
-            $(BaseId + "_" + $(BaseId)[0].options[i].value).collapse("hide");
-        }
-        $(BaseId + "_" + value).collapse("show");
+        //var i;
+        //for (i = 0; i < selectObject.length; i++) {
+        //    $(BaseId + "_" + $(BaseId)[0].options[i].value).collapse("hide");
+        //    console.log(BaseId);
+        //}
+        //$(BaseId + "_" + value).collapse("show");
 
-    }</script>
+    }
+</script>
 
 <h2>Edit</h2>
 
@@ -26,44 +28,41 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="UpdateMatch">
+        <form asp-action="UpdateMatch" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="IdTournament" />
             <input type="hidden" asp-for="RoundNumber" />
             <input type="hidden" asp-for="IdPlayer1" />
+            <input type="hidden" asp-for="IdPlayer2" />
 
             @if (Model.Parties.Any())
             {
                 <div class="container border">
-                    @foreach (var partie in Model.Parties)
+                    @for (int i = 0; i < Model.Parties.Count; i++)
                     {
-                        <div class="form-group row" id="@("Div_partie"+partie.PartNumber)">
+                        <input asp-for="@Model.Parties[i].PartNumber" hidden />
+                        <div class="form-group row">
                             <div class="col-sm">
-                                <label asp-for="@partie.Deck1" class="control-label"></label>
-                                <select asp-for="@partie.Deck1" asp-items="@(new SelectList((IEnumerable<ViewDeck>)ViewData["DecksP1"], "IdDeck", "IdDeck"))" id="@("SelectP1_partie"+partie.PartNumber)" onchange="ShowDeck(this)"></select>
+                                <label asp-for="@Model.Parties[i].Deck1" class="control-label"></label>
+                                <select asp-for="@Model.Parties[i].IdDeckPlayer1" asp-items="@(new SelectList((IEnumerable<ViewDeck>)ViewData["DecksP1"], "IdDeck", "IdDeck", @Model.Parties[i].IdDeckPlayer1))" onchange="ShowDeck(this)" id="@("SelectP1_partie"+@Model.Parties[i].PartNumber)"></select>
                                 @foreach (var deck in (IEnumerable<ViewDeck>)ViewData["DecksP1"])
                                 {
-                                    <textarea readonly class="collapse" id="@("SelectP1_partie"+partie.PartNumber+"_"+deck.IdDeck)">@(deck.DeckList)</textarea>
+                                    <textarea readonly class="collapse" id="@("SelectP1_partie"+@Model.Parties[i].PartNumber+"_"+deck.IdDeck)">@(deck.DeckList)</textarea>
                                 }
-                                <span asp-validation-for="@partie.Deck1" class="text-danger"></span>
+                                <span asp-validation-for="@Model.Parties[i].Deck1" class="text-danger"></span>
                             </div>
                             <div class="col-sm">
-                                <label asp-for="@partie.ResultPart"></label>
-                                <select asp-for="@partie.ResultPart">
-                                    <option value="">qui est le gagnant</option>
-                                    <option value="0">draw</option>
-                                    <option value="1">Joueur 1</option>
-                                    <option value="2">Joueur 2</option>
-                                </select>
+                                <label asp-for="@Model.Parties[i].ResultPart"></label>
+                                <select asp-for="@Model.Parties[i].sResultPart" asp-items="@(new SelectList(new SortedList<string, sbyte?>{{"Qui est le gagnant", -1},{"Draw", 0}, {"Joueur 2", 2}, {"Joueur 1", 1} }, "Value", "Key", @Model.Parties[i].sResultPart))"></select>
                             </div>
                             <div class="col-sm">
-                                <label asp-for="@partie.Deck2" class="control-label"></label>
-                                <select id="@("SelectP2_partie"+partie.PartNumber)" asp-for="@partie.Deck1" asp-items="@(new SelectList((IEnumerable<ViewDeck>)ViewData["DecksP2"], "IdDeck", "IdDeck"))" onchange="ShowDeck(this)"></select>
+                                <label asp-for="@Model.Parties[i].Deck2" class="control-label"></label>
+                                <select asp-for="@Model.Parties[i].IdDeckPlayer2" asp-items="@(new SelectList((IEnumerable<ViewDeck>)ViewData["DecksP2"], "IdDeck", "IdDeck", @Model.Parties[i].IdDeckPlayer2))" onchange="ShowDeck(this)" id="@("SelectP2_partie"+@Model.Parties[i].PartNumber)"></select>
                                 @foreach (var deck in (IEnumerable<ViewDeck>)ViewData["DecksP2"])
                                 {
-                                    <textarea readonly class="collapse" id="@("SelectP2_partie"+partie.PartNumber+"_"+deck.IdDeck)">@(deck.DeckList)</textarea>
+                                    <textarea readonly class="collapse" id="@("SelectP2_partie"+@Model.Parties[i].PartNumber+"_"+deck.IdDeck)">@(deck.DeckList)</textarea>
                                 }
-                                <span asp-validation-for="@partie.Deck2" class="text-danger"></span>
+                                <span asp-validation-for="@Model.Parties[i].Deck2" class="text-danger"></span>
                             </div>
                         </div>
                     }
@@ -79,7 +78,6 @@
 <div>
     <a asp-action="Tournoi" asp-route-id="@Model.IdTournament">Back to Tournoi</a>
 </div>
-
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

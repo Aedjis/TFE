@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Tour0Suisse.Model;
 using Tour0Suisse.Web.Procedure;
 
@@ -128,14 +129,14 @@ namespace Tour0Suisse.Web.Controllers
             }
 
             var decksP1 = await CallAPI.GetDeckOfPlayer(match.IdTournament, match.IdPlayer1);
-            ViewData["DecksP1"] = decksP1;
+            ViewData["DecksP1"] = decksP1.Append(new ViewDeck());
             var decksP2= await CallAPI.GetDeckOfPlayer(match.IdTournament, match.IdPlayer2);
-            ViewData["DecksP2"] = decksP2;
+            ViewData["DecksP2"] = decksP2.Append(new ViewDeck());
 
             var empyParties = new List<ViewPartie>
             {
                 new ViewPartie(), new ViewPartie(), new ViewPartie(), new ViewPartie(), new ViewPartie(),
-                new ViewPartie(), new ViewPartie()
+                new ViewPartie(), new ViewPartie(), new ViewPartie(), new ViewPartie(), new ViewPartie()
             };
 
             if (match.Parties == null)
@@ -143,8 +144,77 @@ namespace Tour0Suisse.Web.Controllers
                 match.Parties = empyParties;
             }
 
-            var temp = (decksP1.Count() + decksP2.Count());
-            match.Parties = match.Parties.Concat(empyParties).Take((temp / 2) + temp % 2);
+            match.Parties = match.Parties.OrderBy(p=>p.PartNumber).Concat(empyParties).Take((match.Tournament.DeckListNumber * 2) - 1).ToList();
+            List<ViewPartie> temp = new List<ViewPartie>();
+            int i= 1;
+            foreach (var p in match.Parties)
+            {
+                if (p.PartNumber == 0)
+                {
+                    p.PartNumber = i;
+                    i++;
+                }
+                else if(p.PartNumber >= i)
+                {
+                    i = p.PartNumber + 1;
+                }
+
+                temp.Add(p);
+            }
+
+            match.Parties = temp;
+            
+            return View("~/Views/Admin/Match.cshtml", match);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateMatch([Bind("IdTournament, RoundNumber, IdPlayer1, IdPlayer2, Parties")]Match match)
+        {
+            var Parties = match.Parties;
+            var retourApis = new List<RetourAPI>();
+            foreach (var p in Parties)
+            {
+                p.IdTournament = match.IdTournament;
+                p.RoundNumber = match.RoundNumber;
+                p.IdPlayer1 = match.IdPlayer1;
+                p.IdPlayer2 = match.IdPlayer2;
+                if (p.ResultPart != null)
+                {
+                    retourApis.Add(await CallAPI.CreateOrUpdatePartie(p));
+                }
+            }
+
+            if (retourApis.Count > 0 && retourApis.All(r => r.Succes))
+            {
+                return RedirectToAction("Tournoi", new {id = match.IdTournament});
+            }
+
+            match = await CallAPI.GetMatch(match.IdTournament, match.RoundNumber, match.IdPlayer1);
+            if (match.IdTournament == 0)
+            {
+                return NotFound();
+            }
+
+            match.Parties = Parties;
+
+            var decksP1 = await CallAPI.GetDeckOfPlayer(match.IdTournament, match.IdPlayer1);
+            ViewData["DecksP1"] = decksP1.Append(new ViewDeck());
+            var decksP2 = await CallAPI.GetDeckOfPlayer(match.IdTournament, match.IdPlayer2);
+            ViewData["DecksP2"] = decksP2.Append(new ViewDeck());
+
+            var empyParties = new List<ViewPartie>
+            {
+                new ViewPartie(), new ViewPartie(), new ViewPartie(), new ViewPartie(), new ViewPartie(),
+                new ViewPartie(), new ViewPartie(), new ViewPartie(), new ViewPartie(), new ViewPartie()
+            };
+
+            if (match.Parties == null)
+            {
+                match.Parties = empyParties;
+            }
+
+            match.Parties = match.Parties.Concat(empyParties).Take((match.Tournament.DeckListNumber*2)-1).ToList();
             return View("~/Views/Admin/Match.cshtml", match);
         }
     }

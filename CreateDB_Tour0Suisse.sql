@@ -1760,8 +1760,6 @@ BEGIN
 END
 GO
 
-
-
 CREATE PROCEDURE SP_Edit_Round
 	@ID_Tournoi INT,
 	@RoundNumber INT,
@@ -1944,8 +1942,6 @@ BEGIN
 END
 GO
 
-
-
 CREATE PROCEDURE SP_CREATE_Match_ALLPairing
 	@ID_Tournoi INT,
 	@RoundNumber INT,
@@ -2123,7 +2119,6 @@ BEGIN
 END
 GO
 
-
 CREATE PROCEDURE SP_CREATE_Partie
 	@ID_Tournament INT,
 	@RoundNumber INT,
@@ -2163,12 +2158,12 @@ BEGIN
 					RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
 				END
 
-			if(@ID_Deck_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerOne and ID_User = @ID_PlayerOne and ID_Tournament = @ID_Tournament))>0)
+			if(@ID_Deck_PlayerOne is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerOne and ID_User = @ID_PlayerOne and ID_Tournament = @ID_Tournament))<>1)
 				BEGIN
 					RAISERROR('le deck1 nes pas bon', 16, 1);
 				END
 
-			if(@ID_Deck_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerTwo and ID_User = @ID_PlayerTwo and ID_Tournament = @ID_Tournament))>0)
+			if(@ID_Deck_PlayerTwo is null or (SELECT COUNT(*) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerTwo and ID_User = @ID_PlayerTwo and ID_Tournament = @ID_Tournament))<>1)
 				BEGIN
 					RAISERROR('le deck2 nes pas bon', 16, 1);
 				END
@@ -2189,9 +2184,6 @@ BEGIN
 		END CATCH
 END
 GO
-
-
-
 
 CREATE PROCEDURE SP_EDIT_Partie
 	@ID_Tournament INT,

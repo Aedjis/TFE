@@ -175,23 +175,7 @@ namespace Tour0Suisse.API.Controllers
         [HttpGet]
         public Match GetMatchOfPlayerForTournamentForRound([FromQuery] int IdTournoi, [FromQuery] int IdPlayer, [FromQuery] int RoundNumber = -1)
         {
-            var m = DB_CURD.GetMatcheForPlayerOfTheRound(IdTournoi, IdPlayer, RoundNumber);
-            if (m != null)
-            {
-                Match retour = new()
-                {
-                    Tournament = DB_CURD.GetTournament(m.IdTournament),
-                    RoundNumber = m.RoundNumber,
-                    P1 = DB_CURD.GetParticipant(m.IdPlayer1, m.IdTournament),
-                    P2 = DB_CURD.GetParticipant(m.IdPlayer2, m.IdTournament),
-                    Parties = DB_CURD.ViewPartiesOfMatch(m.IdTournament, m.IdPlayer1, m.RoundNumber)
-                };
-                return retour;
-            }
-            else
-            {
-                return new Match();
-            }
+            return DB_CURD.GetMatcheForPlayerOfTheRound(IdTournoi, IdPlayer, RoundNumber);
         }
 
         #endregion

@@ -704,14 +704,31 @@ namespace Tour0Suisse.Repository
             return _viewMatches("WHERE ID_Tournament = " + IdTournoi + " AND RoundNumber = " + WhereRound);
         }
 
-        public ViewMatch GetMatcheForPlayerOfTheRound(int IdTournoi, int IdPlayer, int IdRound = -1)
+        public Match GetMatcheForPlayerOfTheRound(int IdTournoi, int IdPlayer, int IdRound = -1)
         {
             string WhereRound = IdRound < 0 ? IdRound.ToString() : WhereTopRoundOfTournament(IdTournoi);
 
 
-            return _viewMatches("WHERE ID_Tournament = " + IdTournoi + "AND (ID_PlayerOne = " +
+            var m = _viewMatches("WHERE ID_Tournament = " + IdTournoi + "AND (ID_PlayerOne = " +
                                 IdPlayer + " OR ID_PlayerTwo = " + IdPlayer +
                                 " ) AND RoundNumber = " + WhereRound).FirstOrDefault();
+
+            if (m != null)
+            {
+                Match retour = new Match
+                {
+                    Tournament = GetTournament(m.IdTournament),
+                    RoundNumber = m.RoundNumber,
+                    P1 = GetParticipant(m.IdPlayer1, m.IdTournament),
+                    P2 = GetParticipant(m.IdPlayer2, m.IdTournament),
+                    Parties = ViewPartiesOfMatch(m.IdTournament, m.IdPlayer1, m.RoundNumber)
+                };
+                return retour;
+            }
+            else
+            {
+                return new Match();
+            }
         }
 
         private string WhereTopRoundOfTournament(int IdTournoi)
@@ -2423,7 +2440,7 @@ namespace Tour0Suisse.Repository
         }
 
 
-        public RetourAPI CreatePartie(Partie P)
+        public RetourAPI CreatePartie(IPartie P)
         {
             try
             {
@@ -2443,7 +2460,7 @@ namespace Tour0Suisse.Repository
                 SqlCommand cmd = db.CreateCommand();
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "SP_CREATE_Partie";
-                cmd.Parameters.AddWithValue("@ID_Tournoi", P.IdTournament);
+                cmd.Parameters.AddWithValue("@ID_Tournament", P.IdTournament);
                 cmd.Parameters.AddWithValue("@RoundNumber", P.RoundNumber);
                 cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayer1);
                 cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayer2);
@@ -2473,7 +2490,7 @@ namespace Tour0Suisse.Repository
         }
 
 
-        public RetourAPI EditPartie(Partie P)
+        public RetourAPI EditPartie(IPartie P)
         {
             try
             {
@@ -2493,7 +2510,7 @@ namespace Tour0Suisse.Repository
                 SqlCommand cmd = db.CreateCommand();
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "SP_EDIT_Partie";
-                cmd.Parameters.AddWithValue("@ID_Tournoi", P.IdTournament);
+                cmd.Parameters.AddWithValue("@ID_Tournament", P.IdTournament);
                 cmd.Parameters.AddWithValue("@RoundNumber", P.RoundNumber);
                 cmd.Parameters.AddWithValue("@ID_PlayerOne", P.IdPlayer1);
                 cmd.Parameters.AddWithValue("@ID_PlayerTwo", P.IdPlayer2);
@@ -2523,7 +2540,7 @@ namespace Tour0Suisse.Repository
         }
 
 
-        public RetourAPI DeletePartie(Partie P)
+        public RetourAPI DeletePartie(IPartie P)
         {
             try
             {
