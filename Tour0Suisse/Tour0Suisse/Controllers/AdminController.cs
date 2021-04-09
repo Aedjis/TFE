@@ -14,35 +14,21 @@ namespace Tour0Suisse.Web.Controllers
     {
         public async Task<ActionResult> Index()
         {
-            int UserId;
-            try
-            {
-                UserId = int.Parse(HttpContext.Session.GetString("UserId"));
-            }
-            catch (Exception ex)
-            {
-                UserId = 0;
-            }
-
+            int UserId = int.TryParse(HttpContext.Session.GetString("UserId"), out int i) ? i : 0;
             if (UserId == 0)
             {
                 return NotFound();
             }
             
 
-            IEnumerable<ViewTournament> tournaments = (await CallAPI.GetTournamentsWHereOrga(UserId)).OrderBy(t=>t.Over).ThenBy(t=>t.Date);
+            IEnumerable<ViewTournament> tournaments = (await CallAPI.GetTournamentsWHereOrga(UserId)).OrderBy(t => t.Over).ThenBy(t => t.Date);
 
             return View("~/Views/Admin/Index.cshtml", tournaments);
         }
 
-        public async Task<ActionResult> Tournoi(int? id)
+        public async Task<ActionResult> Tournoi(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            Tournoi tournoi = await CallAPI.GetTournoiById((int)id);
+            Tournoi tournoi = await CallAPI.GetTournoiById(id);
 
             if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
             {
@@ -64,14 +50,9 @@ namespace Tour0Suisse.Web.Controllers
             return View("~/Views/Admin/Tournoi.cshtml", rounds);
         }
 
-        public async Task<IActionResult> Start(int? id)
+        public async Task<IActionResult> Start(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            Tournoi tournoi = await CallAPI.GetTournoiById((int)id);
+            Tournoi tournoi = await CallAPI.GetTournoiById(id);
 
             if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
             {
@@ -86,20 +67,15 @@ namespace Tour0Suisse.Web.Controllers
             RetourAPI retour = await CallAPI.StartTournoi(tournoi);
             if (!retour.Succes)
             {
-
+                //
             }
 
-            return RedirectToAction("Tournoi", new { id = id });
+            return RedirectToAction("Tournoi", new {id = id});
         }
 
-        public async Task<IActionResult> Pairing(int id, int round)
+        public async Task<IActionResult> EndRound(int id, int round)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            Tournoi tournoi = await CallAPI.GetTournoiById((int)id);
+            Tournoi tournoi = await CallAPI.GetTournoiById(id);
 
             if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
             {
@@ -111,13 +87,36 @@ namespace Tour0Suisse.Web.Controllers
                 return NotFound();
             }
 
-            RetourAPI retour = await CallAPI.PairingRound(new Round { IdTournament = id, RoundNumber = round });
+            RetourAPI retour = await CallAPI.EndRound(id, round);
             if (!retour.Succes)
             {
-
+                //
             }
 
-            return RedirectToAction("Tournoi", new { id = id });
+            return RedirectToAction("Tournoi", new {id = id});
+        }
+
+        public async Task<IActionResult> Pairing(int id, int round)
+        {
+            Tournoi tournoi = await CallAPI.GetTournoiById(id);
+
+            if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
+            {
+                return NotFound();
+            }
+
+            if (tournoi.Over)
+            {
+                return NotFound();
+            }
+
+            RetourAPI retour = await CallAPI.PairingRound(new Round {IdTournament = id, RoundNumber = round});
+            if (!retour.Succes)
+            {
+                //
+            }
+
+            return RedirectToAction("Tournoi", new {id = id});
         }
 
         public async Task<IActionResult> UpdateMatch(int idT, int rn, int idP1)
@@ -146,7 +145,7 @@ namespace Tour0Suisse.Web.Controllers
 
             match.Parties = match.Parties.OrderBy(p=>p.PartNumber).Concat(empyParties).Take((match.Tournament.DeckListNumber * 2) - 1).ToList();
             List<ViewPartie> temp = new List<ViewPartie>();
-            int i= 1;
+            int i = 1;
             foreach (var p in match.Parties)
             {
                 if (p.PartNumber == 0)
@@ -154,7 +153,7 @@ namespace Tour0Suisse.Web.Controllers
                     p.PartNumber = i;
                     i++;
                 }
-                else if(p.PartNumber >= i)
+                else if (p.PartNumber >= i)
                 {
                     i = p.PartNumber + 1;
                 }
@@ -169,7 +168,8 @@ namespace Tour0Suisse.Web.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateMatch([Bind("IdTournament, RoundNumber, IdPlayer1, IdPlayer2, Parties")]Match match)
+        public async Task<IActionResult> UpdateMatch([Bind("IdTournament, RoundNumber, IdPlayer1, IdPlayer2, Parties")]
+            Match match)
         {
             var Parties = match.Parties;
             var retourApis = new List<RetourAPI>();
@@ -216,6 +216,78 @@ namespace Tour0Suisse.Web.Controllers
 
             match.Parties = match.Parties.Concat(empyParties).Take((match.Tournament.DeckListNumber*2)-1).ToList();
             return View("~/Views/Admin/Match.cshtml", match);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateNextRound(int id, int round)
+        {
+            Tournoi tournoi = await CallAPI.GetTournoiById(id);
+
+            if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
+            {
+                return NotFound();
+            }
+
+            if (tournoi.Over)
+            {
+                return NotFound();
+            }
+
+            RetourAPI retour = await CallAPI.CreateRound(new Round {IdTournament = id, RoundNumber = (round + 1), StartRound = DateTime.UtcNow});
+            if (!retour.Succes)
+            {
+                //
+            }
+
+            return RedirectToAction("Tournoi", new {id = id});
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EndTournoi(Tournoi tournoi)
+        {
+            if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
+            {
+                return NotFound();
+            }
+
+            if (tournoi.Deleted != null)
+            {
+                return NotFound();
+            }
+
+            if (tournoi.Over)
+            {
+                return NotFound();
+            }
+
+            RetourAPI retour = await CallAPI.EndTournoi(tournoi);
+            if (retour.Succes)
+            {
+                return RedirectToAction("Details", "Tournois", new {id = tournoi.IdTournament});
+            }
+
+            return RedirectToAction("EndTournoi", new {id = tournoi.IdTournament});
+        }
+        
+        public async Task<IActionResult> EndTournoiR(int id)
+        {
+            Tournoi tournoi = await CallAPI.GetTournoiById(id);
+
+            if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
+            {
+                return NotFound();
+            }
+
+            if (tournoi.Over)
+            {
+                return NotFound();
+            }
+
+            //return RedirectToAction("Details", "Tournois", new { id = id });
+            tournoi.Resultas = tournoi.Resultas.OrderByDescending(r => r.Score);
+            return View("~/Views/Admin/EndTournoi.cshtml", tournoi);
         }
     }
 }

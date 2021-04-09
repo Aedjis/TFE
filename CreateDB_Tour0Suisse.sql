@@ -402,7 +402,7 @@ JOIN Jeu AS J
 GO
 
 CREATE VIEW [View_Tournament] AS
-SELECT ID_Tournament, T.[Name] AS [Name], T.ID_Game AS ID_Game, J.[Name] AS [Game], T.Desciption as [Description], [Date], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose], T.DELETED
+SELECT ID_Tournament, T.[Name] AS [Name], T.ID_Game AS ID_Game, J.[Name] AS [Game], T.Desciption as [Description], [Date], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose], T.DELETED, T.[Over]
 FROM Tournoi AS T
 JOIN Jeu AS J
 	ON T.ID_Game = J.ID_Game
@@ -560,7 +560,7 @@ SELECT	ID_Tournament,
 		IG_Pseudo,
 		SUM(CASE WHEN Resulta = 1 THEN 1 ELSE 0 END) AS Victoire, 
 		SUM(CASE WHEN Resulta = 0 THEN 1 ELSE 0 END) AS Egaliter, 
-		SUM(CASE WHEN Resulta = 2 THEN 1 ELSE 0 END) AS Defaite
+		SUM(CASE WHEN Resulta = -1 THEN 1 ELSE 0 END) AS Defaite
 FROM [View_ResultMatchPlayer]
 GROUP BY ID_Tournament, ID_Player, Pseudo, IG_Pseudo
 --ORDER BY  Victoire DESC, Egaliter DESC, Defaite ASC
@@ -1129,13 +1129,13 @@ BEGIN
 					RAISERROR('La derniere round du tournoi n a pas encore fini, terminer la avant de finir le tournoi',16,1);
 				END
 			--(inseré ici la création des résulta du tournoi ou faire un triggeur pour le faire sur le changement de over a 1)
-
+			
 
 			INSERT INTO Resultat ([ID_Tournament], [ID_User], [Score], [Gain], [TieBreaker], [Rank])
-			SELECT D.ID_Tournament, ID_Player, Score, D.Gain, TieBreaker, [Rank]
+			SELECT RSG.ID_Tournament, ID_Player, Score, ISNULL(D.Gain, 0), TieBreaker, [Rank]
 			FROM
 				(
-				SELECT VSCT.ID_Tournament, VSCT.ID_Player, VSCT.Score, SUM(tb.opponentScore) AS TieBreaker, RANK() OVER(ORDER BY VSCT.Score,SUM(tb.opponentScore))  AS [Rank]
+				SELECT VSCT.ID_Tournament, VSCT.ID_Player, VSCT.Score, SUM(tb.opponentScore) AS TieBreaker, RANK() OVER(ORDER BY VSCT.Score desc,SUM(tb.opponentScore) desc)  AS [Rank]
 				FROM	(
 							SELECT VM.ID_Tournament, VM.ID_PlayerOne AS player, VM.ID_PlayerTwo AS opponent, VSCT.Score AS opponentScore
 							FROM [View_Match] AS VM
@@ -1153,7 +1153,7 @@ BEGIN
 					ON TB.ID_Tournament = VSCT.ID_Tournament and TB.player = VSCT.ID_Player
 				GROUP BY VSCT.ID_Tournament, VSCT.ID_Player, VSCT.Score
 				) AS RSG
-			JOIN Dotation AS D
+			left JOIN Dotation AS D
 				ON D.ID_Tournament = RSG.ID_Tournament AND D.Place = RSG.[Rank]
 			ORDER BY [Rank]
 
@@ -1764,6 +1764,7 @@ CREATE PROCEDURE SP_Edit_Round
 	@ID_Tournoi INT,
 	@RoundNumber INT,
 	@Start DateTime,
+	@End DateTime = null,
 	@responseMessage NVARCHAR(250) OUTPUT,
 	@Reussie BIT OUTPUT
 AS
@@ -1779,9 +1780,9 @@ BEGIN
 					RAISERROR('Le tournoi est introuvable',16,1);
 				End
 
-			if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) =1))
+			if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) <>1))
 				BEGIN
-					RAISERROR('la round n existe pas déjà', 16, 1);
+					RAISERROR('la round n existe pas', 16, 1);
 				END
 
 			if(@Start is null or @Start < GETUTCDATE())
@@ -1790,8 +1791,47 @@ BEGIN
 				END
 
 		
-			INSERT INTO [Round]([ID_Tournament], [RoundNumber], [StartRound])
-				VALUES(@ID_Tournoi, @RoundNumber, @Start)
+			Update[Round]
+				SET[StartRound] = @Start
+				where  [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
+
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie =0;
+			ROLLBACK;
+		END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_End_Round
+	@ID_Tournoi INT,
+	@RoundNumber INT,
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
+AS
+BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1; 
+
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(*) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and DELETED is null)) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
+
+			if(@RoundNumber IS null or ((SELECT COUNT(*) FROM [Round] WHERE (ID_Tournament = @ID_Tournoi and @RoundNumber = RoundNumber)) <>1))
+				BEGIN
+					RAISERROR('la round n existe pas', 16, 1);
+				END
+
+		
+			Update[Round]
+				SET[EndRound] = GETUTCDATE()
+				where  [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
 
 			COMMIT;
 		END TRY
@@ -1871,6 +1911,9 @@ BEGIN
 			--	BEGIN
 			--		RAISERROR('Il n existe pas match pour cette round', 16, 1);
 			--	END
+
+			DELETE Partie 
+				WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
 
 			DELETE [Match] 
 				WHERE [ID_Tournament] = @ID_Tournoi and [RoundNumber] = @RoundNumber
@@ -2454,6 +2497,9 @@ Grant execute
 GO
 Grant execute 
 	on [dbo].[SP_UpdateDeck] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_End_Round] To [API_User]
 GO
 
 

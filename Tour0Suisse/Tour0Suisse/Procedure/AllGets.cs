@@ -92,7 +92,6 @@ namespace Tour0Suisse.Web.Procedure
             }
         }
 
-
         public static async Task<Utilisateur> GetUtilisateurById(int id)
         {
             using (var httpClient = new HttpClient())

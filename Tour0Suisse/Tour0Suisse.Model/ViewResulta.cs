@@ -11,12 +11,9 @@ namespace Tour0Suisse.Model
         int IdUser { get; set; }
         string Pseudo { get; set; }
         string IGPseudo { get; set; }
-        int Rank { get; set; }
-        int Gain { get; set; }
-        int Score { get; set; }
-        int TieBreaker { get; set; }
-        int? AdditionalTieBreaker { get; set; }
-        string AdditionalTieBreakerRules { get; set; }
+        int Victoire { get; set; }
+        int Egaliter { get; set; }
+        int Defaite { get; set; }
     }
 
     public class ViewResulta : IViewResulta
@@ -41,5 +38,8 @@ namespace Tour0Suisse.Model
         public int? AdditionalTieBreaker { get; set; }
         [Display(Name = "Regle du tiebreaker pas arbitrage")]
         public string AdditionalTieBreakerRules { get; set; }
+        public int Victoire { get; set; }
+        public int Egaliter { get; set; }
+        public int Defaite { get; set; }
     }
 }

@@ -37,8 +37,8 @@
 
             @if (Model.Parties.Any())
             {
-                <div class="container border">
-                    @for (int i = 0; i < Model.Parties.Count; i++)
+                <div class="container table-bordered">
+                    @for (int i = 0; i < Model.Parties.Count; i++)  //do not change for foreach, it will not work any more
                     {
                         <input asp-for="@Model.Parties[i].PartNumber" hidden />
                         <div class="form-group row">

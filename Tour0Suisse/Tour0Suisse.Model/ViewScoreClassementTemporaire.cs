@@ -4,15 +4,15 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tour0Suisse.Model
 {
-    public interface IViewScoreClassementTemporaire
+    public interface IViewScoreClassementTemporaire : IViewResulta
     {
         int IdTournament { get; set; }
-        string Tournament { get; set; }
-        int IdPlayer { get; set; }
-        int? Score { get; set; }
-        int? Victoire { get; set; }
-        int? Egaliter { get; set; }
-        int? Defaite { get; set; }
+        string Name { get; set; }
+        int IdUser { get; set; }
+        int Score { get; set; }
+        int Victoire { get; set; }
+        int Egaliter { get; set; }
+        int Defaite { get; set; }
         string IGPseudo { get; set; }
         string Pseudo { get; set; }
     }
@@ -21,16 +21,16 @@ namespace Tour0Suisse.Model
     {
         public int IdTournament { get; set; }
         [Display(Name = "Nom du tournoi")]
-        public string Tournament { get; set; }
-        public int IdPlayer { get; set; }
+        public string Name { get; set; }
+        public int IdUser { get; set; }
         [Display(Name = "Score")]
-        public int? Score { get; set; }
+        public int Score { get; set; }
         [Display(Name = "Victoire")]
-        public int? Victoire { get; set; }
+        public int Victoire { get; set; }
         [Display(Name = "Egaliter")]
-        public int? Egaliter { get; set; }
+        public int Egaliter { get; set; }
         [Display(Name = "Défaite")]
-        public int? Defaite { get; set; }
+        public int Defaite { get; set; }
         [Display(Name = "Pseudo en jeu")]
         public string IGPseudo { get; set; }
         [Display(Name = "Joueur")]

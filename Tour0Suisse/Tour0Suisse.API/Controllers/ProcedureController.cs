@@ -122,6 +122,12 @@ namespace Tour0Suisse.API.Controllers
         }
 
         [HttpPost]
+        public RetourAPI EndTournoi(Tournoi Tournoi)
+        {
+            return DB_CURD.EndTournoi(Tournoi);
+        }
+
+        [HttpPost]
         public RetourAPI Register(Joueur Joueur)
         {
             return DB_CURD.RegisterTournoi(
@@ -172,6 +178,12 @@ namespace Tour0Suisse.API.Controllers
         public RetourAPI EditRound(Round Round)
         {
             return DB_CURD.EditRound(Round);
+        }
+
+        [HttpPost]
+        public RetourAPI EndRound(Round Round)
+        {
+            return DB_CURD.EndRound(Round);
         }
 
         [HttpPost]

@@ -17,7 +17,7 @@
             <input asp-for="@Model.IdUser" class="control-label" type="hidden"/>
 
 
-            @for (int i = 0; i<Model.PseudoIgs.Count; i++)
+            @for (int i = 0; i<Model.PseudoIgs.Count; i++)  // ne pas changé en foreach ça va le bind ne ce fait plus.
             {
                 <div class="form-group">
                     <input asp-for="@Model.PseudoIgs[i].IdGame" class="control-label" type="hidden" />

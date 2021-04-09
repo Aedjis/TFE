@@ -17,9 +17,9 @@ namespace Tour0Suisse.Model
         [Display(Name = "Round numero")]
         public int RoundNumber { get; set; }
         [Display(Name = "Debut de la round")]
-        public DateTime StartRound { get; set; }
+        public DateTime? StartRound { get; set; }
         [Display(Name = "Fin de la round")]
-        public DateTime EndRound { get; set; }
+        public DateTime? EndRound { get; set; }
         [Display(Name = "Liste des matchs")]
         public IEnumerable<ViewMatch> Matches { get; set; }
 

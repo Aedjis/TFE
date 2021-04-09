@@ -38,7 +38,7 @@ namespace Tour0Suisse.API
         {
             List<PairID> retour = new(); // crée la variable qui se verra atrivué la liste de pairing qui doit être retourné.
             retour.Clear();
-            List<ViewScoreClassementTemporaire> PlayerClassement = classements.Where(c => Players.Contains(c.IdPlayer)).ToList(); // ne prend en considération plus que les joueur encore en list
+            List<ViewScoreClassementTemporaire> PlayerClassement = classements.Where(c => Players.Contains(c.IdUser)).ToList(); // ne prend en considération plus que les joueur encore en list
 
 
             Dictionary<int, List<int>> PlayerOpponentList = CreatePlayerOpponentList(Players, matches); // création d'un dictonaire pour retrouvé a liste des adversaire d'un joueur
@@ -144,17 +144,17 @@ namespace Tour0Suisse.API
 
                 List<int>[]
                     GroupPlayer =
-                        new List<int>[(roundNumber - 1) *
-                                      PPV]; //création d'un tableau pour crée les group de liste de joueur 
+                        new List<int>[1 + ((roundNumber - 1) *
+                                      MPP)]; //création d'un tableau pour crée les group de liste de joueur 
 
 
                 for (int i = 0;
-                    i < (roundNumber - 1) * PPV;
+                    i <= (roundNumber - 1) * MPP;
                     i++) //atribution des joueur a chaque group leur correspondant en fonction de leur parcours
                 {
                     GroupPlayer[i] = playerClassement
                         .Where(p => (p.Victoire * PPV + p.Egaliter * PPE + p.Defaite * PPD) == i)
-                        .Select(s => s.IdPlayer).ToList();
+                        .Select(s => s.IdUser).ToList();
                 }
 
 

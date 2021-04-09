@@ -7,7 +7,7 @@ namespace Tour0Suisse.Web.Procedure
 {
     public static partial class CallAPI
     {
-        private static string _BaseUri;
+        private static readonly string _BaseUri;
 
         static CallAPI() => _BaseUri = "https://localhost:44321";
     }

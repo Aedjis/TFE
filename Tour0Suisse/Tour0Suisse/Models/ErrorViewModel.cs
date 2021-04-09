@@ -1,6 +1,4 @@
-using System;
-
-namespace Tour0Suisse.Models
+namespace Tour0Suisse.Web.Models
 {
     public class ErrorViewModel
     {

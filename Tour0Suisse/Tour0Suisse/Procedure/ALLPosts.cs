@@ -107,5 +107,20 @@ namespace Tour0Suisse.Web.Procedure
         {
             return await _PostT("/Procedure/CreateOrUpdatePartie", Partie);
         }
+
+        public static async Task<RetourAPI> EndRound(int Id, int Round)
+        {
+            return await _PostT("/Procedure/EndRound", new Round {IdTournament = Id, RoundNumber = Round});
+        }
+
+        public static async Task<RetourAPI> CreateRound(Round Round)
+        {
+            return await _PostT("/Procedure/CreateRound", Round);
+        }
+
+        public static async Task<RetourAPI> EndTournoi(Tournoi Tournoi)
+        {
+            return await _PostT("/Procedure/EndTournoi", Tournoi);
+        }
     }
 }

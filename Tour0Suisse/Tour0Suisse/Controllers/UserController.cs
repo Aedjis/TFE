@@ -22,7 +22,7 @@ namespace Tour0Suisse.Web.Controllers
         {
             IEnumerable<ViewUser> users = await CallAPI.GetAllUtilisateurs();
             
-            return View( users);
+            return View(users);
         }
 
         public ActionResult LogOff()
@@ -59,7 +59,7 @@ namespace Tour0Suisse.Web.Controllers
 
             Utilisateur user = await CallAPI.GetUser(id);
 
-            if(user == null || user.IdUser <1)
+            if (user == null || user.IdUser < 1)
             {
                 return NotFound();
             }
@@ -79,7 +79,8 @@ namespace Tour0Suisse.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdUser,Pseudo,Email,Password,Organizer,Deleted")] Utilisateur user)
+        public async Task<IActionResult> Create([Bind("IdUser,Pseudo,Email,Password,Organizer,Deleted")]
+            Utilisateur user)
         {
             if (ModelState.IsValid)
             {
@@ -119,7 +120,8 @@ namespace Tour0Suisse.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdUser,Pseudo,Email,Password,Organizer,Deleted")] Utilisateur utilisateur)
+        public async Task<IActionResult> Edit(int id, [Bind("IdUser,Pseudo,Email,Password,Organizer,Deleted")]
+            Utilisateur utilisateur)
         {
             if (!int.TryParse(HttpContext.Session.GetString("UserId"), out int SessionId) || id != utilisateur.IdUser || SessionId != utilisateur.IdUser)
             {
@@ -149,7 +151,7 @@ namespace Tour0Suisse.Web.Controllers
         // GET: User/Delete/5
         public ActionResult Delete(int id)
         {
-            return View("~/Views/User/DeletedCompte.cshtml", new Utilisateur{IdUser= id});
+            return View("~/Views/User/DeletedCompte.cshtml", new Utilisateur {IdUser = id});
         }
 
         // POST: Utilisateurs/Delete/5
@@ -165,7 +167,7 @@ namespace Tour0Suisse.Web.Controllers
                     RetourAPI retourApi = JsonConvert.DeserializeObject<RetourAPI>(apiResponse);
                     if (retourApi.Succes)
                     {
-                        return RedirectToAction("Delete", new { id = utilisateur.IdUser });
+                        return RedirectToAction("Delete", new {id = utilisateur.IdUser});
                     }
                     else
                     {
@@ -190,7 +192,7 @@ namespace Tour0Suisse.Web.Controllers
             if (Jeus != null)
                 foreach (ViewJeu jeu in Jeus)
                 {
-                    if (!utilisateur.PseudoIgs.Any(j => j.IdGame == jeu.IdGame))
+                    if (utilisateur.PseudoIgs.All(j => j.IdGame != jeu.IdGame))
                     {
                         utilisateur.PseudoIgs.Add(new ViewPseudo { Game = jeu.Name, IdGame = jeu.IdGame, IdUser = utilisateur.IdUser, IgPseudo = "" });
                     }

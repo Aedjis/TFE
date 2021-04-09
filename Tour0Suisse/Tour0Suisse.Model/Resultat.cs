@@ -31,5 +31,8 @@ namespace Tour0Suisse.Model
         public int IdUser { get => User.IdUser; set => User.IdUser = value; }
         public string Pseudo { get => User.Pseudo; set => User.Pseudo = value; }
         public string IGPseudo { get ; set ; }
+        public int Victoire { get; set; }
+        public int Egaliter { get; set; }
+        public int Defaite { get; set; }
     }
 }

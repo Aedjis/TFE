@@ -25,18 +25,11 @@ namespace Tour0Suisse.Web.Controllers
         }
 
         // GET: Tournois/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            Tournoi tournoi = await CallAPI.GetTournoiById(id);
 
-            Tournoi tournoi;
-
-            tournoi = await CallAPI.GetTournoiById((int)id);
-
-            if (tournoi == null || tournoi.IdTournament <1)
+            if (tournoi == null || tournoi.IdTournament < 1)
             {
                 return NotFound();
             }
@@ -65,7 +58,7 @@ namespace Tour0Suisse.Web.Controllers
             {
                 if ((tournoi.Organisateurs == null || !tournoi.Organisateurs.Any()) && int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
                 {
-                    tournoi.Organisateurs = new List<ViewOrga>{new ViewOrga{Level = 0, IdUser = IdUser, IdTournament = -1, Name = "", Pseudo = ""}};
+                    tournoi.Organisateurs = new List<ViewOrga> {new ViewOrga {Level = 0, IdUser = IdUser, IdTournament = -1, Name = "", Pseudo = ""}};
                 }
 
                 if (tournoi.Organisateurs != null && tournoi.Organisateurs.Count() != 0)
@@ -86,16 +79,10 @@ namespace Tour0Suisse.Web.Controllers
         }
 
 
-
         // GET: Tournois/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            Tournoi tournoi = await CallAPI.GetTournoiById((int)id);
+            Tournoi tournoi = await CallAPI.GetTournoiById(id);
 
             if (tournoi == null || tournoi.IdTournament < 1)
             {
@@ -126,7 +113,7 @@ namespace Tour0Suisse.Web.Controllers
                 RetourAPI retourApi = await CallAPI.UpdateTournoi(tournoi);
                 if (retourApi.Succes)
                 {
-                    return RedirectToAction("Details", new{id = tournoi.IdTournament});
+                    return RedirectToAction("Details", new {id = tournoi.IdTournament});
                 }
             }
 
@@ -137,14 +124,9 @@ namespace Tour0Suisse.Web.Controllers
         }
 
         // GET: Tournois/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            Tournoi tournoi = await CallAPI.GetTournoiById((int)id);
+            Tournoi tournoi = await CallAPI.GetTournoiById(id);
 
             if (tournoi == null || tournoi.IdTournament < 1)
             {
@@ -187,7 +169,7 @@ namespace Tour0Suisse.Web.Controllers
 
             ViewBag.NbDeck = tournoi.DeckListNumber;
             ViewData["Title"] = "S'inscire pour " + tournoi.Name;
-            return View("~/Views/Tournoi/Register.cshtml", new Joueur{IdTournament = (int)id});
+            return View("~/Views/Tournoi/Register.cshtml", new Joueur {IdTournament = (int) id});
         }
 
         // POST: Decks/Create

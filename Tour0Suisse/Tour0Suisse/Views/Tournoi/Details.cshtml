@@ -86,7 +86,7 @@
             if (Model.Organisateurs.Any(o => o.IdUser == Uid))
             {
                 <a asp-action="Edit" asp-route-id="@Model.IdTournament">Edit</a> 
-                <a asp-action="Admin" asp-route-id="@Model.IdTournament">Admin</a>
+                <a asp-controller="Admin" asp-action="Tournoi" asp-route-id="@Model.IdTournament">Admin</a>
             }
             else if (Model.Participants.Any(p => p.IdUser == Uid))
             {

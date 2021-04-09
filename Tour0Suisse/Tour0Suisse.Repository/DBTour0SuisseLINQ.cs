@@ -173,7 +173,7 @@ namespace Tour0Suisse.Repository
                 SqlConnection db = new SqlConnection(_ConnectionString);
 
                 string querry =
-                    "SELECT ID_Tournament, [Name], ID_Game, [Game], Description, [Date], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose] FROM [View_Tournament] " +
+                    "SELECT ID_Tournament, [Name], ID_Game, [Game], Description, [Date], [MaxNumberPlayer], [DeckListNumber], [PPWin], [PPDraw], [PPLose], [Over], [Deleted] FROM [View_Tournament] " +
                     Where;
 
                 SqlCommand cmd = db.CreateCommand();
@@ -198,7 +198,9 @@ namespace Tour0Suisse.Repository
                         Ppwin = int.Parse(reader["PPWin"].ToString()),
                         Ppdraw = int.Parse(reader["PPDraw"].ToString()),
                         Pplose = int.Parse(reader["PPLose"].ToString()),
-                        Description = reader["Description"].ToString()
+                        Description = reader["Description"].ToString(),
+                        Over = bool.Parse(reader["Over"].ToString()),
+                        Deleted = DateTime.TryParse(reader["Deleted"].ToString(), out DateTime d)? d:(DateTime?)null
                     });
 
 
@@ -991,8 +993,8 @@ namespace Tour0Suisse.Repository
                     Retour.Add(new ViewScoreClassementTemporaire
                     {
                         IdTournament = int.Parse(reader["ID_Tournament"].ToString()),
-                        Tournament = reader["Name"].ToString(),
-                        IdPlayer = int.Parse(reader["ID_Player"].ToString()),
+                        Name = reader["Name"].ToString(),
+                        IdUser = int.Parse(reader["ID_Player"].ToString()),
                         Pseudo = reader["Pseudo"].ToString(),
                         IGPseudo = reader["IG_Pseudo"].ToString(),
                         Score = int.Parse(reader["Score"].ToString()),
@@ -1044,7 +1046,7 @@ namespace Tour0Suisse.Repository
             {
                 SqlConnection db = new SqlConnection(_ConnectionString);
 
-                string querry = "SELECT ID_Tournament, [Name], RoundNumber, StartRound From [View_Round] " + Where;
+                string querry = "SELECT ID_Tournament, [Name], RoundNumber, StartRound, EndRound From [View_Round] " + Where;
 
                 SqlCommand cmd = db.CreateCommand();
                 cmd.CommandText = querry;
@@ -1053,13 +1055,15 @@ namespace Tour0Suisse.Repository
                 SqlDataReader reader = cmd.ExecuteReader();
 
 
+                DateTime dt = new DateTime();
                 while (reader.Read())
                     Retour.Add(new ViewRound
                     {
                         IdTournament = int.Parse(reader["ID_Tournament"].ToString()),
                         Name = reader["Name"].ToString(),
                         RoundNumber = int.Parse(reader["RoundNumber"].ToString()),
-                        StartRound = DateTime.Parse(reader["StartRound"].ToString())
+                        StartRound = DateTime.TryParse(reader["StartRound"].ToString(), out dt)? dt : (DateTime?) null,
+                        EndRound = DateTime.TryParse(reader["EndRound"].ToString(), out dt)? dt : (DateTime?) null
                     });
 
 
@@ -2136,6 +2140,49 @@ namespace Tour0Suisse.Repository
                 cmd.Parameters.AddWithValue("@ID_Tournoi", P.IdTournament);
                 cmd.Parameters.AddWithValue("@RoundNumber", P.RoundNumber);
                 cmd.Parameters.AddWithValue("@Start", P.StartRound);
+                cmd.Parameters.Add(responseMessage);
+                cmd.Parameters.Add(retour);
+
+
+                db.Open();
+
+                Console.WriteLine(cmd.ExecuteNonQuery() + " ligne affecté");
+
+
+                db.Close();
+                return new RetourAPI(bool.Parse(retour.Value.ToString()), responseMessage.Value.ToString());
+            }
+            catch (Exception ex)
+            {
+#if DEBUG
+                throw ex;
+#endif
+                return new RetourAPI(false, "Erreur serveur : " + ex.Message);
+            }
+        }
+
+        public RetourAPI EndRound(Round P)
+        {
+            try
+            {
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250)
+                {
+                    Direction = ParameterDirection.Output
+                };
+
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit)
+                {
+                    Direction = ParameterDirection.Output
+                };
+
+
+                SqlConnection db = new SqlConnection(_ConnectionString);
+
+                SqlCommand cmd = db.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "SP_End_Round";
+                cmd.Parameters.AddWithValue("@ID_Tournoi", P.IdTournament);
+                cmd.Parameters.AddWithValue("@RoundNumber", P.RoundNumber);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Tour0Suisse.Model;
-using Tour0Suisse.Models;
+using Tour0Suisse.Web.Models;
 using Tour0Suisse.Web.Procedure;
 
 namespace Tour0Suisse.Web.Controllers
