@@ -130,14 +130,12 @@ CONSTRAINT PK_Tournament__XXXX PRIMARY KEY(ID_Tournament)
 )ON Tournoi
 GO
 
-
-
 CREATE TABLE [Dotation] (
 ID_Tournament INT NOT NULL,
 Place INT NOT NULL,
 Gain INT NOT NULL DEFAULT(0)
 
-CONSTRAINT PK_Dotationt__XXXX PRIMARY KEY(ID_Tournament)
+CONSTRAINT PK_Dotationt__XXXX PRIMARY KEY(ID_Tournament, Place)
 )ON Tournoi
 GO
 
