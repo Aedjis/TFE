@@ -217,8 +217,8 @@ GO
 CREATE TABLE [Joueur](  --fait doublons avec le tablme deck joueur
 ID_Tournament INT NOT NULL,
 ID_User INT NOT NULL,
-RegisterDate DateTime DEFAULT(GETUTCDATE()),
-CheckIn DateTime NULL,
+RegisterDate DateTime NOT NULL DEFAULT(GETUTCDATE()),
+CheckIn DateTime NULL DEFAULT(NULL),
 [Drop] BIT NOT NULL DEFAULT(0),
 
 CONSTRAINT PK_Player__XXXX PRIMARY KEY(ID_Tournament, ID_User)
@@ -245,6 +245,18 @@ GO
 
 ALTER TABLE [Utilisateur]
 ADD CONSTRAINT UK_Utilisateur_EmailUnique__XXXX	UNIQUE (Email)
+GO
+
+ALTER TABLE [Jeu]
+ADD CONSTRAINT UK_Jeu_NameUnique__XXXX	UNIQUE ([Name])
+GO
+
+ALTER TABLE [Tournoi]
+ADD CONSTRAINT CK_Tournoi_Deck__XXX1	CHECK (DeckListNumber >=3)
+GO
+
+ALTER TABLE [Tournoi]
+ADD CONSTRAINT CK_Tournoi_Deck__XXX2	CHECK (DeckListNumber <=5)
 GO
 
 --____________FIN CREATION CONTRAINT_________________________
@@ -358,15 +370,6 @@ ADD CONSTRAINT FK_DeckJoueur_Deck__XXXX	FOREIGN KEY (ID_Deck)
 										REFERENCES [Deck](ID_Deck)
 GO
 
-
-
-ALTER TABLE [Tournoi]
-ADD CONSTRAINT CK_Tournoi_Deck__XXX1	CHECK (DeckListNumber >=3)
-GO
-
-ALTER TABLE [Tournoi]
-ADD CONSTRAINT CK_Tournoi_Deck__XXX2	CHECK (DeckListNumber <=5)
-GO
 
 --____________FIN CREATION DES LIEN ENTRE LES TABLES_________________________
 
