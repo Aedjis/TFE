@@ -37,7 +37,7 @@ namespace Tour0Suisse.Web.Controllers
 
             if (tournoi.Over)
             {
-                return RedirectToAction();
+                return RedirectToAction("Index");
             }
 
             ViewData["Tournoi"] = tournoi;

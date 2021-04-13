@@ -18,11 +18,6 @@ using Tour0Suisse;
 
 #line default
 #line hidden
-#line 2 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\_ViewImports.cshtml"
-using Tour0Suisse.Models;
-
-#line default
-#line hidden
 #line 1 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\User\Profil.cshtml"
 using Microsoft.AspNetCore.Http;
 
@@ -39,7 +34,7 @@ using Tour0Suisse.Model;
 #line default
 #line hidden
     [global::Microsoft.AspNetCore.Razor.Hosting.RazorSourceChecksumAttribute(@"SHA1", @"68363c261ad2c508fee9a8d3ae7afc0d987fba6c", @"/Views/User/Profil.cshtml")]
-    [global::Microsoft.AspNetCore.Razor.Hosting.RazorSourceChecksumAttribute(@"SHA1", @"4c3a5f40b083326dcec4f1b39a5f0cc2ac12e470", @"/Views/_ViewImports.cshtml")]
+    [global::Microsoft.AspNetCore.Razor.Hosting.RazorSourceChecksumAttribute(@"SHA1", @"8c82a8c00f03253429d48af680cbef87b67d4e4a", @"/Views/_ViewImports.cshtml")]
     public class Views_User_Profil : global::Microsoft.AspNetCore.Mvc.Razor.RazorPage<Tour0Suisse.Model.Utilisateur>
     {
         private static readonly global::Microsoft.AspNetCore.Razor.TagHelpers.TagHelperAttribute __tagHelperAttribute_0 = new global::Microsoft.AspNetCore.Razor.TagHelpers.TagHelperAttribute("asp-action", "AddGamePseudo", global::Microsoft.AspNetCore.Razor.TagHelpers.HtmlAttributeValueStyle.DoubleQuotes);
@@ -239,7 +234,7 @@ Write(ViewData["Message"]);
             WriteLiteral("    ");
             EndContext();
             BeginContext(1912, 91, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "550f6918da2248068a9a873f2fff08b5", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "1f2d008eafb6479681394ca7f11ccdd2", async() => {
                 BeginContext(1971, 28, true);
                 WriteLiteral("Ajouté ou modifié des pseudo");
                 EndContext();
@@ -294,7 +289,7 @@ Write(ViewData["Message"]);
             WriteLiteral("        ");
             EndContext();
             BeginContext(2923, 58, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "32cbb512399c4989babd4fc456fe6ea6", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "9941457b442b40cab120157ff1e464a2", async() => {
                 BeginContext(2973, 4, true);
                 WriteLiteral("Edit");
                 EndContext();
@@ -337,7 +332,7 @@ Write(ViewData["Message"]);
             WriteLiteral("    ");
             EndContext();
             BeginContext(2997, 40, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "05a01e3867a84e3ea0c1f08d9dbbb419", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "f42f55d62259477eaffe1e6f4bdf98c8", async() => {
                 BeginContext(3021, 12, true);
                 WriteLiteral("Back to List");
                 EndContext();
