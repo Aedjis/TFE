@@ -141,27 +141,31 @@ namespace Tour0Suisse.API
             }
             else
             {
+                ////Legacy version non optimiser
+                //List<int>[]
+                //    GroupPlayer =
+                //        new List<int>[1 + ((roundNumber - 1) *
+                //                      MPP)]; //création d'un tableau pour crée les group de liste de joueur 
 
-                List<int>[]
-                    GroupPlayer =
-                        new List<int>[1 + ((roundNumber - 1) *
-                                      MPP)]; //création d'un tableau pour crée les group de liste de joueur 
 
-
-                for (int i = 0;
-                    i <= (roundNumber - 1) * MPP;
-                    i++) //atribution des joueur a chaque group leur correspondant en fonction de leur parcours
-                {
-                    GroupPlayer[i] = playerClassement
-                        .Where(p => (p.Victoire * PPV + p.Egaliter * PPE + p.Defaite * PPD) == i)
-                        .Select(s => s.IdUser).ToList();
-                }
+                //for (int i = 0;
+                //    i <= (roundNumber - 1) * MPP;
+                //    i++) //atribution des joueur a chaque group leur correspondant en fonction de leur parcours
+                //{
+                //    GroupPlayer[i] = playerClassement
+                //        .Where(p => (p.Victoire * PPV + p.Egaliter * PPE + p.Defaite * PPD) == i)
+                //        .Select(s => s.IdUser).ToList();
+                //}
+                ////fin legacy non opti
+                
+                //// version plus opti car ne crée que le group qui on des joueur dedans
+                var GroupPlayer = playerClassement.GroupBy(j => j.Score).OrderByDescending(g => g.Key);
 
 
                 foreach (var Group in GroupPlayer)
                 {
-                    retour.AddRange(PairingInGroup(Group, playerOpponentList, out List<int> OutReportedPlayer,
-                        InReportedPlayer)); //on fait le pairing de chaque groupe et on le rajoute au pairing existant
+                    retour.AddRange(PairingInGroup(Group.Select(g=>g.IdUser).ToList(), playerOpponentList, out List<int> OutReportedPlayer, //avec la nouvel version il faut faire un select sur le group puis le remmettre en list.
+                        InReportedPlayer)); //on fait le pairing de chaque groupe et on le rajoute au pairing existant    
                     InReportedPlayer.Clear();
                     InReportedPlayer.AddRange(OutReportedPlayer); //on transmet la liste es joueur reporté
                     OutReportedPlayer.Clear();

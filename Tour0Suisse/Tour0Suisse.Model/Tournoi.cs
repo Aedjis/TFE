@@ -15,6 +15,7 @@ namespace Tour0Suisse.Model
             Classement = new List<ViewScoreClassementTemporaire>();
             Dotation = new List<ViewDotation>();
             Matchs = new List<ViewMatch>();
+            Rounds = new List<ViewRound>();
         }
 
         public int IdGame
@@ -54,9 +55,11 @@ namespace Tour0Suisse.Model
         [Display(Name = "Classement temporaire")]
         public IEnumerable<ViewScoreClassementTemporaire> Classement { get; set; }
         [Display(Name = "Liste de la dotation")]
-        public IEnumerable<IViewDotation> Dotation { get; set; }
+        public IEnumerable<ViewDotation> Dotation { get; set; }
         [Display(Name = "Liste des matches")]
         public IEnumerable<ViewMatch> Matchs { get; set; }
+        [Display(Name = "Liste des rondes")]
+        public IEnumerable<ViewRound> Rounds { get; set; }
         [Display(Name = "Jeu")]
         public string Game { get => jeu.Name; set => jeu.Name = value; }
     }

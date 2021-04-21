@@ -100,7 +100,8 @@ namespace Tour0Suisse.API.Controllers
                 Pplose = t.Pplose,
                 Over = t.Over,
                 Deleted = t.Deleted,
-                Matchs = GetMatchsOfTournament(t.IdTournament)
+                Matchs = GetMatchsOfTournament(t.IdTournament),
+                Rounds = GetRoundsOfTournament(t.IdTournament)
             };
             if (retour.Over)
             {
