@@ -26,6 +26,7 @@ namespace Tour0Suisse.Model
         public string Pseudo { get; set; }
         public int IdDeck { get; set; }
         [Display(Name = "liste du deck")]
+        [Required]
         public string DeckList { get; set; }
         public int IdGame { get; set; }
         [Display(Name = "Jeu")]

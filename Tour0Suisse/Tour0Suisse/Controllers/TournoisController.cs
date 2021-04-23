@@ -40,6 +40,10 @@ namespace Tour0Suisse.Web.Controllers
 
         public async Task<IActionResult> Create()
         {
+            if (!int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
+            {
+                return RedirectToAction("Index");
+            }
             var Jeus = await CallAPI.GetAllJeus();
 
             ViewData["AllGame"] = new SelectList(Jeus, "IdGame", "Name");
@@ -192,8 +196,10 @@ namespace Tour0Suisse.Web.Controllers
                 RetourAPI retourApi = await CallAPI.RegisterTournoi(joueur);
                 if (retourApi.Succes)
                 {
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction("Details", "Tournois", new{id = joueur.IdTournament});
                 }
+
+                ViewBag.error = retourApi.Message;
             }
 
             Tournoi tournoi = await CallAPI.GetTournoiById(joueur.IdTournament);

@@ -31,5 +31,11 @@ namespace Tour0Suisse.Model
         public string Player2 { get; set; }
         [Display(Name = "Pseudo du joueur 2")]
         public string Pseudo2 { get; set; }
+
+        public int VP1 { get; set; }
+        public int Draw { get; set; }
+        public int VP2 { get; set; }
+
+        public string Resultat => VP1 + " - " + VP2;
     }
 }

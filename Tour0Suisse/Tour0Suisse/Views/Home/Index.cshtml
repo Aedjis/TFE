@@ -1,5 +1,7 @@
-﻿@{
+﻿@using Tour0Suisse.Model
+@{
     ViewData["Title"] = "Home Page";
+    @model IEnumerable<Tour0Suisse.Model.ViewTournament>
 }
 
 <div id="myCarousel" class="carousel slide" data-ride="carousel" data-interval="6000">
@@ -51,4 +53,83 @@
         <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
         <span class="sr-only">Next</span>
     </a>
+</div>
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor((model) => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Date)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.MaxNumberPlayer)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.DeckListNumber)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Ppwin)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Ppdraw)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Pplose)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Over)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Game)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in (List<ViewTournament>)ViewBag.NextTournament)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Name)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.MaxNumberPlayer)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.DeckListNumber)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Ppwin)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Ppdraw)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Pplose)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Over)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Game)
+                    </td>
+                    <td>
+                        <a asp-controller="Tournois" asp-action="Details" asp-route-id="@item.IdTournament">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>

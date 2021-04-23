@@ -107,7 +107,7 @@ namespace Tour0Suisse.API.Controllers
             {
                 retour.Resultas = DB_CURD.GetResultasOfTournament(retour.IdTournament);
             }
-            else if(retour.Deleted==null)
+            if(retour.Deleted==null)
             {
                 var c = DB_CURD.GetScoreClassementTemporairesOfTournamnent(retour.IdTournament);
                 retour.Classement = c.Any() ? c : null;

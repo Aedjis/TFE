@@ -260,7 +260,7 @@ ADD CONSTRAINT CK_Tournoi_MaxNumberPlayer__XXXX	CHECK ((MaxNumberPlayer = null) 
 GO
 
 ALTER TABLE [Resultat]
-ADD CONTRAINT FK_Resultat_Joueur_IDTournamentIDUser__XXXX	FOREIGN KEY (ID_Tournament, ID_User)
+ADD CONSTRAINT FK_Resultat_Joueur_IDTournamentIDUser__XXXX	FOREIGN KEY (ID_Tournament, ID_User)
 															REFERENCES [Joueur](ID_Tournament, ID_User)
 --cette contraint pourrais être supprimé dans une optique de minimisation des donnée (si une fois que une tournoi est fini on supprime la liste de ces joueur pour ce référé au resulta pour le retrouvé, non recommandé)
 GO
@@ -278,28 +278,27 @@ ADD CONSTRAINT CK_Match_IDPlayer__XXXX CHECK (ID_PlayerOne <> ID_PlayerTwo)
 GO
 
 ALTER TABLE [Match]
-ADD CONTRAINT FK_Match_Joueur_IDTournamentIDPlayerOne__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerOne)
+ADD CONSTRAINT FK_Match_Joueur_IDTournamentIDPlayerOne__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerOne)
 															REFERENCES [Joueur](ID_Tournament, ID_User)
 GO
 
 ALTER TABLE [Match]
-ADD CONTRAINT FK_Match_Joueur_IDTournamentIDPlayerTwo__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerTwo)
+ADD CONSTRAINT FK_Match_Joueur_IDTournamentIDPlayerTwo__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerTwo)
 															REFERENCES [Joueur](ID_Tournament, ID_User)
 GO
 
 ALTER TABLE [Partie]
-ADD CONTRAINT FK_Partie_Match_IDTournamentRoundNumberIDPlayerOneIDPlayerTwo__XXXX	FOREIGN KEY (ID_Tournament, RoundNumber, ID_PlayerOne, ID_PlayerTwo)
-																					REFERENCES [Match](ID_Tournament, RoundNumber, ID_PlayerOne, ID_PlayerTwo)
--- la référence a player 2 est la pour s'assuré que la partie a raison d'être
+ADD CONSTRAINT FK_Partie_Match_IDTournamentRoundNumberIDPlayerOneIDPlayerTwo__XXXX	FOREIGN KEY (ID_Tournament, RoundNumber, ID_PlayerOne)
+																					REFERENCES [Match](ID_Tournament, RoundNumber, ID_PlayerOne)
 GO
 
 ALTER TABLE [Partie]
-ADD CONTRAINT FK_Partie_DeckJoueur_IDTournamentIDPlayerOneIDDeckPlayerOne__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerOne, ID_Deck_PlayerOne)
+ADD CONSTRAINT FK_Partie_DeckJoueur_IDTournamentIDPlayerOneIDDeckPlayerOne__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerOne, ID_Deck_PlayerOne)
 																					REFERENCES [DeckJoueur](ID_Tournament, ID_User, ID_Deck)
 GO
 
 ALTER TABLE [Partie]
-ADD CONTRAINT FK_Partie_DeckJoueur_IDTournamentIDPlayerTwoIDDeckPlayerTwo__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerTwo, ID_Deck_PlayerTwo)
+ADD CONSTRAINT FK_Partie_DeckJoueur_IDTournamentIDPlayerTwoIDDeckPlayerTwo__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerTwo, ID_Deck_PlayerTwo)
 																					REFERENCES [DeckJoueur](ID_Tournament, ID_User, ID_Deck)
 GO
 --____________FIN CREATION CONTRAINT_________________________
@@ -541,7 +540,6 @@ JOIN Utilisateur AS U
 	ON U.ID_User = P.ID_PlayerOne
 LEFT JOIN PseudoIG AS Ps
 	ON Ps.ID_User = U.ID_User AND Ps.ID_Game = T.ID_Game
-WHERE P.ID_Tournament IN (SELECT ID_Tournament FROM Tournoi WHERE [Over] = 0)
 union
 SELECT P.ID_Tournament, RoundNumber, PartNumber, ID_PlayerTWO AS ID_Player, U.Pseudo, Ps.IG_Pseudo,	CASE ResultPart
 																											WHEN 2
@@ -557,11 +555,10 @@ JOIN Utilisateur AS U
 	ON U.ID_User = P.ID_PlayerTwo
 LEFT JOIN PseudoIG AS Ps
 	ON Ps.ID_User = U.ID_User AND Ps.ID_Game = T.ID_Game
-WHERE P.ID_Tournament IN (SELECT ID_Tournament FROM Tournoi WHERE [Over] = 0)
 GO
 
 CREATE VIEW [View_Match] AS
-SELECT M.[ID_Tournament], M.[RoundNumber], R.StartRound, [ID_PlayerOne], U1.Pseudo AS [PlayerOne], P1.IG_Pseudo AS [PseudoPlayerOne], [ID_PlayerTwo], U2.Pseudo AS [PlayerTwo], P2.IG_Pseudo AS [PseudoPlayerTwo]
+SELECT M.[ID_Tournament], M.[RoundNumber], R.StartRound, [ID_PlayerOne], U1.Pseudo AS [PlayerOne], P1.IG_Pseudo AS [PseudoPlayerOne], [ID_PlayerTwo], U2.Pseudo AS [PlayerTwo], P2.IG_Pseudo AS [PseudoPlayerTwo], ResultP1, ResultDraw, ResultP2
 FROM [Match] AS M
 JOIN Tournoi AS T
 	ON T.ID_Tournament = M.ID_Tournament
@@ -575,6 +572,12 @@ LEFT JOIN Utilisateur AS U2
 	ON U2.ID_User = M.ID_PlayerTwo
 LEFT JOIN PseudoIG AS P2
 	ON P2.ID_User = U2.ID_User AND P2.ID_Game = T.ID_Game
+LEFT JOIN	(SELECT ID_Tournament, RoundNumber, ID_Player,	SUM( CASE WHEN Resulta>0 THEN 1 ELSE 0 END) AS ResultP1 , 
+															SUM( CASE WHEN Resulta=0 THEN 1 ELSE 0 END) AS ResultDraw , 
+															SUM( CASE WHEN Resulta<0 THEN 1 ELSE 0 END) AS ResultP2
+				FROM [View_ResultPartPlayer]
+				GROUP BY ID_Tournament, RoundNumber, ID_Player, Pseudo, IG_Pseudo) AS VRP
+	ON VRP.ID_Tournament = M.ID_Tournament AND VRP.RoundNumber = M.RoundNumber AND VRP.ID_Player = M.ID_PlayerOne
 GO
 
 CREATE VIEW [View_ResultMatchPlayer] AS
@@ -1060,7 +1063,7 @@ CREATE PROCEDURE SP_EditTournoi
 	@ID_Game INT =NULL,
 	@Description TEXT = NULL,
 	@MaxNumberPlayer INT =NULL,
-	@Dotation List_Pairing = null readonly,
+	@Dotation List_Pairing readonly,
 	@DeckListNumber INT =NULL,
 	@PPWin INT =NULL,
 	@PPDraw INT =NULL,
@@ -1277,6 +1280,10 @@ BEGIN
 			if( @ID_User IS NULL OR (SELECT COUNT(1) FROM Utilisateur WHERE (ID_User = @ID_User and DELETED is null)) <> 1)
 				Begin
 					RAISERROR('L utilisateur est introuvable',16,1);
+				End
+			if( (SELECT COUNT(1) FROM Joueur WHERE (ID_User = @ID_User and ID_Tournament = @ID_Tournoi)) <>0)
+				Begin
+					RAISERROR('L utilisateur est déjà instrit au tournoi',16,1);
 				End
 			if((SELECT COUNT(1) FROM @ListDeck) > (SELECT [DeckListNumber] FROM Tournoi WHERE ID_Tournament = @ID_Tournoi))
 				Begin

@@ -1,4 +1,5 @@
-﻿@model IEnumerable<Tour0Suisse.Model.ViewTournament>
+﻿@using Microsoft.AspNetCore.Http
+@model IEnumerable<Tour0Suisse.Model.ViewTournament>
 
 @{
     ViewData["Title"] = "Index";
@@ -7,7 +8,10 @@
 <h2>Index</h2>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    @if (bool.TryParse(Context.Session.GetString("Orga"), out bool Orga) && Orga)
+    {
+        <a asp-action="Create">Creer un nouveau tournoi</a>
+    }
 </p>
 <table class="table">
     <thead>

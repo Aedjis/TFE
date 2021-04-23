@@ -271,7 +271,7 @@ using Tour0Suisse;
             WriteLiteral("\r\n                </td>\r\n                <td>\r\n                    ");
             EndContext();
             BeginContext(2437, 95, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "1d5550696e2a4d70a956e5d59004fbe3", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "010daeec074e499985e86e53607592e9", async() => {
                 BeginContext(2521, 7, true);
                 WriteLiteral("Details");
                 EndContext();
@@ -308,7 +308,7 @@ using Tour0Suisse;
             WriteLiteral(" |\r\n                    ");
             EndContext();
             BeginContext(2556, 89, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "072edc8f5c4e414fab2d34c572480591", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "62e44c923fb4496dae752889dbbd50b0", async() => {
                 BeginContext(2637, 4, true);
                 WriteLiteral("Edit");
                 EndContext();
@@ -345,7 +345,7 @@ using Tour0Suisse;
             WriteLiteral("|\r\n                    ");
             EndContext();
             BeginContext(2668, 90, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "372cda52d7da418fba88073923fd430a", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "1b4dc47e7b4d4bafb6e4058d53cf9a88", async() => {
                 BeginContext(2749, 5, true);
                 WriteLiteral("Admin");
                 EndContext();

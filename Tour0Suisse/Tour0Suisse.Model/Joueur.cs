@@ -11,7 +11,8 @@ namespace Tour0Suisse.Model
         public Joueur()
         {
             User = new ViewUser();
-           
+            Tournament = new ViewTournament();
+
         }
 
         

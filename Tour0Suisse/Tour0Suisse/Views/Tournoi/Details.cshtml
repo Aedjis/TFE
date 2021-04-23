@@ -79,13 +79,13 @@
         </dd>
     </dl>
 </div>
-<div class="row col-lg-12">
+<div class="row">
     <h2>Rondes</h2>
     <ul class="nav nav-tabs">
-        <li><a class="navbar-link" data-toggle="tab" href="#Participant">Participant</a></li>
-        <li><a class="navbar-link @((Model.Classement.Any())? "":"disable")" data-toggle="tab" href="#Classement">Classement</a></li>
-        <li><a class="navbar-link @((Model.Rounds.Any())? "":"disable")" data-toggle="tab" href="#Ronde">Ronde</a></li>
-        <li><a class="navbar-link @((Model.Resultas.Any())? "":"disable")" data-toggle="tab" href="#Resultat">Resultat</a></li>
+        <li><a class="navbar-link disabled" data-toggle="tab" href="#Participant">Participant</a></li>
+        <li @((Model.Classement == null || !Model.Classement.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Classement == null || !Model.Classement.Any())? "":"data-toggle=tab") href="#Classement">Classement</a></li>
+        <li @((Model.Classement == null || !Model.Rounds.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Classement == null || !Model.Rounds.Any())? "":"data-toggle=tab") href="#Ronde">Ronde</a></li>
+        <li @((Model.Classement == null || !Model.Resultas.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Classement == null || !Model.Resultas.Any())? "":"data-toggle=tab") href="#Resultat">Resultat</a></li>
         <li><a class="navbar-link" data-toggle="tab" href="#Admin">Admin</a></li>
     </ul>
     <div class="tab-content">
@@ -113,15 +113,18 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var particpant in Model.Participants)
+                        @if (Model.Participants != null)
                         {
-                            <tr>
-                                <td>@Html.DisplayFor(p=>particpant.Pseudo)</td>
-                                <td>@Html.DisplayFor(p=>particpant.IGPseudo)</td>
-                                <td>@Html.DisplayFor(p => particpant.RegisterDate)</td>
-                                <td>@Html.DisplayFor(p => particpant.CheckIn)</td>
-                                <td>@Html.DisplayFor(p => particpant.Drop)</td>
-                            </tr>
+                            @foreach (var particpant in Model.Participants)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(p => particpant.Pseudo)</td>
+                                    <td>@Html.DisplayFor(p => particpant.IGPseudo)</td>
+                                    <td>@Html.DisplayFor(p => particpant.RegisterDate)</td>
+                                    <td>@Html.DisplayFor(p => particpant.CheckIn)</td>
+                                    <td>@Html.DisplayFor(p => particpant.Drop)</td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
@@ -154,16 +157,19 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var classement in Model.Classement.OrderByDescending(c=>c.Score))
+                        @if (Model.Classement != null)
                         {
-                            <tr>
-                                <td>@Html.DisplayFor(c=>classement.Pseudo)</td>
-                                <td>@Html.DisplayFor(c => classement.IGPseudo)</td>
-                                <td>@Html.DisplayFor(c => classement.Score)</td>
-                                <td>@Html.DisplayFor(c => classement.Victoire)</td>
-                                <td>@Html.DisplayFor(c => classement.Egaliter)</td>
-                                <td>@Html.DisplayFor(c => classement.Defaite)</td>
-                            </tr>
+                            @foreach (var classement in Model.Classement.OrderByDescending(c => c.Score))
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(c => classement.Pseudo)</td>
+                                    <td>@Html.DisplayFor(c => classement.IGPseudo)</td>
+                                    <td>@Html.DisplayFor(c => classement.Score)</td>
+                                    <td>@Html.DisplayFor(c => classement.Victoire)</td>
+                                    <td>@Html.DisplayFor(c => classement.Egaliter)</td>
+                                    <td>@Html.DisplayFor(c => classement.Defaite)</td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
@@ -171,96 +177,99 @@
         </div>
         <div id="Ronde" class="tab-pane fade">
             --Ronde--
-                        
-            @if (Model.Rounds.Any())
-            {
-                <div class="container">
-                    <ul class="nav nav-tabs">
-                        @foreach (var round in Model.Rounds)
-                        {
-                            <li><a data-toggle="tab" href="@("#Ronde"+round.RoundNumber)">@("Ronde n°"+round.RoundNumber)</a></li>
-                        }
-                    </ul>
-                </div>
-                <div class="tab-content">
-                    @foreach (var round in Model.Rounds)
-                    {
-                        <div id="@("Ronde" + round.RoundNumber)" class="tab-pane fade">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>
-                                            @Html.DisplayName("Début de round")
-                                        </th>
-                                        <th>
-                                            @Html.DisplayName("Fin de round")
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            @{ string Start = (round.StartRound == null) ? "" : ((DateTime)round.StartRound).ToLocalTime().ToString();} @(Start)
-                                        </td>
-                                        <td>
-                                            @{ string End = (round.EndRound == null) ? "" : ((DateTime)round.EndRound).ToLocalTime().ToString();} @(End)
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            @if (Model.Matchs.Any(m => m.RoundNumber == round.RoundNumber))
-                            {
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th style="text-align:left">
-                                                @Html.DisplayName("Joueur 1")
-                                            </th>
-                                            <th style="text-align:left">
-                                                @Html.DisplayName("Pseudo Joueur 1")
-                                            </th>
-                                            <th style="text-align:center">
-                                                ???
-                                            </th>
-                                            <th style="text-align:right">
-                                                @Html.DisplayName("Pseudo Joueur 2")
-                                            </th>
-                                            <th style="text-align:right">
-                                                @Html.DisplayName("Joueur 2")
-                                            </th>
+              @if (Model.Rounds != null)
+              {
+                  @if (Model.Rounds.Any())
+                  {
+                      <div class="container">
+                          <ul class="nav nav-tabs">
+                              @foreach (var round in Model.Rounds)
+                              {
+                                  <li><a data-toggle="tab" href="@("#Ronde" + round.RoundNumber)">@("Ronde n°" + round.RoundNumber)</a></li>
+                              }
+                          </ul>
+                      </div>
+                      <div class="tab-content">
+                          @foreach (var round in Model.Rounds)
+                          {
+                              <div id="@("Ronde" + round.RoundNumber)" class="tab-pane fade">
+                                  <table class="table">
+                                      <thead>
+                                      <tr>
+                                          <th>
+                                              @Html.DisplayName("Début de round")
+                                          </th>
+                                          <th>
+                                              @Html.DisplayName("Fin de round")
+                                          </th>
+                                      </tr>
+                                      </thead>
+                                      <tbody>
+                                      <tr>
+                                          <td>
+                                              @{ string Start = (round.StartRound == null) ? "" : ((DateTime) round.StartRound).ToLocalTime().ToString(); }
+                                              @(Start)
+                                          </td>
+                                          <td>
+                                              @{ string End = (round.EndRound == null) ? "" : ((DateTime) round.EndRound).ToLocalTime().ToString(); }
+                                              @(End)
+                                          </td>
+                                      </tr>
+                                      </tbody>
+                                  </table>
+                                  @if (Model.Matchs.Any(m => m.RoundNumber == round.RoundNumber))
+                                  {
+                                      <table class="table">
+                                          <thead>
+                                          <tr>
+                                              <th style="text-align: left">
+                                                  @Html.DisplayName("Joueur 1")
+                                              </th>
+                                              <th style="text-align: left">
+                                                  @Html.DisplayName("Pseudo Joueur 1")
+                                              </th>
+                                              <th style="text-align: center">
+                                                  @Html.DisplayName("Score")
+                                              </th>
+                                              <th style="text-align: right">
+                                                  @Html.DisplayName("Pseudo Joueur 2")
+                                              </th>
+                                              <th style="text-align: right">
+                                                  @Html.DisplayName("Joueur 2")
+                                              </th>
 
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach (var item in Model.Matchs.Where(m => m.RoundNumber == round.RoundNumber))
-                                        {
-                                            <tr>
-                                                <td style="text-align:left">
-                                                    @Html.DisplayFor(modelItem => item.Player1)
-                                                </td>
-                                                <td style="text-align:left">
-                                                    @Html.DisplayFor(modelItem => item.Pseudo1)
-                                                </td>
-                                                <td style="text-align:center">
-                                                    ???
-                                                </td>
-                                                <td style="text-align:right">
-                                                    @Html.DisplayFor(modelItem => item.Pseudo2)
-                                                </td>
-                                                <td style="text-align:right">
-                                                    @Html.DisplayFor(modelItem => item.Player2)
-                                                </td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            }
-                        </div>
-                    }
-                    </div>
-                    
-            }
+                                          </tr>
+                                          </thead>
+                                          <tbody>
+                                          @foreach (var item in Model.Matchs.Where(m => m.RoundNumber == round.RoundNumber))
+                                          {
+                                              <tr>
+                                                  <td style="text-align: left">
+                                                      @Html.DisplayFor(modelItem => item.Player1)
+                                                  </td>
+                                                  <td style="text-align: left">
+                                                      @Html.DisplayFor(modelItem => item.Pseudo1)
+                                                  </td>
+                                                  <td style="text-align: center">
+                                                      @Html.DisplayFor(modelItem => item.Resultat)
+                                                  </td>
+                                                  <td style="text-align: right">
+                                                      @Html.DisplayFor(modelItem => item.Pseudo2)
+                                                  </td>
+                                                  <td style="text-align: right">
+                                                      @Html.DisplayFor(modelItem => item.Player2)
+                                                  </td>
+                                              </tr>
+                                          }
+                                          </tbody>
+                                      </table>
+                                  }
+                              </div>
+                          }
+                      </div>
 
+                  }
+              }
         </div>
         <div id="Resultat" class="tab-pane fade">
             --Resultat--
@@ -304,21 +313,24 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach (var resulta in Model.Resultas.OrderBy(r=>r.Rank))
+                        @if (Model.Resultas != null)
                         {
-                            <tr>
-                                <td>@Html.DisplayFor(r => resulta.Rank)</td>
-                                <td>@Html.DisplayFor(r => resulta.Pseudo)</td>
-                                <td>@Html.DisplayFor(r => resulta.IGPseudo)</td>
-                                <td>@Html.DisplayFor(r => resulta.Gain)</td>
-                                <td>@Html.DisplayFor(r => resulta.Score)</td>
-                                <td>@Html.DisplayFor(r => resulta.TieBreaker)</td>
-                                @*<td>@Html.DisplayFor(r => resulta.Victoire)</td>
-                                <td>@Html.DisplayFor(r => resulta.Egaliter)</td>
-                                <td>@Html.DisplayFor(r => resulta.Defaite)</td>*@
-                                <td>@Html.DisplayFor(r => resulta.AdditionalTieBreaker)</td>
-                                <td>@Html.DisplayFor(r => resulta.AdditionalTieBreakerRules)</td>
-                            </tr>
+                            @foreach (var resulta in Model.Resultas.OrderBy(r => r.Rank))
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(r => resulta.Rank)</td>
+                                    <td>@Html.DisplayFor(r => resulta.Pseudo)</td>
+                                    <td>@Html.DisplayFor(r => resulta.IGPseudo)</td>
+                                    <td>@Html.DisplayFor(r => resulta.Gain)</td>
+                                    <td>@Html.DisplayFor(r => resulta.Score)</td>
+                                    <td>@Html.DisplayFor(r => resulta.TieBreaker)</td>
+                                    @*<td>@Html.DisplayFor(r => resulta.Victoire)</td>
+                                    <td>@Html.DisplayFor(r => resulta.Egaliter)</td>
+                                    <td>@Html.DisplayFor(r => resulta.Defaite)</td>*@
+                                    <td>@Html.DisplayFor(r => resulta.AdditionalTieBreaker)</td>
+                                    <td>@Html.DisplayFor(r => resulta.AdditionalTieBreakerRules)</td>
+                                </tr>
+                            }
                         }
                     </tbody>
                     </table>
@@ -342,13 +354,16 @@
                     </tr>
                     </thead>
                     <tbody>
-                        @foreach (var orga in Model.Organisateurs)
+                        @if (Model.Organisateurs != null)
                         {
-                            <tr>
-                                <td>@Html.DisplayFor(o=>orga.Pseudo)</td>
-                                <td>@Html.DisplayFor(o=>orga.Level)</td>
-                                <td>???</td>
-                            </tr>
+                            @foreach (var orga in Model.Organisateurs)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(o => orga.Pseudo)</td>
+                                    <td>@Html.DisplayFor(o => orga.Level)</td>
+                                    <td>???</td>
+                                </tr>
+                            }
                         }
                     </tbody>
                 </table>
@@ -356,18 +371,19 @@
         </div>
     </div>
 </div>
-<div>
+<div class="row">
     @{
         if (int.TryParse(Context.Session.GetString("UserId"), out int Uid))
         {
             if (Model.Organisateurs.Any(o => o.IdUser == Uid))
             {
-                <a asp-action="Edit" asp-route-id="@Model.IdTournament">Edit</a> 
+                <a asp-action="Edit" asp-route-id="@Model.IdTournament">Edit</a> @("|")
                 <a asp-controller="Admin" asp-action="Tournoi" asp-route-id="@Model.IdTournament">Admin</a>
             }
             else if (Model.Participants.Any(p => p.IdUser == Uid))
             {
-                <a asp-action="DeckList" asp-route-id="@Model.IdTournament">Edit</a>
+                <a asp-action="DeckList" asp-route-id="@Model.IdTournament">Modifier ces decks</a> @("|")
+                <a asp-action="Unregister" asp-route-id="@Model.IdTournament">Ce désinscrire</a>
             }
             else
             {

@@ -28,7 +28,7 @@ namespace Tour0Suisse.Web.Controllers
         public ActionResult LogOff()
         {
             HttpContext.Session.Clear();
-            return View("~/Views/Home/Index.cshtml");
+            return RedirectToAction("Index", "Home");
         }
 
 
@@ -42,10 +42,12 @@ namespace Tour0Suisse.Web.Controllers
                     HttpContext.Session.SetString("UserId", Logged.IdUser.ToString());
                     HttpContext.Session.SetString("User", Logged.Pseudo);
                     HttpContext.Session.SetString("Orga", Logged.Organizer.ToString());
-                    return View("~/Views/Home/Index.cshtml");
+                    return RedirectToAction("Index", "Home");
                 }
+
+                ViewBag.error = "La combinaison mot de passe + adresse mail n'existe pas.";
             }
-           
+
             return View("~/Views/User/Connexion.cshtml", user);
         }
 
@@ -84,18 +86,13 @@ namespace Tour0Suisse.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                using (var httpClient = new HttpClient())
+                RetourAPI retourApi = await CallAPI.InsertUser(user);
+                if (retourApi.Succes)
                 {
-                    using (var response = await httpClient.PostAsJsonAsync("https://localhost:44321/Procedure/CreateUser", user))
-                    {
-                        string apiResponse = await response.Content.ReadAsStringAsync();
-                        RetourAPI retourApi = await CallAPI.InsertUser(user);
-                        if (retourApi.Succes)
-                        {
-                            return View("~/Views/User/InscriptionReussie.cshtml");
-                        }
-                    }
+                    return View("~/Views/User/InscriptionReussie.cshtml");
                 }
+
+                ViewBag.error = retourApi.Message;
             }
 
             return View("~/Views/User/Inscription.cshtml", user);
@@ -120,7 +117,7 @@ namespace Tour0Suisse.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdUser,Pseudo,Email,Password,Organizer,Deleted")]
+        public async Task<IActionResult> Edit(int id, [Bind("IdUser,Pseudo,Email,Password,OldPassword,Organizer,Deleted")]
             Utilisateur utilisateur)
         {
             if (!int.TryParse(HttpContext.Session.GetString("UserId"), out int SessionId) || id != utilisateur.IdUser || SessionId != utilisateur.IdUser)
@@ -139,6 +136,9 @@ namespace Tour0Suisse.Web.Controllers
                         RetourAPI retourApi = JsonConvert.DeserializeObject<RetourAPI>(apiResponse);
                         if (retourApi.Succes)
                         {
+                            HttpContext.Session.SetString("UserId", utilisateur.IdUser.ToString());
+                            HttpContext.Session.SetString("User", utilisateur.Pseudo);
+                            HttpContext.Session.SetString("Orga", utilisateur.Organizer.ToString());
                             return RedirectToAction("Details", new {id = utilisateur.IdUser});
                         }
                     }

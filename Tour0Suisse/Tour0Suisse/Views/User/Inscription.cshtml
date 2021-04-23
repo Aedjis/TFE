@@ -9,6 +9,13 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
+        @if (ViewBag.error != null)
+        {
+            <div class="warning">
+                <span class="text-danger">@( (string)@ViewBag.error )</span>
+            </div>
+        }
+        
 
         <form asp-controller="User" asp-action="Create" method="post" class="form-horizontal">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>

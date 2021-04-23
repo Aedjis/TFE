@@ -123,6 +123,11 @@ namespace Tour0Suisse.Model
             }
         }
 
-        public byte[] BinaryOldPassword => _OldPassword;
-    }
+        public byte[] BinaryOldPassword
+        {
+            get => _OldPassword;
+
+            set => _OldPassword = value;
+        }
+}
 }

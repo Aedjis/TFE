@@ -754,7 +754,7 @@ namespace Tour0Suisse.Repository
                 SqlConnection db = new SqlConnection(_ConnectionString);
 
                 string querry =
-                    "SELECT [ID_Tournament], [RoundNumber], [ID_PlayerOne], [PlayerOne], [PseudoPlayerOne], [ID_PlayerTwo], [PlayerTwo], [PseudoPlayerTwo] From [View_Match] " +
+                    "SELECT [ID_Tournament], [RoundNumber], [ID_PlayerOne], [PlayerOne], [PseudoPlayerOne], [ID_PlayerTwo], [PlayerTwo], [PseudoPlayerTwo], ResultP1, ResultDraw, ResultP2 From [View_Match] " +
                     Where;
 
                 SqlCommand cmd = db.CreateCommand();
@@ -774,7 +774,10 @@ namespace Tour0Suisse.Repository
                         Pseudo1 = reader["PseudoPlayerOne"].ToString(),
                         IdPlayer2 = int.Parse(reader["ID_PlayerTwo"].ToString()),
                         Player2 = reader["PlayerTwo"].ToString(),
-                        Pseudo2 = reader["PseudoPlayerTwo"].ToString()
+                        Pseudo2 = reader["PseudoPlayerTwo"].ToString(), 
+                        VP1 = int.TryParse(reader["ResultP1"].ToString(), out int vp1)? vp1:0,
+                        Draw = int.TryParse(reader["ResultDraw"].ToString(), out int draw) ? draw : 0,
+                        VP2 = int.TryParse(reader["ResultP2"].ToString(), out int vp2) ? vp2 : 0
                     });
 
 
@@ -1130,6 +1133,10 @@ namespace Tour0Suisse.Repository
             string password = string.IsNullOrEmpty(Utilisateur.HexaOldPassword)
                 ? Utilisateur.HexaPassword
                 : Utilisateur.HexaOldPassword;
+            if (string.IsNullOrEmpty(password) || Utilisateur.IdUser <= 0)
+            {
+                return false;
+            }
 
             List<ViewUser> User = _ViewUsers("WHERE  ID_User = '" + Utilisateur.IdUser + "' AND [Password] = " +
                                              password).Where(u => u.Deleted == null).ToList();

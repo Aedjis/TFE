@@ -18,7 +18,7 @@ namespace Tour0Suisse.Web.Controllers
             
 
             ViewBag.NextTournament = listTournois.Where(t => t.Date > DateTime.Now && !t.Over && t.Deleted == null)
-                .OrderBy(t => t.Date).Take(15).TakeLast(10);
+                .OrderBy(t => t.Date).Take(15).TakeLast(10).ToList();
 
             return View();
         }

@@ -35,19 +35,19 @@ namespace Tour0Suisse.Web.Controllers
                 return NotFound();
             }
 
-            if (tournoi.Over)
-            {
-                return RedirectToAction("Index");
-            }
+            //if (tournoi.Over)
+            //{
+            //    return RedirectToAction("Index");
+            //}
 
-            ViewData["Tournoi"] = tournoi;
-            List<Round> rounds = new List<Round>();
-            foreach (var vr in await CallAPI.GetRounds(tournoi.IdTournament))
-            {
-                rounds.Add(vr.CreateRoundFromView(tournoi.Matchs));
-            }
+            //ViewData["Tournoi"] = tournoi;
+            //List<Round> rounds = new List<Round>();
+            //foreach (var vr in await CallAPI.GetRounds(tournoi.IdTournament))
+            //{
+            //    rounds.Add(vr.CreateRoundFromView(tournoi.Matchs));
+            //}
 
-            return View("~/Views/Admin/Tournoi.cshtml", rounds);
+            return View("~/Views/Admin/Tournoi.cshtml", tournoi);
         }
 
         public async Task<IActionResult> Start(int id)
