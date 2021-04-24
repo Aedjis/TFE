@@ -73,7 +73,7 @@ using Microsoft.AspNetCore.Http;
             WriteLiteral("        ");
             EndContext();
             BeginContext(254, 51, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "781c7a8486864606a621a35640317c46", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "cd4cdfaee233491abed567f3e0a9de41", async() => {
                 BeginContext(277, 24, true);
                 WriteLiteral("Creer un nouveau tournoi");
                 EndContext();
@@ -311,7 +311,7 @@ using Microsoft.AspNetCore.Http;
             WriteLiteral("\r\n            </td>\r\n            <td>\r\n                ");
             EndContext();
             BeginContext(2491, 69, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "b215ecb7bc2640e8b4c687a7bc1a1039", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "d4463f15ac3749419f486b115f95e437", async() => {
                 BeginContext(2549, 7, true);
                 WriteLiteral("Details");
                 EndContext();

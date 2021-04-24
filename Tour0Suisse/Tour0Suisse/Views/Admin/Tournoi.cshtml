@@ -164,7 +164,7 @@
                     }
                     @if (round.RoundNumber == Model.Rounds.Max(m => m.RoundNumber))
                     {
-                        if (!Model.Matchs.Any())
+                        if (Model.Matchs.All(m => m.RoundNumber != round.RoundNumber))
                         {
                             <form asp-action="Pairing" asp-route-id="@Model.IdTournament" asp-route-round="@(round.RoundNumber)">
                                 <input type="submit" value="crée tout les matchs" class="btn btn-default" />
