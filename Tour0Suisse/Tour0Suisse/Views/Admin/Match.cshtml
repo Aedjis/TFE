@@ -1,33 +1,28 @@
 ﻿@using Tour0Suisse.Model
+@using Microsoft.AspNetCore.Http
 @model Tour0Suisse.Model.Match
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Match";
 }
-
-
-<script>
-    function ShowDeck(selectObject) {
-
-        //var BaseId = "#" + selectObject.id;
-        //var value = selectObject.value;
-
-        //var i;
-        //for (i = 0; i < selectObject.length; i++) {
-        //    $(BaseId + "_" + $(BaseId)[0].options[i].value).collapse("hide");
-        //    console.log(BaseId);
-        //}
-        //$(BaseId + "_" + value).collapse("show");
-
-    }
-</script>
-
-<h2>Edit</h2>
 
 <h4>Match</h4>
 <hr />
+@if (ViewBag.error != null)
+{
+    <div class="warning">
+        <span class="text-danger">@( (string)@ViewBag.error )</span>
+    </div>
+}
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-lg-3 text-center">
+        @foreach (var deck in (IEnumerable<ViewDeck>)ViewData["DecksP1"])
+        {
+            <h4>@deck.IdDeck</h4>
+            <textarea readonly class="text-info">@(deck.DeckList)</textarea>
+        }
+    </div>
+    <div class="col-lg-6 text-center">
         <form asp-action="UpdateMatch" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="IdTournament" />
@@ -37,41 +32,56 @@
 
             @if (Model.Parties.Any())
             {
-                <div class="container table-bordered">
-                    @for (int i = 0; i < Model.Parties.Count; i++)  //do not change for foreach, it will not work any more
-                    {
-                        <input asp-for="@Model.Parties[i].PartNumber" hidden />
-                        <div class="form-group row">
-                            <div class="col-sm">
-                                <label asp-for="@Model.Parties[i].Deck1" class="control-label"></label>
-                                <select asp-for="@Model.Parties[i].IdDeckPlayer1" asp-items="@(new SelectList((IEnumerable<ViewDeck>)ViewData["DecksP1"], "IdDeck", "IdDeck", @Model.Parties[i].IdDeckPlayer1))" onchange="ShowDeck(this)" id="@("SelectP1_partie"+@Model.Parties[i].PartNumber)"></select>
-                                @foreach (var deck in (IEnumerable<ViewDeck>)ViewData["DecksP1"])
-                                {
-                                    <textarea readonly class="collapse" id="@("SelectP1_partie"+@Model.Parties[i].PartNumber+"_"+deck.IdDeck)">@(deck.DeckList)</textarea>
-                                }
-                                <span asp-validation-for="@Model.Parties[i].Deck1" class="text-danger"></span>
-                            </div>
-                            <div class="col-sm">
-                                <label asp-for="@Model.Parties[i].ResultPart"></label>
-                                <select asp-for="@Model.Parties[i].sResultPart" asp-items="@(new SelectList(new SortedList<string, sbyte?>{{"Qui est le gagnant", -1},{"Draw", 0}, {"Joueur 2", 2}, {"Joueur 1", 1} }, "Value", "Key", @Model.Parties[i].sResultPart))"></select>
-                            </div>
-                            <div class="col-sm">
-                                <label asp-for="@Model.Parties[i].Deck2" class="control-label"></label>
-                                <select asp-for="@Model.Parties[i].IdDeckPlayer2" asp-items="@(new SelectList((IEnumerable<ViewDeck>)ViewData["DecksP2"], "IdDeck", "IdDeck", @Model.Parties[i].IdDeckPlayer2))" onchange="ShowDeck(this)" id="@("SelectP2_partie"+@Model.Parties[i].PartNumber)"></select>
-                                @foreach (var deck in (IEnumerable<ViewDeck>)ViewData["DecksP2"])
-                                {
-                                    <textarea readonly class="collapse" id="@("SelectP2_partie"+@Model.Parties[i].PartNumber+"_"+deck.IdDeck)">@(deck.DeckList)</textarea>
-                                }
-                                <span asp-validation-for="@Model.Parties[i].Deck2" class="text-danger"></span>
-                            </div>
-                        </div>
-                    }
-                </div>
+                <table class="table-responsive col-lg-12">
+                    <thead>
+                        <tr>
+                            <th class="text-center">
+                                @Html.DisplayNameFor(m => m.Parties[0].Deck1)
+                            </th>
+                            <th class="text-center">
+                                @Html.DisplayNameFor(m => m.Parties[0].ResultPart)
+                            </th>
+                            <th class="text-center">
+                                @Html.DisplayNameFor(m => m.Parties[0].Deck2)
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Parties.Count; i++) //do not change for foreach, it will not work any more
+                        {
+                            <tr>
+                                <input asp-for="@Model.Parties[i].PartNumber" hidden />
+
+                                <td class="text-center">
+                                    <select asp-for="@Model.Parties[i].IdDeckPlayer1" asp-items="@(new SelectList(((IEnumerable<ViewDeck>) ViewData["DecksP1"]).Append(new ViewDeck()), "IdDeck", "IdDeck", @Model.Parties[i].IdDeckPlayer1))" class="form-control text-center"></select>
+                                    <span asp-validation-for="@Model.Parties[i].Deck1" class="text-danger"></span>
+                                </td>
+                                <td class="text-center">
+                                    <select asp-for="@Model.Parties[i].sResultPart" asp-items="@(new SelectList(new SortedList<string, sbyte?> {{"Qui est le gagnant", -1}, {"Draw", 0}, {"Joueur 2", 2}, {"Joueur 1", 1}}, "Value", "Key", @Model.Parties[i].sResultPart))" class="form-control text-center"></select>
+                                </td>
+                                <td class="text-center">
+                                    <select asp-for="@Model.Parties[i].IdDeckPlayer2" asp-items="@(new SelectList(((IEnumerable<ViewDeck>) ViewData["DecksP2"]).Append(new ViewDeck()), "IdDeck", "IdDeck", @Model.Parties[i].IdDeckPlayer2))" class="form-control text-center"></select>
+                                    <span asp-validation-for="@Model.Parties[i].Deck2" class="text-danger"></span>
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             }
+
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
+                    <input type="submit" value="Save" class="btn btn-default" />
+                </div>
+            
         </form>
+    </div>
+    <div class="col-lg-3 text-center">
+        @foreach (var deck in (IEnumerable<ViewDeck>)ViewData["DecksP2"])
+        {
+            <h4>@deck.IdDeck</h4>
+            <textarea readonly class="text-info">@(deck.DeckList)</textarea>
+        }
     </div>
 </div>
 

@@ -103,6 +103,11 @@ namespace Tour0Suisse.Web.Procedure
             return await _PostT("/Procedure/CreateMatchAllPairing", Round);
         }
 
+        public static async Task<RetourAPI> CreatePartie(ViewPartie Partie)
+        {
+            return await _PostT("/Procedure/CreatePartie", Partie);
+        }
+
         public static async Task<RetourAPI> CreateOrUpdatePartie(ViewPartie Partie)
         {
             return await _PostT("/Procedure/CreateOrUpdatePartie", Partie);
@@ -121,6 +126,16 @@ namespace Tour0Suisse.Web.Procedure
         public static async Task<RetourAPI> EndTournoi(Tournoi Tournoi)
         {
             return await _PostT("/Procedure/EndTournoi", Tournoi);
+        }
+
+        public static async Task<RetourAPI> UnregisterTournoi(Joueur j)
+        {
+            return await _PostT("/Procedure/Unregister", j);
+        }
+
+        public static async Task<RetourAPI> EditDeck(ViewDeck Deck)
+        {
+            return await _PostT("/Procedure/EditDecks", Deck);
         }
     }
 }

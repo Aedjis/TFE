@@ -30,21 +30,43 @@ namespace Tour0Suisse.Model
         [Display(Name = "Liste des decks")]
         public IEnumerable<ViewDeck> Decks
         {
-            get => _decks;
-            set => _decks = value.ToArray();
+            get { return _decks; }
+            set
+            {
+                if(value != null && value.Any()){ _decks = value.ToArray();}
+            }
         }
 
         private ViewDeck[] _decks;
-        public ViewDeck[] Deck 
+        public ViewDeck[] Deck
         {
-            get => _decks;
-            set => _decks = value;
+            get { return _decks; }
+            set { _decks = value; }
         }
 
-        public int IdTournament { get => Tournament.IdTournament; set => Tournament.IdTournament = value; }
-        public string Name { get => Tournament.Name; set => Tournament.Name = value; }
-        public int IdUser { get => User.IdUser; set => User.IdUser = value; }
-        public string Pseudo { get => User.Pseudo; set => User.Pseudo = value; }
+        public int IdTournament
+        {
+            get { return Tournament.IdTournament; }
+            set { Tournament.IdTournament = value; }
+        }
+
+        public string Name
+        {
+            get { return Tournament.Name; }
+            set { Tournament.Name = value; }
+        }
+
+        public int IdUser
+        {
+            get { return User.IdUser; }
+            set { User.IdUser = value; }
+        }
+
+        public string Pseudo
+        {
+            get { return User.Pseudo; }
+            set { User.Pseudo = value; }
+        }
     }
 
     

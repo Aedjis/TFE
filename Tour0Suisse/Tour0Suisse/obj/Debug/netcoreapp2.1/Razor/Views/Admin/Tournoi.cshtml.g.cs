@@ -228,7 +228,7 @@ using Tour0Suisse.Model;
             WriteLiteral("        <div class=\"form-group\">\r\n            ");
             EndContext();
             BeginContext(2004, 174, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "73533ad1703842288c5d8fc8dc6a3714", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "c1223e41819343cd99242171a46d1270", async() => {
                 BeginContext(2064, 107, true);
                 WriteLiteral("\r\n                <input type=\"submit\" value=\"Commencer le tournoi\" class=\"btn btn-default\"/>\r\n            ");
                 EndContext();
@@ -475,7 +475,7 @@ WriteAttributeValue("", 2696, "Ronde" + round.RoundNumber, 2696, 30, false);
             WriteLiteral("\r\n                                    </td>\r\n                                    <td style=\"text-align:center\">\r\n                                        ");
             EndContext();
             BeginContext(5719, 262, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "359e04d76caf49d4af81a1ce09514e62", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "482cac439e004fb495676a3644b36f04", async() => {
                 BeginContext(5848, 43, true);
                 WriteLiteral(" \r\n                                        ");
                 EndContext();
@@ -586,7 +586,7 @@ WriteAttributeValue("", 2696, "Ronde" + round.RoundNumber, 2696, 30, false);
             WriteLiteral("                            ");
             EndContext();
             BeginContext(6858, 248, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "2789d35706664522afd9bfff3446c400", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "3bf2818861624516a3d8a78f04f3774a", async() => {
                 BeginContext(6959, 140, true);
                 WriteLiteral("\r\n                                <input type=\"submit\" value=\"crée tout les matchs\" class=\"btn btn-default\" />\r\n                            ");
                 EndContext();
@@ -642,7 +642,7 @@ WriteAttributeValue("", 2696, "Ronde" + round.RoundNumber, 2696, 30, false);
             WriteLiteral("                            ");
             EndContext();
             BeginContext(7248, 245, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "89e18e4d811f42f1b1bcc99bfe5cb941", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "50e7e900679e403aaa678d147be41106", async() => {
                 BeginContext(7350, 136, true);
                 WriteLiteral("\r\n                                <input type=\"submit\" value=\"Terminé la Round\" class=\"btn btn-default\" />\r\n                            ");
                 EndContext();
@@ -698,7 +698,7 @@ WriteAttributeValue("", 2696, "Ronde" + round.RoundNumber, 2696, 30, false);
             WriteLiteral("                            ");
             EndContext();
             BeginContext(7607, 259, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "f6b3e0a23f46434da399db17926a86a6", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "a1ff6f13e3ef4665938aef1f80e22d39", async() => {
                 BeginContext(7716, 143, true);
                 WriteLiteral("\r\n                                <input type=\"submit\" value=\"Crée la prochaine round\" class=\"btn btn-default\" />\r\n                            ");
                 EndContext();
@@ -765,7 +765,7 @@ WriteAttributeValue("", 2696, "Ronde" + round.RoundNumber, 2696, 30, false);
             WriteLiteral("\r\n    ");
             EndContext();
             BeginContext(12481, 164, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "ffea55bbef7f423e9f7348629f7f54d5", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "f9534f3218284e96a9a72af659ada810", async() => {
                 BeginContext(12547, 91, true);
                 WriteLiteral("\r\n        <input type=\"submit\" value=\"Terminer le tournoi\" class=\"btn btn-default\" />\r\n    ");
                 EndContext();
@@ -810,7 +810,7 @@ WriteAttributeValue("", 2696, "Ronde" + round.RoundNumber, 2696, 30, false);
             WriteLiteral("<div>\r\n    ");
             EndContext();
             BeginContext(12678, 95, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "5317c05d54e547c998676fe0f9e5b7a0", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "14ab93fff7bb4495961fe0226ec121d2", async() => {
                 BeginContext(12763, 6, true);
                 WriteLiteral("Retour");
                 EndContext();
@@ -847,7 +847,7 @@ WriteAttributeValue("", 2696, "Ronde" + round.RoundNumber, 2696, 30, false);
             WriteLiteral("\r\n    | ");
             EndContext();
             BeginContext(12781, 38, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "ad73fd9d266841a5a9ae6ef3aabdbe76", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "cdb657f3d6be43d3b978837bcfdf7e7c", async() => {
                 BeginContext(12803, 12, true);
                 WriteLiteral("Back to List");
                 EndContext();

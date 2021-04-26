@@ -1417,15 +1417,17 @@ BEGIN
 
 			if(@ID_Deck <> 0)
 				BEGIN
-					DELETE DeckJoueur
-					WHERE [ID_Tournament] = @ID_Tournoi AND [ID_User] = @ID_User  AND [ID_Deck] = @ID_Deck
+					UPDATE Deck
+					SET DeckList = @DeckList
+					WHERE [ID_Deck] = @ID_Deck
 				END
 			ELSE IF ((SELECT COUNT(1) FROM DeckJoueur WHERE ID_Tournament = @ID_Tournoi and ID_User = @ID_User) >= (SELECT [DeckListNumber] FROM Tournoi WHERE ID_Tournament = @ID_Tournoi))
 				BEGIN
 					RAISERROR('trop de deck on été soumis',16,1);
 				END
-		
-			SELECT @IDGame = [ID_Game] 
+			ELSE
+				BEGIN
+				 SELECT @IDGame = [ID_Game] 
 				FROM Tournoi
 				WHERE ID_Tournament = @ID_Tournoi
 
@@ -1433,11 +1435,12 @@ BEGIN
 				OUTPUT inserted.ID_Deck INTO @ListID
 				VALUES(@DeckList, @IDGame)
 
-			SELECT ID = @IDDeck 
+			SELECT @IDDeck = ID
 				FROM @ListID
 		
 			INSERT INTO DeckJoueur ([ID_Tournament], [ID_User], [ID_Deck])
 				VALUES(@ID_Tournoi, @ID_User, @IDDeck)
+				END
 
 			COMMIT;
 		END TRY
@@ -2327,12 +2330,12 @@ BEGIN
 					RAISERROR('la le joueur 2 nest pas trouvé parli les participant', 16, 1);
 				END
 
-			if(@ID_Deck_PlayerOne is null or (SELECT COUNT(1) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerOne and ID_User = @ID_PlayerOne and ID_Tournament = @ID_Tournament))>0)
+			if(@ID_Deck_PlayerOne is null or (SELECT COUNT(1) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerOne and ID_User = @ID_PlayerOne and ID_Tournament = @ID_Tournament))<>1)
 				BEGIN
 					RAISERROR('le deck1 nes pas bon', 16, 1);
 				END
 
-			if(@ID_Deck_PlayerTwo is null or (SELECT COUNT(1) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerTwo and ID_User = @ID_PlayerTwo and ID_Tournament = @ID_Tournament))>0)
+			if(@ID_Deck_PlayerTwo is null or (SELECT COUNT(1) FROM [DeckJoueur] WHERE (ID_Deck = @ID_Deck_PlayerTwo and ID_User = @ID_PlayerTwo and ID_Tournament = @ID_Tournament))<>1)
 				BEGIN
 					RAISERROR('le deck2 nes pas bon', 16, 1);
 				END

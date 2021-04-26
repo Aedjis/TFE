@@ -708,7 +708,7 @@ namespace Tour0Suisse.Repository
 
         public Match GetMatcheForPlayerOfTheRound(int IdTournoi, int IdPlayer, int IdRound = -1)
         {
-            string WhereRound = IdRound < 0 ? IdRound.ToString() : WhereTopRoundOfTournament(IdTournoi);
+            string WhereRound = IdRound > 0 ? IdRound.ToString() : WhereTopRoundOfTournament(IdTournoi);
 
 
             var m = _viewMatches("WHERE ID_Tournament = " + IdTournoi + "AND (ID_PlayerOne = " +
@@ -1632,7 +1632,7 @@ namespace Tour0Suisse.Repository
         }
 
 
-        public RetourAPI UnregisterTournoi(DeckJoueur P)
+        public RetourAPI UnregisterTournoi(Joueur J)
         {
             try
             {
@@ -1652,8 +1652,8 @@ namespace Tour0Suisse.Repository
                 SqlCommand cmd = db.CreateCommand();
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.CommandText = "SP_UnregisterTournoi";
-                cmd.Parameters.AddWithValue("@ID_Tournoi", P.IdTournament);
-                cmd.Parameters.AddWithValue("@ID_User", P.IdUser);
+                cmd.Parameters.AddWithValue("@ID_Tournoi", J.IdTournament);
+                cmd.Parameters.AddWithValue("@ID_User", J.IdUser);
                 cmd.Parameters.Add(responseMessage);
                 cmd.Parameters.Add(retour);
 

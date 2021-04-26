@@ -213,5 +213,190 @@ namespace Tour0Suisse.Web.Controllers
             ViewData["Title"] = "S'inscire pour " + tournoi.Name;
             return View("~/Views/Tournoi/Register.cshtml", joueur);
         }
+
+        public async Task<ActionResult> Unregister(int IdTournoi, string error = null)
+        {
+            if (IdTournoi < 1 || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
+            {
+                return NotFound();
+            }
+           
+            Tournoi tournoi = await CallAPI.GetTournoiById(IdTournoi);
+
+            if (tournoi == null || tournoi.Participants.All(p => p.IdUser != IdUser))
+            {
+                return NotFound();
+            }
+
+            ViewBag.error = error;
+            return View("~/Views/Tournoi/Unregister.cshtml", tournoi);
+        }
+
+        // POST: Decks/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Unregister([Bind("IdTournament")] Tournoi Tournoi)
+        {
+            if (Tournoi.IdTournament < 1 || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
+            {
+                return NotFound();
+            }
+
+            var joueur = new Joueur();
+            
+            joueur.User.IdUser = IdUser;
+            joueur.IdTournament = Tournoi.IdTournament;
+
+
+            RetourAPI retourApi = await CallAPI.UnregisterTournoi(joueur);
+            if (retourApi.Succes)
+            {
+                return RedirectToAction("Index");
+            }
+            
+            return RedirectToAction("Unregister", new{ IdTournoi = Tournoi.IdTournament, error = retourApi.Message});
+        }
+
+        public async Task<IActionResult> UpdateMatch(int idT, int rn, int idP1, string error = null)
+        {
+            Match match = await CallAPI.GetMatch(idT, rn, idP1);
+            if (match.IdTournament == 0)
+            {
+                return NotFound();
+            }
+
+            var decksP1 = await CallAPI.GetDeckOfPlayer(match.IdTournament, match.IdPlayer1);
+            ViewData["DecksP1"] = decksP1;
+            var decksP2 = await CallAPI.GetDeckOfPlayer(match.IdTournament, match.IdPlayer2);
+            ViewData["DecksP2"] = decksP2;
+
+            if (!int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser) ||
+                (match.IdPlayer1 != IdUser && match.IdPlayer2 != IdUser))
+            {
+                return View("~/Views/Tournoi/Match.cshtml", match);
+            }
+
+            var empyParties = new List<ViewPartie>
+            {
+                new ViewPartie(), new ViewPartie(), new ViewPartie(), new ViewPartie(), new ViewPartie(),
+                new ViewPartie(), new ViewPartie(), new ViewPartie(), new ViewPartie(), new ViewPartie()
+            };
+
+            if (match.Parties == null)
+            {
+                match.Parties = empyParties;
+            }
+
+            match.Parties = match.Parties.OrderBy(p => p.PartNumber).Concat(empyParties).Take((match.Tournament.DeckListNumber * 2) - 1).ToList();
+            List<ViewPartie> temp = new List<ViewPartie>();
+            int i = 1;
+            foreach (var p in match.Parties)
+            {
+                if (p.PartNumber == 0)
+                {
+                    p.PartNumber = i;
+                    i++;
+                }
+                else if (p.PartNumber >= i)
+                {
+                    i = p.PartNumber + 1;
+                }
+
+                temp.Add(p);
+            }
+
+            match.Parties = temp;
+            ViewBag.error = error;
+            return View("~/Views/Tournoi/Match.cshtml", match);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateMatch([Bind("IdTournament, RoundNumber, IdPlayer1, IdPlayer2, Parties")]
+            Match match)
+        {
+            if (match.IdTournament == 0 || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser) || (match.IdPlayer1 != IdUser && match.IdPlayer2 != IdUser))
+            {
+                return NotFound();
+            }
+
+            var Parties = match.Parties;
+            var retourApis = new List<RetourAPI>();
+            foreach (var p in Parties)
+            {
+                p.IdTournament = match.IdTournament;
+                p.RoundNumber = match.RoundNumber;
+                p.IdPlayer1 = match.IdPlayer1;
+                p.IdPlayer2 = match.IdPlayer2;
+                if (p.ResultPart != null)
+                {
+                    retourApis.Add(await CallAPI.CreatePartie(p));
+                }
+            }
+
+            string error = null;
+            if (retourApis.Count > 0 && retourApis.All(r => r.Succes))
+            {
+                error = "Vérifier que les resulta entré sont correcte!";
+            }
+            return RedirectToAction("UpdateMatch", new{ idT = match.IdTournament, rn = match.RoundNumber, idP1 = match.IdPlayer1, error });
+        }
+
+        public async Task<IActionResult> EditDeck(int IdTournoi, string error = null)
+        {
+            if (IdTournoi < 1 || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
+            {
+                return NotFound();
+            }
+
+            Joueur joueur = await CallAPI.GetJoueur(IdTournoi, IdUser);
+
+            if (joueur == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.error = error;
+            return View("~/Views/Tournoi/EditDeck.cshtml", joueur);
+        }
+
+        // POST: Decks/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditDeck([Bind("Deck, IdTournament")] Joueur joueur)
+        {
+            if (joueur.IdTournament < 1 || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
+            {
+                return NotFound();
+            }
+
+            string error = null;
+            if (ModelState.IsValid)
+            {
+                joueur.User.IdUser = IdUser;
+
+
+                var retourApis = new List<RetourAPI>();
+                foreach (var d in joueur.Decks)
+                {
+                    
+                    retourApis.Add(await CallAPI.EditDeck(d));
+
+                }
+
+                if (retourApis.Count > 0 && retourApis.All(r => r.Succes))
+                {
+                    return RedirectToAction("Details", "Tournois", new { id = joueur.IdTournament });
+                }
+
+                error = string.Join("<br/>", retourApis.Where(r => !(r.Succes)).Select(r => r.Message));
+            }
+
+            return RedirectToAction("EditDeck", new {IdTournoi = joueur.IdTournament, error = error});
+        }
     }
 }

@@ -80,7 +80,7 @@
     </dl>
 </div>
 <div class="row">
-    <h2>Rondes</h2>
+    <h2>Details</h2>
     <ul class="nav nav-tabs">
         <li><a class="navbar-link disabled" data-toggle="tab" href="#Participant">Participant</a></li>
         <li @((Model.Classement == null || !Model.Classement.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Classement == null || !Model.Classement.Any())? "":"data-toggle=tab") href="#Classement">Classement</a></li>
@@ -251,7 +251,7 @@
                                                       @Html.DisplayFor(modelItem => item.Pseudo1)
                                                   </td>
                                                   <td style="text-align: center">
-                                                      @Html.DisplayFor(modelItem => item.Resultat)
+                                                      <a asp-action="UpdateMatch" asp-route-idT="@item.IdTournament" asp-route-rn="@item.RoundNumber" asp-route-idP1="@item.IdPlayer1">@Html.DisplayFor(modelItem => item.Resultat)</a>
                                                   </td>
                                                   <td style="text-align: right">
                                                       @Html.DisplayFor(modelItem => item.Pseudo2)
@@ -378,19 +378,22 @@
             if (Model.Organisateurs.Any(o => o.IdUser == Uid))
             {
                 <a asp-action="Edit" asp-route-id="@Model.IdTournament">Edit</a> @("|")
-                <a asp-controller="Admin" asp-action="Tournoi" asp-route-id="@Model.IdTournament">Admin</a>
+                <a asp-controller="Admin" asp-action="Tournoi" asp-route-id="@Model.IdTournament">Admin</a> @("|")
             }
-            else if (Model.Participants.Any(p => p.IdUser == Uid))
+            else if (!Model.Rounds.Any())
             {
-                <a asp-action="DeckList" asp-route-id="@Model.IdTournament">Modifier ces decks</a> @("|")
-                <a asp-action="Unregister" asp-route-id="@Model.IdTournament">Ce désinscrire</a>
-            }
-            else
-            {
-                <a asp-action="Register" asp-route-id="@Model.IdTournament">S'inscire</a>
+                if (Model.Participants.Any(p => p.IdUser == Uid))
+                {
+                    <a asp-action="EditDeck" asp-route-IdTournoi="@Model.IdTournament">Modifier ces decks</a> @("|")
+                    <a asp-action="Unregister" asp-route-IdTournoi="@Model.IdTournament">Ce désinscrire @Model.IdTournament</a> @("|")
+                }
+                else
+                {
+                    <a asp-action="Register" asp-route-id="@Model.IdTournament">S'inscire</a> @("|")
+                }
             }
 
         }
     }
-    | <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Back to List</a>
 </div>

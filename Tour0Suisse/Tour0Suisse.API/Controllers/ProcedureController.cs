@@ -146,8 +146,7 @@ namespace Tour0Suisse.API.Controllers
         [HttpPost]
         public RetourAPI Unregister(Joueur Joueur)
         {
-            return DB_CURD.UnregisterTournoi(new DeckJoueur
-                {IdDeck = 0, IdTournament = Joueur.IdTournament, IdUser = Joueur.User.IdUser});
+            return DB_CURD.UnregisterTournoi(Joueur);
         }
 
         [HttpPost]

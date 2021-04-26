@@ -128,9 +128,9 @@ namespace Tour0Suisse.Web.Controllers
             }
 
             var decksP1 = await CallAPI.GetDeckOfPlayer(match.IdTournament, match.IdPlayer1);
-            ViewData["DecksP1"] = decksP1.Append(new ViewDeck());
+            ViewData["DecksP1"] = decksP1;
             var decksP2= await CallAPI.GetDeckOfPlayer(match.IdTournament, match.IdPlayer2);
-            ViewData["DecksP2"] = decksP2.Append(new ViewDeck());
+            ViewData["DecksP2"] = decksP2;
 
             var empyParties = new List<ViewPartie>
             {

@@ -234,7 +234,7 @@ Write(ViewData["Message"]);
             WriteLiteral("    ");
             EndContext();
             BeginContext(1912, 91, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "27f9aff5550545f4981dda092a43a811", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "4bf3b9ee6b7543e1a6384f5833cdf2b5", async() => {
                 BeginContext(1971, 28, true);
                 WriteLiteral("Ajouté ou modifié des pseudo");
                 EndContext();
@@ -289,7 +289,7 @@ Write(ViewData["Message"]);
             WriteLiteral("        ");
             EndContext();
             BeginContext(2923, 58, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "23a497e98c8d4543a438287b24cbc994", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "cc601b11945d4e8b8c0466c71e66b593", async() => {
                 BeginContext(2973, 4, true);
                 WriteLiteral("Edit");
                 EndContext();
@@ -332,7 +332,7 @@ Write(ViewData["Message"]);
             WriteLiteral("    ");
             EndContext();
             BeginContext(2997, 40, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "2597fd80cfd84fe9be6ca8e2f5144985", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "39737c0823e645feb5c1c410950e9335", async() => {
                 BeginContext(3021, 12, true);
                 WriteLiteral("Back to List");
                 EndContext();

@@ -1,0 +1,47 @@
+﻿@model Tour0Suisse.Model.Joueur
+
+<h2>Changer</h2>
+
+<h4>Deck</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        @if (ViewBag.error != null)
+        {
+            <div class="warning">
+                <span class="text-danger">@( (string)@ViewBag.error )</span>
+            </div>
+        }
+
+        <form asp-action="EditDeck">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input asp-for="@Model.IdTournament" class="control-label" type="hidden"/>
+
+            @{
+                for (int i = 0; Model.Tournament.DeckListNumber > i; i++)
+                {
+                        <div class="form-group">
+                            <label asp-for="@Model.Deck[i].DeckList" class="control-label"></label>
+                            <input asp-for="Deck[i].IdTournament" type="hidden" />
+                            <input asp-for="Deck[i].IdUser" type="hidden" />
+                            <input asp-for="Deck[i].IdDeck" type="hidden" />
+                            <textarea asp-for="@Model.Deck[i].DeckList" class="form-control" rows="5" pattern="(\w){1,}" required></textarea>
+                            <span asp-validation-for="@Model.Deck[i].DeckList" class="text-danger"></span>
+                        </div>
+                }
+            }
+
+            <div class="form-group">
+                <input type="submit" value="Change" class="btn btn-default"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

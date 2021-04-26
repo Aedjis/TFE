@@ -198,7 +198,7 @@ namespace Tour0Suisse.API.Controllers
 
             Joueur retour = new()
             {
-                IdTournament = j.IdTournament,
+                Tournament = DB_CURD.GetTournament(Idtournoi),
                 User = DB_CURD.GetUser(j.IdUser),
                 IGPseudo = j.IGPseudo,
                 RegisterDate = j.RegisterDate,
