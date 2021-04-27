@@ -92,7 +92,7 @@
         <div id="Participant" class="tab-pane fade">
             --Participant--
             <div class="container">
-                <table class="table">
+                <table class="table List table-striped">
                     <thead>
                         <tr>
                             <th>
@@ -133,7 +133,7 @@
         <div id="Classement" class="tab-pane fade">
             --Classement--
             <div class="container">
-                <table class="table">
+                <table class="table List table-striped">
                     <thead>
                         <tr>
                             <th>
@@ -193,7 +193,7 @@
                           @foreach (var round in Model.Rounds)
                           {
                               <div id="@("Ronde" + round.RoundNumber)" class="tab-pane fade">
-                                  <table class="table">
+                                  <table class="table Details">
                                       <thead>
                                       <tr>
                                           <th>
@@ -219,7 +219,7 @@
                                   </table>
                                   @if (Model.Matchs.Any(m => m.RoundNumber == round.RoundNumber))
                                   {
-                                      <table class="table">
+                                      <table class="table List table-striped">
                                           <thead>
                                           <tr>
                                               <th style="text-align: left">
@@ -274,7 +274,7 @@
         <div id="Resultat" class="tab-pane fade">
             --Resultat--
             <div class="container">
-                <table class="table">
+                <table class="table List table-striped">
                     <thead>
                         <tr>
                             <th>
@@ -339,7 +339,7 @@
         <div id="Admin" class="tab-pane fade">
             --Admin--
             <div class="container">
-                <table class="table">
+                <table class="table List table-striped">
                     <thead>
                     <tr>
                         <th>
@@ -397,3 +397,4 @@
     }
     <a asp-action="Index">Back to List</a>
 </div>
+

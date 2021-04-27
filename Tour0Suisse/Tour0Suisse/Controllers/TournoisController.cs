@@ -27,9 +27,13 @@ namespace Tour0Suisse.Web.Controllers
         // GET: Tournois/Details/5
         public async Task<IActionResult> Details(int id)
         {
+            if(id < 1)
+            {
+                return NotFound();
+            }
             Tournoi tournoi = await CallAPI.GetTournoiById(id);
 
-            if (tournoi == null || tournoi.IdTournament < 1)
+            if (tournoi == null)
             {
                 return NotFound();
             }
@@ -86,12 +90,14 @@ namespace Tour0Suisse.Web.Controllers
         // GET: Tournois/Edit/5
         public async Task<IActionResult> Edit(int id)
         {
-            Tournoi tournoi = await CallAPI.GetTournoiById(id);
+            var temp = await CallAPI.GetTournoi(id);
 
-            if (tournoi == null || tournoi.IdTournament < 1)
+            if (temp.Item1)
             {
                 return NotFound();
             }
+
+            Tournoi tournoi = temp.Item2;
 
             IEnumerable<ViewJeu> Jeus = await CallAPI.GetAllJeus();
 
@@ -130,12 +136,14 @@ namespace Tour0Suisse.Web.Controllers
         // GET: Tournois/Delete/5
         public async Task<IActionResult> Delete(int id)
         {
-            Tournoi tournoi = await CallAPI.GetTournoiById(id);
+            var temp = await CallAPI.GetTournoi(id);
 
-            if (tournoi == null || tournoi.IdTournament < 1)
+            if (temp.Item1)
             {
                 return NotFound();
             }
+
+            Tournoi tournoi = temp.Item2;
 
             return View("~/Views/Tournoi/Delete.cshtml", tournoi);
         }
@@ -157,19 +165,21 @@ namespace Tour0Suisse.Web.Controllers
             }
         }
 
-        public async Task<IActionResult> Register(int? id)
+        public async Task<IActionResult> Register(int id)
         {
-            if (id == null || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
+            if (!int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
             {
                 return NotFound();
             }
 
-            Tournoi tournoi = await CallAPI.GetTournoiById((int)id);
+            var temp = await CallAPI.GetTournoi(id);
 
-            if (tournoi == null || tournoi.IdTournament < 1)
+            if (temp.Item1)
             {
                 return NotFound();
             }
+
+            Tournoi tournoi = temp.Item2;
 
             ViewBag.NbDeck = tournoi.DeckListNumber;
             ViewData["Title"] = "S'inscire pour " + tournoi.Name;
@@ -202,12 +212,14 @@ namespace Tour0Suisse.Web.Controllers
                 ViewBag.error = retourApi.Message;
             }
 
-            Tournoi tournoi = await CallAPI.GetTournoiById(joueur.IdTournament);
+            var temp = await CallAPI.GetTournoi(joueur.IdTournament);
 
-            if (tournoi == null || tournoi.IdTournament < 1)
+            if (temp.Item1)
             {
                 return NotFound();
             }
+
+            Tournoi tournoi = temp.Item2;
 
             ViewBag.NbDeck = tournoi.DeckListNumber;
             ViewData["Title"] = "S'inscire pour " + tournoi.Name;
@@ -221,12 +233,14 @@ namespace Tour0Suisse.Web.Controllers
                 return NotFound();
             }
            
-            Tournoi tournoi = await CallAPI.GetTournoiById(IdTournoi);
+           var temp = await CallAPI.GetTournoi(IdTournoi);
 
-            if (tournoi == null || tournoi.Participants.All(p => p.IdUser != IdUser))
+            if (temp.Item1)
             {
                 return NotFound();
             }
+
+            Tournoi tournoi = temp.Item2;
 
             ViewBag.error = error;
             return View("~/Views/Tournoi/Unregister.cshtml", tournoi);

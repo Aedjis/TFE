@@ -16,6 +16,8 @@ namespace Tour0Suisse.Model
             Dotation = new List<ViewDotation>();
             Matchs = new List<ViewMatch>();
             Rounds = new List<ViewRound>();
+            Name = "";
+            Description = "";
         }
 
         public int IdGame

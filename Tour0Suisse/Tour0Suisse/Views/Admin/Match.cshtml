@@ -14,15 +14,15 @@
         <span class="text-danger">@( (string)@ViewBag.error )</span>
     </div>
 }
-<div class="row">
-    <div class="col-lg-3 text-center">
+<div class="div-row">
+    <div class="text-center div-left">
         @foreach (var deck in (IEnumerable<ViewDeck>)ViewData["DecksP1"])
         {
             <h4>@deck.IdDeck</h4>
             <textarea readonly class="text-info">@(deck.DeckList)</textarea>
         }
     </div>
-    <div class="col-lg-6 text-center">
+    <div class="text-center div-center">
         <form asp-action="UpdateMatch" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="IdTournament" />
@@ -76,7 +76,7 @@
             
         </form>
     </div>
-    <div class="col-lg-3 text-center">
+    <div class="text-center div-right">
         @foreach (var deck in (IEnumerable<ViewDeck>)ViewData["DecksP2"])
         {
             <h4>@deck.IdDeck</h4>

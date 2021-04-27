@@ -39,3 +39,34 @@ body {
     }
 }
 
+table.List {
+    text-align: center;
+    border: 1px solid silver;
+    border-radius: 7px;
+    border-collapse: separate;
+}
+
+
+    table.List thead th {
+        color: whitesmoke;
+        text-align: inherit;
+        background-color: #333333;
+        border-radius: 7px 7px 0 0;
+    }
+
+div.div-row {
+    display: flex;
+   
+}
+
+div.div-left {
+    order: 1;
+}
+div.div-center {
+    order: 50;
+    margin: auto;
+}
+
+div.div-right {
+    order: 100;
+}

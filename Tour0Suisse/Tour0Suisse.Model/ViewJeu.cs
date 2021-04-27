@@ -13,6 +13,11 @@ namespace Tour0Suisse.Model
 
     public class ViewJeu : IViewJeu
     {
+        public ViewJeu()
+        {
+            Name = "";
+        }
+
         public int IdGame { get; set; }
         [Display(Name = "Nom dujeu")]
         public string Name { get; set; }

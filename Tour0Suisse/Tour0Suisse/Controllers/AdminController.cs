@@ -28,40 +28,33 @@ namespace Tour0Suisse.Web.Controllers
 
         public async Task<ActionResult> Tournoi(int id)
         {
-            Tournoi tournoi = await CallAPI.GetTournoiById(id);
+            var temp = await CallAPI.GetTournoi(id);
 
-            if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
+            if (temp.Item1)
             {
                 return NotFound();
             }
 
-            //if (tournoi.Over)
-            //{
-            //    return RedirectToAction("Index");
-            //}
-
-            //ViewData["Tournoi"] = tournoi;
-            //List<Round> rounds = new List<Round>();
-            //foreach (var vr in await CallAPI.GetRounds(tournoi.IdTournament))
-            //{
-            //    rounds.Add(vr.CreateRoundFromView(tournoi.Matchs));
-            //}
+            Tournoi tournoi = temp.Item2;
+            
 
             return View("~/Views/Admin/Tournoi.cshtml", tournoi);
         }
 
         public async Task<IActionResult> Start(int id)
         {
-            Tournoi tournoi = await CallAPI.GetTournoiById(id);
+            var temp = await CallAPI.GetTournoi(id);
 
-            if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
+            if (temp.Item1)
             {
                 return NotFound();
             }
 
+            Tournoi tournoi = temp.Item2;
+
             if (tournoi.Over)
             {
-                return NotFound();
+                return RedirectToAction("Tournoi", new{id});
             }
 
             RetourAPI retour = await CallAPI.StartTournoi(tournoi);
@@ -75,12 +68,14 @@ namespace Tour0Suisse.Web.Controllers
 
         public async Task<IActionResult> EndRound(int id, int round)
         {
-            Tournoi tournoi = await CallAPI.GetTournoiById(id);
+            var temp = await CallAPI.GetTournoi(id);
 
-            if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
+            if (temp.Item1)
             {
                 return NotFound();
             }
+
+            Tournoi tournoi = temp.Item2;
 
             if (tournoi.Over)
             {
@@ -98,12 +93,14 @@ namespace Tour0Suisse.Web.Controllers
 
         public async Task<IActionResult> Pairing(int id, int round)
         {
-            Tournoi tournoi = await CallAPI.GetTournoiById(id);
+            var temp = await CallAPI.GetTournoi(id);
 
-            if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
+            if (temp.Item1)
             {
                 return NotFound();
             }
+
+            Tournoi tournoi = temp.Item2;
 
             if (tournoi.Over)
             {
@@ -222,12 +219,14 @@ namespace Tour0Suisse.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateNextRound(int id, int round)
         {
-            Tournoi tournoi = await CallAPI.GetTournoiById(id);
+            var temp = await CallAPI.GetTournoi(id);
 
-            if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
+            if (temp.Item1)
             {
                 return NotFound();
             }
+
+            Tournoi tournoi = temp.Item2;
 
             if (tournoi.Over)
             {
@@ -273,12 +272,14 @@ namespace Tour0Suisse.Web.Controllers
         
         public async Task<IActionResult> EndTournoiR(int id)
         {
-            Tournoi tournoi = await CallAPI.GetTournoiById(id);
+            var temp = await CallAPI.GetTournoi(id);
 
-            if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
+            if (temp.Item1)
             {
                 return NotFound();
             }
+
+            Tournoi tournoi = temp.Item2;
 
             if (tournoi.Over)
             {

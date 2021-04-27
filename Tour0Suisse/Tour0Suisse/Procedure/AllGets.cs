@@ -175,5 +175,25 @@ namespace Tour0Suisse.Web.Procedure
             }
         }
 
+
+
+        public static async Task<Tuple<bool, Tournoi>> GetTournoi(int id)
+        {
+            Tournoi t = new Tournoi();
+
+            if (id < 1)
+            {
+                return new Tuple<bool, Tournoi>(false, t);
+            }
+
+            Tournoi tournoi = await CallAPI.GetTournoiById(id);
+
+            if (tournoi == null || tournoi.IdTournament < 1 || tournoi.Deleted != null)
+            {
+                return new Tuple<bool, Tournoi>(false, t);
+            }
+
+            return new Tuple<bool, Tournoi>(false, tournoi);
+        }
     }
 }
