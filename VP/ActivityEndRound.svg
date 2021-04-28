@@ -87,25 +87,25 @@
       ><path d="M0 0 L317 0 L317 204 L0 204 L0 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath28"
-      ><path d="M270 163 L270 178 L231 178 L231 163 ZM0 0 L0 204 L317 204 L317 177 L309 177 L309 162 L317 162 L317 0 Z"
+      ><path d="M270 163 L270 178 L231 178 L231 163 ZM0 0 L0 204 L317 204 L317 175 L309 175 L309 160 L317 160 L317 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath29"
       ><path d="M0 0 L204 0 L204 262 L0 262 L0 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath30"
-      ><path d="M156 142 L156 157 L118 157 L118 142 ZM79 143 L79 158 L40 158 L40 143 ZM0 0 L0 190 L204 190 L204 0 ZM0 205 L0 262 L204 262 L204 205 Z"
+      ><path d="M153 140 L153 155 L118 155 L118 140 ZM79 143 L79 158 L40 158 L40 143 ZM0 0 L0 190 L204 190 L204 0 ZM0 205 L0 262 L204 262 L204 205 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath31"
       ><path d="M0 0 L347 0 L347 277 L0 277 L0 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath32"
-      ><path d="M150 72 L150 87 L112 87 L112 72 ZM73 73 L73 88 L34 88 L34 73 ZM0 0 L0 120 L199 120 L199 135 L0 135 L0 277 L347 277 L347 0 Z"
+      ><path d="M147 70 L147 85 L112 85 L112 70 ZM73 73 L73 88 L34 88 L34 73 ZM0 0 L0 120 L199 120 L199 135 L0 135 L0 277 L347 277 L347 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath33"
       ><path d="M0 0 L314 0 L314 277 L0 277 L0 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath34"
-      ><path d="M273 72 L273 87 L235 87 L235 72 ZM196 73 L196 88 L157 88 L157 73 ZM0 0 L0 277 L314 277 L314 135 L111 135 L111 120 L314 120 L314 0 Z"
+      ><path d="M270 70 L270 85 L235 85 L235 70 ZM196 73 L196 88 L157 88 L157 73 ZM0 0 L0 277 L314 277 L314 135 L111 135 L111 120 L314 120 L314 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath35"
       ><path d="M0 0 L235 0 L235 204 L0 204 L0 0 Z"
@@ -132,7 +132,7 @@
       ><path d="M-39 -15 L78 -15 L78 30 L-39 30 L-39 -15 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath43"
-      ><path d="M-38 -15 L76 -15 L76 30 L-38 30 L-38 -15 Z"
+      ><path d="M-35 -15 L70 -15 L70 30 L-35 30 L-35 -15 Z"
       /></clipPath
     ></defs
     ><g fill="white" text-rendering="geometricPrecision" fill-opacity="1" stroke-opacity="1" stroke="white"
@@ -143,7 +143,7 @@
     /></g
     ><g font-size="11px" transform="translate(4,4)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
     ><text x="24" xml:space="preserve" y="12" clip-path="url(#clipPath4)" stroke="none"
-      >Organizateur</text
+      >Organisateur</text
     ></g
     ><g fill-opacity="1" text-rendering="geometricPrecision" stroke="black" stroke-linecap="butt" transform="translate(4,19)" stroke-miterlimit="0" stroke-opacity="1" fill="black" stroke-width="2" font-family="sans-serif" stroke-linejoin="round" font-size="11px" image-rendering="optimizeQuality"
     ><rect fill="none" x="0" width="112" height="419" y="0" clip-path="url(#clipPath5)"
@@ -296,9 +296,9 @@
     ><text x="9" xml:space="preserve" y="12" clip-path="url(#clipPath42)" stroke="none"
       >non</text
     ></g
-    ><g font-size="11px" transform="translate(319,196)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
-    ><text x="9" xml:space="preserve" y="12" clip-path="url(#clipPath43)" stroke="none"
-      >Oui</text
+    ><g font-size="11px" transform="translate(319,194)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
+    ><text x="10" xml:space="preserve" y="12" clip-path="url(#clipPath43)" stroke="none"
+      >oui</text
     ></g
     ><g font-size="10px" fill-opacity="1" fill="rgb(120,120,120)" text-rendering="geometricPrecision" image-rendering="optimizeQuality" stroke="rgb(120,120,120)" stroke-opacity="1"
     ><text x="317" xml:space="preserve" y="498" stroke="none"

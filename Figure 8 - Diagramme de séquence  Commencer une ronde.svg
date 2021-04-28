@@ -21,16 +21,16 @@
       ><path d="M0 0 L0 40 L65 40 L65 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath6"
-      ><path d="M-84 -15 L168 -15 L168 30 L-84 30 L-84 -15 Z"
+      ><path d="M-70 -15 L140 -15 L140 30 L-70 30 L-70 -15 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath7"
-      ><path d="M-70 -15 L140 -15 L140 30 L-70 30 L-70 -15 Z"
+      ><path d="M-84 -15 L168 -15 L168 30 L-84 30 L-84 -15 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath8"
       ><path d="M0 0 L527 0 L527 104 L0 104 L0 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath9"
-      ><path d="M88 7 L88 22 L4 22 L4 7 ZM401 30 L401 45 L121 45 L121 30 ZM0 0 L0 104 L527 104 L527 0 Z"
+      ><path d="M88 7 L88 22 L4 22 L4 7 ZM402 30 L402 45 L120 45 L120 30 ZM0 0 L0 104 L527 104 L527 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath10"
       ><path d="M0 0 L134 0 L134 124 L0 124 L0 0 Z"
@@ -39,40 +39,37 @@
       ><path d="M0 0 L0 124 L134 124 L134 65 L91 65 L91 50 L134 50 L134 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath12"
-      ><path d="M361 30 L361 45 L160 45 L160 30 ZM380 61 L380 76 L141 76 L141 61 ZM0 0 L0 104 L527 104 L527 23 L522 23 L522 8 L527 8 L527 0 Z"
+      ><path d="M364 30 L364 45 L156 45 L156 30 ZM380 61 L380 76 L141 76 L141 61 ZM0 0 L0 104 L527 104 L527 23 L522 23 L522 8 L527 8 L527 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath13"
-      ><path d="M380 30 L380 45 L141 45 L141 30 ZM0 0 L0 104 L527 104 L527 101 L520 101 L520 86 L527 86 L527 0 L361 0 L361 14 L160 14 L160 0 Z"
+      ><path d="M380 30 L380 45 L141 45 L141 30 ZM0 0 L0 104 L527 104 L527 101 L520 101 L520 86 L527 86 L527 0 L364 0 L364 14 L156 14 L156 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath14"
-      ><path d="M452 30 L452 45 L70 45 L70 30 ZM0 0 L0 104 L527 104 L527 0 Z"
+      ><path d="M456 30 L456 45 L65 45 L65 30 ZM0 0 L0 104 L527 104 L527 27 L526 27 L526 12 L527 12 L527 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath15"
-      ><path d="M0 0 L0 117 L21 117 L21 124 L134 124 L134 65 L89 65 L89 50 L134 50 L134 0 Z"
+      ><path d="M0 0 L0 117 L25 117 L25 124 L134 124 L134 114 L95 114 L95 99 L134 99 L134 65 L89 65 L89 50 L134 50 L134 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath16"
-      ><path d="M0 0 L0 69 L21 69 L21 84 L0 84 L0 124 L134 124 L134 17 L89 17 L89 2 L134 2 L134 0 Z"
+      ><path d="M0 0 L0 69 L25 69 L25 84 L0 84 L0 124 L134 124 L134 66 L95 66 L95 51 L134 51 L134 17 L89 17 L89 2 L134 2 L134 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath17"
       ><path d="M-292 -15 L584 -15 L584 30 L-292 30 L-292 -15 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath18"
-      ><path d="M-231 -15 L462 -15 L462 30 L-231 30 L-231 -15 Z"
-      /></clipPath
-      ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath19"
-      ><path d="M-382 -15 L764 -15 L764 30 L-382 30 L-382 -15 Z"
-      /></clipPath
-      ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath20"
       ><path d="M-239 -15 L478 -15 L478 30 L-239 30 L-239 -15 Z"
       /></clipPath
-      ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath21"
-      ><path d="M-201 -15 L402 -15 L402 30 L-201 30 L-201 -15 Z"
+      ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath19"
+      ><path d="M-391 -15 L782 -15 L782 30 L-391 30 L-391 -15 Z"
       /></clipPath
-      ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath22"
+      ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath20"
+      ><path d="M-208 -15 L416 -15 L416 30 L-208 30 L-208 -15 Z"
+      /></clipPath
+      ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath21"
       ><path d="M-204 -15 L408 -15 L408 30 L-204 30 L-204 -15 Z"
       /></clipPath
-      ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath23"
-      ><path d="M-280 -15 L560 -15 L560 30 L-280 30 L-280 -15 Z"
+      ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath22"
+      ><path d="M-282 -15 L564 -15 L564 30 L-282 30 L-282 -15 Z"
       /></clipPath
     ></defs
     ><g fill="white" text-rendering="geometricPrecision" fill-opacity="1" stroke-opacity="1" stroke="white"
@@ -109,13 +106,13 @@
     ><g stroke-linecap="butt" transform="translate(437,462)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke-linejoin="round" stroke="black" stroke-opacity="1" stroke-miterlimit="0"
     ><polygon fill="none" points=" 0 0 64 0 79 15 64 15 64 0 79 15 79 39 0 39" clip-path="url(#clipPath4)"
     /></g
-    ><g font-size="11px" transform="translate(2,37)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
-    ><text x="10" xml:space="preserve" y="12" clip-path="url(#clipPath6)" stroke="none"
-      >Organisateur</text
-    ></g
     ><g font-size="11px" transform="translate(440,2)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
-    ><text x="13" xml:space="preserve" y="12" clip-path="url(#clipPath7)" stroke="none"
-      >Systeme</text
+    ><text x="13" xml:space="preserve" y="12" clip-path="url(#clipPath6)" stroke="none"
+      >Système</text
+    ></g
+    ><g font-size="11px" transform="translate(2,37)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
+    ><text x="10" xml:space="preserve" y="12" clip-path="url(#clipPath7)" stroke="none"
+      >Organisateur</text
     ></g
     ><g stroke-linecap="butt" font-size="11px" transform="translate(-2,30)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke-linejoin="round" stroke="black" stroke-opacity="1"
     ><line y2="50" fill="none" x1="50" clip-path="url(#clipPath9)" x2="473" y1="50"
@@ -158,39 +155,40 @@
       /><polygon points=" 50 70 62 76 62 64" clip-path="url(#clipPath16)" stroke="none"
       /><polygon fill="none" points=" 50 70 62 76 62 64" clip-path="url(#clipPath16)"
     /></g
-    ><g font-size="11px" transform="translate(524,293)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
-    ><text x="9" xml:space="preserve" y="12" clip-path="url(#clipPath17)" stroke="none"
+    ><g font-size="11px" transform="translate(524,293)" fill-opacity="1" fill="white" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="white" stroke-opacity="1"
+    ><rect x="0" width="292" height="15" y="0" clip-path="url(#clipPath17)" stroke="none"
+      /><text fill="black" x="9" xml:space="preserve" y="12" clip-path="url(#clipPath17)" stroke="none"
       >2.2: Création d'une nouvelle ronde avec la date actuelle</text
     ></g
     ><g font-size="11px" transform="translate(518,244)" fill-opacity="1" fill="white" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="white" stroke-opacity="1"
-    ><rect x="0" width="231" height="15" y="0" clip-path="url(#clipPath18)" stroke="none"
+    ><rect x="0" width="239" height="15" y="0" clip-path="url(#clipPath18)" stroke="none"
       /><text fill="black" x="10" xml:space="preserve" y="12" clip-path="url(#clipPath18)" stroke="none"
-      >2.1: verification de l'état de la derniere rond</text
+      >2.1: Vérification de l'état de la dernière ronde</text
     ></g
-    ><g font-size="11px" transform="translate(68,311)" fill-opacity="1" fill="white" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="white" stroke-opacity="1"
-    ><rect x="0" width="382" height="15" y="0" clip-path="url(#clipPath19)" stroke="none"
-      /><text fill="black" x="9" xml:space="preserve" y="12" clip-path="url(#clipPath19)" stroke="none"
-      >2.3: redirection vers la page d'administration avec les données mise a jour</text
+    ><g font-size="11px" transform="translate(63,311)" fill-opacity="1" fill="white" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="white" stroke-opacity="1"
+    ><rect x="0" width="391" height="15" y="0" clip-path="url(#clipPath19)" stroke="none"
+      /><text fill="black" x="10" xml:space="preserve" y="12" clip-path="url(#clipPath19)" stroke="none"
+      >2.3: Redirection vers la page d'administration avec les données mises à jour</text
     ></g
     ><g font-size="11px" transform="translate(139,188)" fill-opacity="1" fill="white" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="white" stroke-opacity="1"
-    ><rect x="0" width="239" height="15" y="0" clip-path="url(#clipPath20)" stroke="none"
-      /><text fill="black" x="10" xml:space="preserve" y="12" clip-path="url(#clipPath20)" stroke="none"
+    ><rect x="0" width="239" height="15" y="0" clip-path="url(#clipPath18)" stroke="none"
+      /><text fill="black" x="10" xml:space="preserve" y="12" clip-path="url(#clipPath18)" stroke="none"
       >2: Clique sur commencer une nouvelle ronde</text
     ></g
-    ><g font-size="11px" transform="translate(158,157)" fill-opacity="1" fill="white" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="white" stroke-opacity="1"
-    ><rect x="0" width="201" height="15" y="0" clip-path="url(#clipPath21)" stroke="none"
-      /><text fill="black" x="9" xml:space="preserve" y="12" clip-path="url(#clipPath21)" stroke="none"
-      >1.2: envoie les information du tournoi</text
+    ><g font-size="11px" transform="translate(154,157)" fill-opacity="1" fill="white" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="white" stroke-opacity="1"
+    ><rect x="0" width="208" height="15" y="0" clip-path="url(#clipPath20)" stroke="none"
+      /><text fill="black" x="9" xml:space="preserve" y="12" clip-path="url(#clipPath20)" stroke="none"
+      >1.2: Envoie les informations du tournoi</text
     ></g
     ><g font-size="11px" transform="translate(520,135)" fill-opacity="1" fill="white" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="white" stroke-opacity="1"
-    ><rect x="0" width="204" height="15" y="0" clip-path="url(#clipPath22)" stroke="none"
-      /><text fill="black" x="9" xml:space="preserve" y="12" clip-path="url(#clipPath22)" stroke="none"
-      >1.1: Récupére les données du tournoi</text
+    ><rect x="0" width="204" height="15" y="0" clip-path="url(#clipPath21)" stroke="none"
+      /><text fill="black" x="9" xml:space="preserve" y="12" clip-path="url(#clipPath21)" stroke="none"
+      >1.1: Récupère les données du tournoi</text
     ></g
-    ><g font-size="11px" transform="translate(119,60)" fill-opacity="1" fill="white" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="white" stroke-opacity="1"
-    ><rect x="0" width="280" height="15" y="0" clip-path="url(#clipPath23)" stroke="none"
-      /><text fill="black" x="10" xml:space="preserve" y="12" clip-path="url(#clipPath23)" stroke="none"
-      >1: se connecte a la page d'administration d'un tournoi</text
+    ><g font-size="11px" transform="translate(118,60)" fill-opacity="1" fill="white" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="white" stroke-opacity="1"
+    ><rect x="0" width="282" height="15" y="0" clip-path="url(#clipPath22)" stroke="none"
+      /><text fill="black" x="10" xml:space="preserve" y="12" clip-path="url(#clipPath22)" stroke="none"
+      >1: Se connecte à la page d'administration d'un tournoi</text
     ></g
     ><g font-size="10px" fill-opacity="1" fill="rgb(120,120,120)" text-rendering="geometricPrecision" image-rendering="optimizeQuality" stroke="rgb(120,120,120)" stroke-opacity="1"
     ><text x="576" xml:space="preserve" y="493" stroke="none"

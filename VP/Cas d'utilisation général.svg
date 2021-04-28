@@ -227,8 +227,8 @@
     ><ellipse rx="40" fill="none" ry="20" clip-path="url(#clipPath4)" cx="40" cy="20"
     /></g
     ><g font-size="11px" transform="translate(341,82)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
-    ><text x="8" xml:space="preserve" y="17" clip-path="url(#clipPath5)" stroke="none"
-      >Parcourire le</text
+    ><text x="11" xml:space="preserve" y="17" clip-path="url(#clipPath5)" stroke="none"
+      >Parcourir le</text
       ><text x="30" xml:space="preserve" y="32" clip-path="url(#clipPath5)" stroke="none"
       >site</text
     ></g
@@ -239,8 +239,10 @@
     ><ellipse rx="45.5" fill="none" ry="20" clip-path="url(#clipPath6)" cx="45.5" cy="20"
     /></g
     ><g font-size="11px" transform="translate(427,32)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
-    ><text x="4" xml:space="preserve" y="24" clip-path="url(#clipPath7)" stroke="none"
-      >S'inscrire au site</text
+    ><text x="7" xml:space="preserve" y="17" clip-path="url(#clipPath7)" stroke="none"
+      >S'inscrire sur le</text
+      ><text x="36" xml:space="preserve" y="32" clip-path="url(#clipPath7)" stroke="none"
+      >site</text
     ></g
     ><g font-size="11px" transform="translate(354,307)" fill-opacity="1" fill="rgb(122,207,245)" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="rgb(122,207,245)" stroke-opacity="1"
     ><ellipse rx="45" ry="20" clip-path="url(#clipPath8)" cx="45" cy="20" stroke="none"
@@ -281,10 +283,8 @@
     ><ellipse rx="73.5" fill="none" ry="20" clip-path="url(#clipPath14)" cx="73.5" cy="20"
     /></g
     ><g font-size="11px" transform="translate(505,102)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
-    ><text x="17" xml:space="preserve" y="17" clip-path="url(#clipPath15)" stroke="none"
-      >Éditier / Supprimer son</text
-      ><text x="61" xml:space="preserve" y="32" clip-path="url(#clipPath15)" stroke="none"
-      >profil</text
+    ><text x="4" xml:space="preserve" y="24" clip-path="url(#clipPath15)" stroke="none"
+      >Éditer / Supprimer son profil</text
     ></g
     ><g font-size="11px" transform="translate(406,165)" fill-opacity="1" fill="rgb(122,207,245)" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="rgb(122,207,245)" stroke-opacity="1"
     ><ellipse rx="58.5" ry="20" clip-path="url(#clipPath16)" cx="58.5" cy="20" stroke="none"

@@ -69,10 +69,10 @@
       ><path d="M0 0 L0 85 L296 85 L296 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath22"
-      ><path d="M0 0 L0 15 L211 15 L211 0 Z"
+      ><path d="M0 0 L0 15 L213 15 L213 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath23"
-      ><path d="M0 0 L0 19 L211 19 L211 0 Z"
+      ><path d="M0 0 L0 19 L213 19 L213 0 Z"
       /></clipPath
       ><clipPath clipPathUnits="userSpaceOnUse" id="clipPath24"
       ><path d="M0 0 L0 56 L296 56 L296 0 Z"
@@ -316,24 +316,24 @@
     ><g stroke-linecap="butt" font-size="11px" transform="translate(126,238)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke-linejoin="round" stroke="black" stroke-opacity="1" stroke-miterlimit="0"
     ><line y2="0" fill="none" x1="2" clip-path="url(#clipPath21)" x2="293" y1="0"
     /></g
-    ><g font-size="11px" transform="translate(168,302)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
-    ><text x="66" xml:space="preserve" y="12" clip-path="url(#clipPath22)" stroke="none"
+    ><g font-size="11px" transform="translate(167,302)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
+    ><text x="67" xml:space="preserve" y="12" clip-path="url(#clipPath22)" stroke="none"
       >Finir une ronde</text
     ></g
-    ><g font-size="11px" transform="translate(168,287)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
+    ><g font-size="11px" transform="translate(167,287)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
     ><text x="24" xml:space="preserve" y="12" clip-path="url(#clipPath22)" stroke="none"
-      >Modifier des résultats de matchs</text
+      >Modifier les résultats des matchs</text
     ></g
-    ><g font-size="11px" transform="translate(168,272)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
+    ><g font-size="11px" transform="translate(167,272)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
     ><text x="28" xml:space="preserve" y="12" clip-path="url(#clipPath22)" stroke="none"
-      >Entrer des résultats de matchs</text
+      >Entrer les résultats des matchs</text
     ></g
-    ><g font-size="11px" transform="translate(168,257)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
-    ><text x="47" xml:space="preserve" y="12" clip-path="url(#clipPath22)" stroke="none"
+    ><g font-size="11px" transform="translate(167,257)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
+    ><text x="48" xml:space="preserve" y="12" clip-path="url(#clipPath22)" stroke="none"
       >Commencer une ronde</text
     ></g
-    ><g font-size="11px" transform="translate(168,238)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" font-weight="bold" stroke-opacity="1"
-    ><text x="58" xml:space="preserve" y="16" clip-path="url(#clipPath23)" stroke="none"
+    ><g font-size="11px" transform="translate(167,238)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" font-weight="bold" stroke-opacity="1"
+    ><text x="59" xml:space="preserve" y="16" clip-path="url(#clipPath23)" stroke="none"
       >extension points</text
     ></g
     ><g font-size="11px" transform="translate(126,182)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
@@ -347,8 +347,8 @@
     ><ellipse rx="72" fill="none" ry="41" clip-path="url(#clipPath25)" cx="72" cy="41"
     /></g
     ><g font-size="11px" transform="translate(459,113)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
-    ><text x="16" xml:space="preserve" y="38" clip-path="url(#clipPath26)" stroke="none"
-      >Entrer des résultats de</text
+    ><text x="15" xml:space="preserve" y="38" clip-path="url(#clipPath26)" stroke="none"
+      >Entrer les résultats des</text
       ><text x="54" xml:space="preserve" y="53" clip-path="url(#clipPath26)" stroke="none"
       >matchs</text
     ></g
@@ -377,8 +377,8 @@
     ><ellipse rx="79" fill="none" ry="20" clip-path="url(#clipPath30)" cx="79" cy="20"
     /></g
     ><g font-size="11px" transform="translate(515,241)" fill-opacity="1" fill="black" text-rendering="geometricPrecision" image-rendering="optimizeQuality" font-family="sans-serif" stroke="black" stroke-opacity="1"
-    ><text x="18" xml:space="preserve" y="17" clip-path="url(#clipPath31)" stroke="none"
-      >Modifier des résultats de</text
+    ><text x="17" xml:space="preserve" y="17" clip-path="url(#clipPath31)" stroke="none"
+      >Modifier les résultats des</text
       ><text x="60" xml:space="preserve" y="32" clip-path="url(#clipPath31)" stroke="none"
       >matchs</text
     ></g
