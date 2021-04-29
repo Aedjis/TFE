@@ -237,73 +237,6 @@ GO
 
 --____________________________________________________________________________
 
---____________DEBUT CREATION CONTRAINT_____________________
-
-ALTER TABLE [Utilisateur]
-ADD CONSTRAINT CK_Utilisateur_EmailValid__XXXX	CHECK (Email LIKE '%_@__%.__%')
-GO
-
-ALTER TABLE [Utilisateur]
-ADD CONSTRAINT UK_Utilisateur_EmailUnique__XXXX	UNIQUE (Email)
-GO
-
-ALTER TABLE [Jeu]
-ADD CONSTRAINT UK_Jeu_NameUnique__XXXX	UNIQUE ([Name])
-GO
-
-ALTER TABLE [Tournoi]
-ADD CONSTRAINT CK_Tournoi_Deck__XXXX	CHECK ((DeckListNumber >=3) and (DeckListNumber <=5))
-GO
---___________________________
-ALTER TABLE [Tournoi]
-ADD CONSTRAINT CK_Tournoi_MaxNumberPlayer__XXXX	CHECK ((MaxNumberPlayer = null) or (MaxNumberPlayer <6))
-GO
-
-ALTER TABLE [Resultat]
-ADD CONSTRAINT FK_Resultat_Joueur_IDTournamentIDUser__XXXX	FOREIGN KEY (ID_Tournament, ID_User)
-															REFERENCES [Joueur](ID_Tournament, ID_User)
---cette contraint pourrais être supprimé dans une optique de minimisation des donnée (si une fois que une tournoi est fini on supprime la liste de ces joueur pour ce référé au resulta pour le retrouvé, non recommandé)
-GO
-
-ALTER TABLE [DeckJoueur]
-ADD CONSTRAINT UK_DeckJoueur_IDDeck_Unique__XXXX	UNIQUE ([ID_Deck])
-GO
-
-ALTER TABLE [Round]
-ADD CONSTRAINT CK_Round_StartEndRound__XXXX	CHECK (StartRound < EndRound)
-GO
-
-ALTER TABLE [Match]
-ADD CONSTRAINT CK_Match_IDPlayer__XXXX CHECK (ID_PlayerOne <> ID_PlayerTwo)
-GO
-
-ALTER TABLE [Match]
-ADD CONSTRAINT FK_Match_Joueur_IDTournamentIDPlayerOne__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerOne)
-															REFERENCES [Joueur](ID_Tournament, ID_User)
-GO
-
-ALTER TABLE [Match]
-ADD CONSTRAINT FK_Match_Joueur_IDTournamentIDPlayerTwo__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerTwo)
-															REFERENCES [Joueur](ID_Tournament, ID_User)
-GO
-
-ALTER TABLE [Partie]
-ADD CONSTRAINT FK_Partie_Match_IDTournamentRoundNumberIDPlayerOneIDPlayerTwo__XXXX	FOREIGN KEY (ID_Tournament, RoundNumber, ID_PlayerOne)
-																					REFERENCES [Match](ID_Tournament, RoundNumber, ID_PlayerOne)
-GO
-
-ALTER TABLE [Partie]
-ADD CONSTRAINT FK_Partie_DeckJoueur_IDTournamentIDPlayerOneIDDeckPlayerOne__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerOne, ID_Deck_PlayerOne)
-																					REFERENCES [DeckJoueur](ID_Tournament, ID_User, ID_Deck)
-GO
-
-ALTER TABLE [Partie]
-ADD CONSTRAINT FK_Partie_DeckJoueur_IDTournamentIDPlayerTwoIDDeckPlayerTwo__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerTwo, ID_Deck_PlayerTwo)
-																					REFERENCES [DeckJoueur](ID_Tournament, ID_User, ID_Deck)
-GO
---____________FIN CREATION CONTRAINT_________________________
-
---____________________________________________________________________________
 
 --_____________DEBUT CREATION DES LIENS ENTRE LES TABLES________
 
@@ -362,7 +295,6 @@ ADD CONSTRAINT FK_Match_Utilisateur__2XXXX	FOREIGN KEY (ID_PlayerTwo)
 											REFERENCES [Utilisateur](ID_User)
 GO
 
---_______ cette FK est redondante avec FK_Partie_Match_IDTournamentRoundNumberIDPlayerOneIDPlayerTwo__XXXX elle peut -etre supprimé sans risqué de compromettre les donné (tant que la contraint précédament cité est en place)
 ALTER TABLE [Partie]
 ADD CONSTRAINT FK_Part_Match__XXXX	FOREIGN KEY (ID_Tournament, RoundNumber, ID_PlayerOne)
 									REFERENCES [Match](ID_Tournament, RoundNumber, ID_PlayerOne)
@@ -417,6 +349,73 @@ GO
 --____________FIN CREATION DES LIEN ENTRE LES TABLES_________________________
 
 --____________________________________________________
+--____________DEBUT CREATION CONTRAINT_____________________
+
+ALTER TABLE [Utilisateur]
+ADD CONSTRAINT CK_Utilisateur_EmailValid__XXXX	CHECK (Email LIKE '%_@__%.__%')
+GO
+
+ALTER TABLE [Utilisateur]
+ADD CONSTRAINT UK_Utilisateur_EmailUnique__XXXX	UNIQUE (Email)
+GO
+
+ALTER TABLE [Jeu]
+ADD CONSTRAINT UK_Jeu_NameUnique__XXXX	UNIQUE ([Name])
+GO
+
+ALTER TABLE [Tournoi]
+ADD CONSTRAINT CK_Tournoi_Deck__XXXX	CHECK ((DeckListNumber >=3) and (DeckListNumber <=5))
+GO
+--___________________________
+ALTER TABLE [Tournoi]
+ADD CONSTRAINT CK_Tournoi_MaxNumberPlayer__XXXX	CHECK ((MaxNumberPlayer = null) or (MaxNumberPlayer <6))
+GO
+
+ALTER TABLE [Resultat]
+ADD CONSTRAINT FK_Resultat_Joueur_IDTournamentIDUser__XXXX	FOREIGN KEY (ID_Tournament, ID_User)
+															REFERENCES [Joueur](ID_Tournament, ID_User)
+--cette contraint pourrais être supprimé dans une optique de minimisation des donnée (si une fois que une tournoi est fini on supprime la liste de ces joueur pour ce référé au resulta pour le retrouvé, non recommandé)
+GO
+
+ALTER TABLE [DeckJoueur]
+ADD CONSTRAINT UK_DeckJoueur_IDDeck_Unique__XXXX	UNIQUE ([ID_Deck])
+GO
+
+ALTER TABLE [Round]
+ADD CONSTRAINT CK_Round_StartEndRound__XXXX	CHECK (StartRound < EndRound)
+GO
+
+ALTER TABLE [Match]
+ADD CONSTRAINT CK_Match_IDPlayer__XXXX CHECK (ID_PlayerOne <> ID_PlayerTwo)
+GO
+
+ALTER TABLE [Match]
+ADD CONSTRAINT FK_Match_Joueur_IDTournamentIDPlayerOne__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerOne)
+															REFERENCES [Joueur](ID_Tournament, ID_User)
+GO
+
+ALTER TABLE [Match]
+ADD CONSTRAINT FK_Match_Joueur_IDTournamentIDPlayerTwo__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerTwo)
+															REFERENCES [Joueur](ID_Tournament, ID_User)
+GO
+
+--ALTER TABLE [Partie]
+--ADD CONSTRAINT FK_Partie_Match_IDTournamentRoundNumberIDPlayerOne__XXXX	FOREIGN KEY (ID_Tournament, RoundNumber, ID_PlayerOne)
+--																					REFERENCES [Match](ID_Tournament, RoundNumber, ID_PlayerOne)
+--GO       -- redondance avec la FK_Part_Match__XXXX
+
+ALTER TABLE [Partie]
+ADD CONSTRAINT FK_Partie_DeckJoueur_IDTournamentIDPlayerOneIDDeckPlayerOne__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerOne, ID_Deck_PlayerOne)
+																					REFERENCES [DeckJoueur](ID_Tournament, ID_User, ID_Deck)
+GO
+
+ALTER TABLE [Partie]
+ADD CONSTRAINT FK_Partie_DeckJoueur_IDTournamentIDPlayerTwoIDDeckPlayerTwo__XXXX	FOREIGN KEY (ID_Tournament, ID_PlayerTwo, ID_Deck_PlayerTwo)
+																					REFERENCES [DeckJoueur](ID_Tournament, ID_User, ID_Deck)
+GO
+--____________FIN CREATION CONTRAINT_________________________
+
+--____________________________________________________________________________
 
 --_____________DEBUT DE CREATION D'UTILISATEUR, JEU, DECK VIDE______________________
 
