@@ -216,8 +216,7 @@ namespace Tour0Suisse.API.Controllers
             List<ViewMatch> Matches = DB_CURD.GetMatchesOf(Round.IdTournament);
             ViewTournament Tournoi = DB_CURD.GetTournament(Round.IdTournament);
 
-            List<PairID> PairingList = AlgoPairing.Pairing(Players, Classements, Matches, Round.RoundNumber,
-                Tournoi.Ppwin, Tournoi.Ppdraw, Tournoi.Pplose);
+            List<PairID> PairingList = AlgoPairing.Pairing(Players, Classements, Matches, Round.RoundNumber);
 
             return DB_CURD.CreateMatchAllParing(Round, PairingList);
         }

@@ -27,26 +27,22 @@ namespace Tour0Suisse.API
         ///  
         ///  </summary>
         ///  <param name="Players">Liste des joueur encore dans le tournoi</param>
-        ///  <param name="classements">classement de tout les joueurs du tournoi</param>
-        ///  <param name="matches">liste de tout les match joué dans le tournoi</param>
+        ///  <param name="Classements">classement de tout les joueurs du tournoi</param>
+        ///  <param name="Matches">liste de tout les match joué dans le tournoi</param>
         ///  <param name="RoundNumber">le numero de round</param>
-        ///  <param name="PPV">le nombre de point par victoire</param>
-        ///  <param name="PPE">le nombre de point par egaliter</param>
-        ///  <param name="PPD">le nombre de point par defaite</param>
         ///  <returns></returns>
-        public static List<PairID> Pairing(List<int> Players, List<ViewScoreClassementTemporaire> classements, List<ViewMatch> matches, int RoundNumber, int PPV = 2, int PPE = 1, int PPD = 0)
+        public static List<PairID> Pairing(List<int> Players, List<ViewScoreClassementTemporaire> Classements, List<ViewMatch> Matches, int RoundNumber)
         {
             List<PairID> retour = new(); // crée la variable qui se verra atrivué la liste de pairing qui doit être retourné.
             retour.Clear();
-            List<ViewScoreClassementTemporaire> PlayerClassement = classements.Where(c => Players.Contains(c.IdUser)).ToList(); // ne prend en considération plus que les joueur encore en list
+            List<ViewScoreClassementTemporaire> playerClassement = Classements.Where(c => Players.Contains(c.IdUser)).ToList(); // ne prend en considération plus que les joueur encore en list
 
 
-            Dictionary<int, List<int>> PlayerOpponentList = CreatePlayerOpponentList(Players, matches); // création d'un dictonaire pour retrouvé a liste des adversaire d'un joueur
+            Dictionary<int, List<int>> playerOpponentList = CreatePlayerOpponentList(Players, Matches); // création d'un dictonaire pour retrouvé a liste des adversaire d'un joueur
 
-            if (!DescPairing(Players, PlayerOpponentList, PlayerClassement, RoundNumber, out retour, PPV, PPE, PPD))
+            if (!DescPairing(Players, playerOpponentList, playerClassement, RoundNumber, out retour))
             {
-
-                if (!ForcePairing(Players, PlayerOpponentList, retour, out retour))
+                if (!ForcePairing(Players, playerOpponentList, retour, out retour))
                 {
                     retour.Clear();
                 }
@@ -55,6 +51,7 @@ namespace Tour0Suisse.API
 
             return retour; // retourné le pairing 
         }
+
         /// <summary>
         /// fonction qui force le pairing sans faire attention au classement
         /// </summary>
@@ -76,7 +73,6 @@ namespace Tour0Suisse.API
                 {
                     foreach (var pair in retour)//pour chaque pairing dejà fait
                     {
-
                         if (!playerOpponentList[Player].Contains(pair.ID1))//on regard si le playerone du pairing n'est pas dans la liste des adversaire déjà rencontré
                         {
                             var ListNewOpponent = NoPairedPlayer.Except(playerOpponentList[pair.ID2]).ToList();//on crée une liste d'advaisaire potentielle sur base des joueur reporté qui serait ne serait pas dans la liste des adversaire du playertwo de la pair
@@ -111,8 +107,8 @@ namespace Tour0Suisse.API
             }
 
             return !NoPairedPlayer.Any();
-
         }
+
         /// <summary>
         /// fonction qui fait du pairing en partant du haut du classement puis le descent
         /// </summary>
@@ -121,23 +117,15 @@ namespace Tour0Suisse.API
         /// <param name="playerClassement">statisitque de chaque joueur</param>
         /// <param name="roundNumber">numero de la round</param>
         /// <param name="retour">liste des pairing effectué</param>
-        /// <param name="PPV">point par victoire pour le classement</param>
-        /// <param name="PPE">point par egalité pour le classement</param>
-        /// <param name="PPD">point par defaite pour le classment</param>
         /// <returns>signal si le pairing est complete</returns>
-        public static bool DescPairing(List<int> players, Dictionary<int, List<int>> playerOpponentList, List<ViewScoreClassementTemporaire> playerClassement, int roundNumber, out List<PairID> retour, int PPV = 2, int PPE = 1, int PPD = 0)
+        public static bool DescPairing(List<int> players, Dictionary<int, List<int>> playerOpponentList, List<ViewScoreClassementTemporaire> playerClassement, int roundNumber, out List<PairID> retour)
         {
-            int MPP = (PPV < PPE) ? 
-                        (PPE < PPD) ? 
-                            PPD : PPE : (PPV < PPD) ? 
-                                            PPD : PPV;
-
             retour = new List<PairID>();//inisialisation de la liste de pairing qui sera retourné
-            List<int> InReportedPlayer = new();//création de la liste des joueur qui sont été réporté
+            List<int> inReportedPlayers = new();//création de la liste des joueur qui sont été réporté
 
             if ((roundNumber - 1) == 0)
             {
-                retour.AddRange(PairingInGroup(players, playerOpponentList, out List<int> OutReportedPlayer, InReportedPlayer));//on fait le pairing de chaque groupe et on le rajoute au pairing existant
+                retour.AddRange(PairingInGroup(players, playerOpponentList, out List<int> outReportedPlayers, inReportedPlayers));//on fait le pairing de chaque groupe et on le rajoute au pairing existant
             }
             else
             {
@@ -159,27 +147,27 @@ namespace Tour0Suisse.API
                 ////fin legacy non opti
                 
                 //// version plus opti car ne crée que le group qui on des joueur dedans
-                var GroupPlayer = playerClassement.GroupBy(j => j.Score).OrderByDescending(g => g.Key);
+                var groupPlayer = playerClassement.GroupBy(j => j.Score).OrderByDescending(g => g.Key);
 
 
-                foreach (var Group in GroupPlayer)
+                foreach (var Group in groupPlayer)
                 {
                     retour.AddRange(PairingInGroup(Group.Select(g=>g.IdUser).ToList(), playerOpponentList, out List<int> OutReportedPlayer, //avec la nouvel version il faut faire un select sur le group puis le remmettre en list.
-                        InReportedPlayer)); //on fait le pairing de chaque groupe et on le rajoute au pairing existant    
-                    InReportedPlayer.Clear();
-                    InReportedPlayer.AddRange(OutReportedPlayer); //on transmet la liste es joueur reporté
+                        inReportedPlayers)); //on fait le pairing de chaque groupe et on le rajoute au pairing existant    
+                    inReportedPlayers.Clear();
+                    inReportedPlayers.AddRange(OutReportedPlayer); //on transmet la liste es joueur reporté
                     OutReportedPlayer.Clear();
                 }
             }
 
-            switch (InReportedPlayer.Count)//en fonction du nombre de joueur qui n'ont pas pu etre pairé on : 
+            switch (inReportedPlayers.Count)//en fonction du nombre de joueur qui n'ont pas pu etre pairé on : 
             {
                 case 0:
                     return true;//ne fait rien car ils ont tous été pairé
                 case 1:
                     retour.Add(new PairID//on donne un bye au seul joueur qui n'as pas été pairé (ccela est du a un nombre de joueur impaire
                     {
-                        ID1 = InReportedPlayer.ElementAt(0),
+                        ID1 = inReportedPlayers.ElementAt(0),
                         ID2 = 0
                     });
                     return true;
@@ -264,7 +252,6 @@ namespace Tour0Suisse.API
                     {
                         foreach (var pair in retour)//pour chaque pairing dejà fait
                         {
-
                             if (!PlayerOpponentList[Player].Contains(pair.ID1))//on regard si le playerone du pairing n'est pas dans la liste des adversaire déjà rencontré
                             {
                                 var ListNewOpponent = OutReportedPlayer.Except(PlayerOpponentList[pair.ID2]).ToList();//on crée une liste d'advaisaire potentielle sur base des joueur reporté qui serait ne serait pas dans la liste des adversaire du playertwo de la pair
@@ -300,9 +287,9 @@ namespace Tour0Suisse.API
             }
 
 
-
             return retour;
         }
+
         /// <summary>
         /// cherche et attribue un adversaire a un joueur
         /// </summary>
