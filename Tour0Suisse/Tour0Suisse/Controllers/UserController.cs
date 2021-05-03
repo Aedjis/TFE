@@ -14,6 +14,7 @@ namespace Tour0Suisse.Web.Controllers
     {
         public IActionResult Index()
         {
+            ViewData["Title"] = "Liste des utilisateurs";
             return View("~/Views/Home/Index.cshtml");
         }
 
@@ -21,7 +22,7 @@ namespace Tour0Suisse.Web.Controllers
         public async Task<IActionResult> AllUser()
         {
             IEnumerable<ViewUser> users = await CallAPI.GetAllUtilisateurs();
-            
+            ViewData["Title"] = "Liste des utilisateurs";
             return View(users);
         }
 
@@ -47,7 +48,7 @@ namespace Tour0Suisse.Web.Controllers
 
                 ViewBag.error = "La combinaison mot de passe + adresse mail n'existe pas.";
             }
-
+            ViewData["Title"] = "Connexion";
             return View("~/Views/User/Connexion.cshtml", user);
         }
 
@@ -65,7 +66,7 @@ namespace Tour0Suisse.Web.Controllers
             {
                 return NotFound();
             }
-
+            ViewData["Title"] = "Profil " + user.Pseudo;
             return View("~/Views/User/Profil.cshtml", user);
         }
 
@@ -73,6 +74,7 @@ namespace Tour0Suisse.Web.Controllers
         // GET: User/Create
         public ActionResult Create()
         {
+            ViewData["Title"] = "S'inscrire";
             return View("~/Views/User/Inscription.cshtml");
         }
 
@@ -89,12 +91,15 @@ namespace Tour0Suisse.Web.Controllers
                 RetourAPI retourApi = await CallAPI.InsertUser(user);
                 if (retourApi.Succes)
                 {
+                    ViewData["Title"] = "Merci de vous êtes inscrit";
+
                     return View("~/Views/User/InscriptionReussie.cshtml");
                 }
 
                 ViewBag.error = retourApi.Message;
             }
 
+            ViewData["Title"] = "S'inscrire";
             return View("~/Views/User/Inscription.cshtml", user);
         }
 
@@ -109,6 +114,7 @@ namespace Tour0Suisse.Web.Controllers
                 return NotFound();
             }
 
+            ViewData["Title"] = "Modifier son profil";
             return View("~/Views/User/UpdateProfil.cshtml", utilisateur);
         }
 
@@ -145,12 +151,14 @@ namespace Tour0Suisse.Web.Controllers
                 }
             }
 
+            ViewData["Title"] = "Modifier son profil";
             return View("~/Views/User/UpdateProfil.cshtml", utilisateur);
         }
 
         // GET: User/Delete/5
         public ActionResult Delete(int id)
         {
+            ViewData["Title"] = "Supprimer son compte";
             return View("~/Views/User/DeletedCompte.cshtml", new Utilisateur {IdUser = id});
         }
 
@@ -198,6 +206,7 @@ namespace Tour0Suisse.Web.Controllers
                     }
                 }
 
+            ViewData["Title"] = "Ajouter des pseudos de jeu";
             return View("~/Views/User/AddGamePseudo.cshtml", utilisateur);
         }
 
@@ -226,6 +235,7 @@ namespace Tour0Suisse.Web.Controllers
                 }
             }
 
+            ViewData["Title"] = "Ajouter des pseudos de jeu";
             return View("~/Views/User/AddGamePseudo.cshtml", utilisateur);
         }
     }

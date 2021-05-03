@@ -1,12 +1,12 @@
-﻿@model IEnumerable<Tour0Suisse.Model.ViewTournament>
-
+﻿@using Tour0Suisse.Web.Models
+@model IEnumerable<Tour0Suisse.Model.ViewTournament>
 @{
-    ViewData["Title"] = "Index";
+    TexteFr TB = TexteFr.Instance;
 }
 
-<h2>Index</h2>
+<h2>@ViewData["Title"]</h2>
 
-<table class="table List table-striped">
+<table class="table List Search table-striped">
     <thead>
         <tr>
             <th>
@@ -77,9 +77,9 @@
                     @Html.DisplayFor(modelItem => item.Game)
                 </td>
                 <td>
-                    <a asp-controller="Tournois" asp-action="Details" asp-route-id="@item.IdTournament">Details</a> |
-                    <a asp-controller="Tournois" asp-action="Edit" asp-route-id="@item.IdTournament">Edit</a>|
-                    <a asp-controller="Admin" asp-action="Tournoi" asp-route-id="@item.IdTournament">Admin</a>
+                    <a asp-controller="Tournois" asp-action="Details" asp-route-id="@item.IdTournament">@TB.Admin_Index_Details</a><br/>
+                    <a asp-controller="Tournois" asp-action="Edit" asp-route-id="@item.IdTournament">@TB.Admin_Index_Edit</a><br/>
+                    <a asp-controller="Admin" asp-action="Tournoi" asp-route-id="@item.IdTournament">@TB.Admin_Index_Admin</a>
                 </td>
             </tr>
         }

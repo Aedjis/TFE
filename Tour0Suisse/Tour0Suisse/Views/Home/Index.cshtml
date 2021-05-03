@@ -1,7 +1,9 @@
 ﻿@using Tour0Suisse.Model
+@using Tour0Suisse.Web.Models
 @{
-    ViewData["Title"] = "Home Page";
-    @model IEnumerable<Tour0Suisse.Model.ViewTournament>
+    TexteFr TB = TexteFr.Instance;
+
+    @model IEnumerable<Tour0Suisse.Model.ViewTournament>;
 }
 <br/>
 <div class="container">
@@ -58,7 +60,7 @@
     <br/>
 </div>
 <div class="container">
-    <table class="table table-striped">
+    <table class="table List table-striped">
         <thead>
             <tr>
                 <th>
@@ -95,7 +97,9 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in (List<ViewTournament>)ViewBag.NextTournament)
+        @if ((List<ViewTournament>) ViewBag.NextTournament != null)
+        {
+            @foreach (var item in (List<ViewTournament>) ViewBag.NextTournament)
             {
                 <tr>
                     <td>
@@ -129,10 +133,11 @@
                         @Html.DisplayFor(modelItem => item.Game)
                     </td>
                     <td>
-                        <a asp-controller="Tournois" asp-action="Details" asp-route-id="@item.IdTournament">Details</a>
+                        <a asp-controller="Tournois" asp-action="Details" asp-route-id="@item.IdTournament">@TB.Home_Index_Details</a>
                     </td>
                 </tr>
             }
+        }
         </tbody>
     </table>
 </div>

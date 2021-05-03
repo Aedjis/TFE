@@ -2,10 +2,10 @@
 @model IEnumerable<Tour0Suisse.Model.ViewTournament>
 
 @{
-    ViewData["Title"] = "Index";
+    
 }
 
-<h2>Index</h2>
+<h2>@ViewData["Title"]</h2>
 
 <p>
     @if (bool.TryParse(Context.Session.GetString("Orga"), out bool Orga) && Orga)
@@ -13,7 +13,7 @@
         <a asp-action="Create">Creer un nouveau tournoi</a>
     }
 </p>
-<table class="table List table-striped">
+<table class="table List Search table-striped">
     <thead>
         <tr>
             <th>

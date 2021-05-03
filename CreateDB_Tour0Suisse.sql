@@ -1120,12 +1120,12 @@ BEGIN
 				[PPLose] = ISNULL(@PPLose, [PPLose])
 			WHERE @ID_Tournoi = ID_Tournament
 
-			if(0<(SELECT COUNT(1) FROM @Dotation))
+			if(0<((SELECT COUNT(1) FROM @Dotation) + (SELECT COUNT(1) FROM Dotation WHERE ID_Tournament = @ID_Tournoi)))
 			BEGIN
 				if(0<(SELECT COUNT(1) FROM Dotation WHERE ID_Tournament = @ID_Tournoi))
 					BEGIN
 						DELETE Dotation
-							WHERE ID_Tournament = @ID_Tournoi AND Place IN (SELECT ID_PlayerOne FROM @Dotation)
+							WHERE ID_Tournament = @ID_Tournoi -- pour le moment je supprimer tout puis je recrée tout, idéalement je devrait supprimé juste quand les id n'existe plus et update ceux qui existe encore puis crée le restant. --AND Place NOT IN (SELECT ID_PlayerOne FROM @Dotation)
 					END
 				
 				INSERT INTO Dotation(ID_Tournament, Place, Gain)

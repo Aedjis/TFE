@@ -1,12 +1,14 @@
-﻿@model Tour0Suisse.Model.Tournoi
+﻿@using Tour0Suisse.Web.Models
+@model Tour0Suisse.Model.Tournoi
 
 @{
-    ViewData["Title"] = "Edit";
+    TexteFr TB = TexteFr.Instance;
+    int counter = 0;
 }
 
-<h2>Edit</h2>
+<h2>@ViewData["Title"]</h2>
 
-<h4>Tournoi</h4>
+<h4>@TB.Tournoi_Edit_Title</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -20,7 +22,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Date" class="control-label"></label>
-                <span class="text-danger">Il est déconseiller de changé la date d'un tournoi</span>
+                <span class="text-danger">@TB.Tournoi_Edit_WarrningDate</span>
                 <input asp-for="Date" class="form-control" />
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
@@ -60,28 +62,88 @@
                 <span asp-validation-for="Pplose" class="text-danger"></span>
             </div>
             @*<div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="Over" /> @Html.DisplayNameFor(model => model.Over)
-                    </label>
-                </div>
-            </div>*@
+                    <div class="checkbox">
+                        <label>
+                            <input asp-for="Over" /> @Html.DisplayNameFor(model => model.Over)
+                        </label>
+                    </div>
+                </div>*@
+            <div class="form-group">
+                <label asp-for="Dotation" class="control-label"></label>
+                <table id="ListDotation">
+                    <thead>
+                        <tr>
+                            <th>@TB.Tournoi_Edit_DotationDisplayTop</th>
+                            <th>@TB.Tournoi_Edit_DotationDisplayGain</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.Dotation != null && Model.Dotation.Any())
+                        {
+                            foreach (var dot in Model.Dotation)
+                            {
+                                <tr id="@("Dotation" + counter)">
+                                    <td><input name="@("Dotation[" + counter + "].Place")" type="number" class="form-control text-center" value="@dot.Place" /></td>
+                                    <td><input name="@("Dotation[" + counter + "].Gain")" type="number" class="form-control text-center" value="@dot.Gain" /></td>
+                                </tr>
+
+                                @(counter++)
+                            }
+                        }
+                        else
+                        {
+                            <tr id="Dotation0">
+                                <td><input name="Dotation[0].Place" type="number" class="form-control text-center" /></td>
+                                <td><input name="Dotation[0].Gain" type="number" class="form-control text-center" /></td>
+                            </tr>
+
+                            @(counter++)
+                        }
+                    </tbody>
+                </table>
+                <button id="add" class="btn btn-primary">@TB.Tournoi_Edit_DotationAdd</button> <div class="btn btn-primary" onclick="removeTr();">@TB.Tournoi_Edit_DotationRemove</div>
+                <span asp-validation-for="Dotation" class="text-danger"></span>
+            </div>
             <div class="form-group">
                 <label asp-for="Deleted" class="control-label"></label>
                 <input asp-for="Deleted" class="form-control" />
                 <span asp-validation-for="Deleted" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input type="submit" value="@TB.Tournoi_Edit_SubmitSave" class="btn btn-default" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Details" asp-route-id="@Model.IdTournament">retour</a>
+    <a asp-action="Details" asp-route-id="@Model.IdTournament">@TB.Tournoi_Edit_Retour</a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+
+
+<script>
+    var counter = @counter;
+    $(function () {
+        $('#add').click(function () {
+            $('<tr id="Dotation' + counter + '">'+
+                '<td><input name="Dotation[' + counter + '].Place" type="number" class="form-control text-center" /></td>' +
+                '<td><input name="Dotation[' + counter + '].Gain" type="number" class="form-control text-center" /></td>' +
+                '</tr>').appendTo('#ListDotation');
+            counter++;
+            return false;
+        });
+    });
+    function removeTr() {
+        if (counter > 1) {
+            counter--;
+            $('#Dotation' + counter).remove();
+        }
+        return false;
+    }
+</script>

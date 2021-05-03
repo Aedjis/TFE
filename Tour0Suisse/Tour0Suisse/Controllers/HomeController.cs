@@ -19,18 +19,20 @@ namespace Tour0Suisse.Web.Controllers
 
             ViewBag.NextTournament = listTournois.Where(t => t.Date > DateTime.Now && !t.Over && t.Deleted == null)
                 .OrderBy(t => t.Date).Take(15).TakeLast(10).ToList();
-
+            ViewData["Title"] = "Home";
             return View();
         }
 
         public IActionResult Privacy()
         {
+            ViewData["Title"] = "Privacy";
             return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
+            ViewData["Title"] = "Erreur";
             return View(new ErrorViewModel {RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier});
         }
     }

@@ -1,12 +1,13 @@
 ﻿@using Microsoft.AspNetCore.Http
 @using Tour0Suisse.Model
+@using Tour0Suisse.Web.Models
 @model Tournoi
 
 @{
-    ViewData["Title"] = "Details";
+   TexteFr TB = TexteFr.Instance;
 }
 
-<h2>Details</h2>
+<h2>@ViewData["Title"]</h2>
 
 <div>
     <h4>Tournoi</h4>
@@ -26,7 +27,7 @@
                     @Html.DisplayNameFor(model => model.Description)
                 </th>
                 <th>
-                    @Html.DisplayName("Nombre de joueur")
+                    @Html.DisplayName(TB.Admin_Tournoi_NbJoueur)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.DeckListNumber)
@@ -70,7 +71,7 @@
     {
         <div class="form-group">
             <form asp-action="Start" asp-route-id="@Model.IdTournament">
-                <input type="submit" value="Commencer le tournoi" class="btn btn-default"/>
+                <input type="submit" value="@TB.Admin_Tournoi_SubmitStart" class="btn btn-default"/>
             </form>
         </div>
     }
@@ -94,10 +95,10 @@
                         <thead>
                             <tr>
                                 <th>
-                                    @Html.DisplayName("Début de round")
+                                    @Html.DisplayName(TB.Admin_Tournoi_DisplayDebut)
                                 </th>
                                 <th>
-                                    @Html.DisplayName("Fin de round")
+                                    @Html.DisplayName(TB.Admin_Tournoi_DisplayFin)
                                 </th>
                             </tr>
                         </thead>
@@ -114,23 +115,23 @@
                     </table>
                     @if (Model.Matchs.Any(m => m.RoundNumber == round.RoundNumber))
                     {
-                        <table class="table List table-striped">
+                        <table class="table List Search table-striped">
                             <thead>
                             <tr>
                                 <th style="text-align:left">
-                                    @Html.DisplayName("Joueur 1")
+                                    @Html.DisplayName(TB.Admin_Tournoi_DisplayJ1)
                                 </th>
                                 <th style="text-align:left">
-                                    @Html.DisplayName("Pseudo Joueur 1")
+                                    @Html.DisplayName(TB.Admin_Tournoi_DisplayJ1Pseudo)
                                 </th>
                                 <th style="text-align:center">
-                                    @Html.DisplayName("Score")
+                                    @Html.DisplayName(TB.Admin_Tournoi_DisplayScore)
                                 </th>
                                 <th style="text-align:right">
-                                    @Html.DisplayName("Pseudo Joueur 2")
+                                    @Html.DisplayName(TB.Admin_Tournoi_DisplayJ2Pseudo)
                                 </th>
                                 <th style="text-align:right">
-                                    @Html.DisplayName("Joueur 2")
+                                    @Html.DisplayName(TB.Admin_Tournoi_DisplayJ2)
                                 </th>
 
                             </tr>
@@ -167,19 +168,19 @@
                         if (Model.Matchs.All(m => m.RoundNumber != round.RoundNumber))
                         {
                             <form asp-action="Pairing" asp-route-id="@Model.IdTournament" asp-route-round="@(round.RoundNumber)">
-                                <input type="submit" value="crée tout les matchs" class="btn btn-default" />
+                                <input type="submit" value="@TB.Admin_Tournoi_SubmitPairing" class="btn btn-default" />
                             </form>
                         }
                         else if (round.EndRound == null)
                         {
                             <form asp-action="EndRound" asp-route-id="@Model.IdTournament" asp-route-round="@(round.RoundNumber)">
-                                <input type="submit" value="Terminé la Round" class="btn btn-default" />
+                                <input type="submit" value="@TB.Admin_Tournoi_SubmitEndRound" class="btn btn-default" />
                             </form>
                         }
                         else
                         {
                             <form asp-action="CreateNextRound" asp-route-id="@Model.IdTournament" asp-route-round="@(round.RoundNumber)">
-                                <input type="submit" value="Crée la prochaine round" class="btn btn-default" />
+                                <input type="submit" value="@TB.Admin_Tournoi_SubmitNextRound" class="btn btn-default" />
                             </form>
                         }
 
@@ -280,13 +281,13 @@
     }*@
 
     <form asp-action="EndTournoiR" asp-route-id="@Model.IdTournament">
-        <input type="submit" value="Terminer le tournoi" class="btn btn-default" />
+        <input type="submit" value="@TB.Admin_Tournoi_SubmitEndTournoi" class="btn btn-default" />
     </form>
 
 </div>
     }
 }
 <div>
-    <a asp-controller="Tournois" asp-action="Details" asp-route-id="@Model.IdTournament">Retour</a>
-    | <a asp-action="Index">Back to List</a>
+    <a asp-controller="Tournois" asp-action="Details" asp-route-id="@Model.IdTournament">@TB.Admin_Tournoi_Details</a>
+    | <a asp-action="Index">@TB.Admin_Tournoi_Index</a>
 </div>

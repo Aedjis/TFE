@@ -22,7 +22,7 @@ namespace Tour0Suisse.Web.Controllers
             
 
             IEnumerable<ViewTournament> tournaments = (await CallAPI.GetTournamentsWHereOrga(UserId)).OrderBy(t => t.Over).ThenBy(t => t.Date);
-
+            ViewData["Title"] = "Vos tournois";
             return View("~/Views/Admin/Index.cshtml", tournaments);
         }
 
@@ -36,8 +36,8 @@ namespace Tour0Suisse.Web.Controllers
             }
 
             Tournoi tournoi = temp.Item2;
-            
 
+            ViewData["Title"] = "Admin Tournoi";
             return View("~/Views/Admin/Tournoi.cshtml", tournoi);
         }
 
@@ -159,7 +159,7 @@ namespace Tour0Suisse.Web.Controllers
             }
 
             match.Parties = temp;
-            
+            ViewData["Title"] = "Match";
             return View("~/Views/Admin/Match.cshtml", match);
         }
 
@@ -212,6 +212,7 @@ namespace Tour0Suisse.Web.Controllers
             }
 
             match.Parties = match.Parties.Concat(empyParties).Take((match.Tournament.DeckListNumber*2)-1).ToList();
+            ViewData["Title"] = "Match";
             return View("~/Views/Admin/Match.cshtml", match);
         }
 
@@ -288,6 +289,7 @@ namespace Tour0Suisse.Web.Controllers
 
             //return RedirectToAction("Details", "Tournois", new { id = id });
             tournoi.Resultas = tournoi.Resultas.OrderByDescending(r => r.Score);
+            ViewData["Title"] = "Finir tournoi";
             return View("~/Views/Admin/EndTournoi.cshtml", tournoi);
         }
     }

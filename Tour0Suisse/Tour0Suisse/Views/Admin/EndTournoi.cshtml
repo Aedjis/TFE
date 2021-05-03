@@ -1,10 +1,11 @@
-﻿@model Tour0Suisse.Model.Tournoi
-
+﻿@using Tour0Suisse.Web.Models
+@model Tour0Suisse.Model.Tournoi
 @{
-    ViewData["Title"] = "EndTournoi";
+    TexteFr TB = TexteFr.Instance;
 }
 
-<h2>EndTournoi</h2>
+
+<h2>@ViewData["Title"]</h2>
 
 <div>
     <h4>Tournoi</h4>
@@ -39,7 +40,7 @@
             @Html.DisplayNameFor(model=> model.Resultas)
         </dt>
         <dd>
-            <table>
+            <table class="table List table-striped">
                 <thead>
                 <tr>
                     <th>@Html.DisplayNameFor(Model => Model.Classement.FirstOrDefault().Pseudo)</th>
@@ -69,8 +70,8 @@
 </div>
 <form asp-action="EndTournoi" method="post">
     <input asp-for="IdTournament" hidden readonly/>
-    <input type="submit" value="Terminer le tournoi" class="btn btn-default"/>
+    <input type="submit" value="@TB.Admin_EndTournoi_Submit_End" class="btn btn-default"/>
 </form>
 <div>
-    <a asp-action="Tournoi" asp-route-id="@Model.IdTournament">Back to AdminPage</a>
+    <a asp-action="Tournoi" asp-route-id="@Model.IdTournament" class="btn">@TB.Admin_EndTournoi_Back</a>
 </div>

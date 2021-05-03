@@ -20,7 +20,7 @@ namespace Tour0Suisse.Web.Controllers
         public async Task<IActionResult> Index()
         {
             List<ViewTournament> listTournois = (await CallAPI.GetAllTournaments()).ToList();
-
+            ViewData["Title"] = "Liste des tournois";
             return View("~/Views/Tournoi/Index.cshtml", listTournois);
         }
 
@@ -37,7 +37,7 @@ namespace Tour0Suisse.Web.Controllers
             {
                 return NotFound();
             }
-
+            ViewData["Title"] = "Détails du tournoi";
             return View("~/Views/Tournoi/Details.cshtml", tournoi);
         }
 
@@ -51,6 +51,7 @@ namespace Tour0Suisse.Web.Controllers
             var Jeus = await CallAPI.GetAllJeus();
 
             ViewData["AllGame"] = new SelectList(Jeus, "IdGame", "Name");
+            ViewData["Title"] = "Création d'un tournoi";
             return View("~/Views/Tournoi/CreateTournoi.cshtml");
         }
 
@@ -59,7 +60,7 @@ namespace Tour0Suisse.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("IdTournament,Name,Date,Description,IdGame,MaxNumberPlayer,DeckListNumber,Ppwin,Ppdraw,Pplose,Over,Deleted")]
+        public async Task<IActionResult> Create([Bind("IdTournament,Name,Date,Description,IdGame,MaxNumberPlayer,DeckListNumber,Ppwin,Ppdraw,Pplose,Over,Deleted,Dotation")]
             Tournoi tournoi)
         {
             if (ModelState.IsValid)
@@ -83,6 +84,7 @@ namespace Tour0Suisse.Web.Controllers
             IEnumerable<ViewJeu> Jeus = await CallAPI.GetAllJeus();
 
             ViewData["AllGame"] = new SelectList(Jeus, "IdGame", "Name", tournoi.jeu.IdGame);
+            ViewData["Title"] = "Création d'un tournoi";
             return View("~/Views/Tournoi/CreateTournoi.cshtml", tournoi);
         }
 
@@ -102,6 +104,7 @@ namespace Tour0Suisse.Web.Controllers
             IEnumerable<ViewJeu> Jeus = await CallAPI.GetAllJeus();
 
             ViewData["AllGame"] = new SelectList(Jeus, "IdGame", "Name", tournoi.jeu.IdGame);
+            ViewData["Title"] = "Modifier un tournoi";
             return View("~/Views/Tournoi/Edit.cshtml", tournoi);
         }
 
@@ -110,7 +113,7 @@ namespace Tour0Suisse.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("IdTournament,Name,Date,Description,IdGame,MaxNumberPlayer,DeckListNumber,Ppwin,Ppdraw,Pplose,Over,Deleted")]
+        public async Task<IActionResult> Edit(int id, [Bind("IdTournament,Name,Date,Description,IdGame,MaxNumberPlayer,DeckListNumber,Ppwin,Ppdraw,Pplose,Over,Deleted,Dotation")]
             Tournoi tournoi)
         {
             if (id != tournoi.IdTournament)
@@ -130,6 +133,7 @@ namespace Tour0Suisse.Web.Controllers
             IEnumerable<ViewJeu> Jeus = await CallAPI.GetAllJeus();
 
             ViewData["AllGame"] = new SelectList(Jeus, "IdGame", "Name", tournoi.jeu.IdGame);
+            ViewData["Title"] = "Modifier un tournoi";
             return View("~/Views/Tournoi/Edit.cshtml", tournoi);
         }
 
@@ -145,6 +149,7 @@ namespace Tour0Suisse.Web.Controllers
 
             Tournoi tournoi = temp.Item2;
 
+            ViewData["Title"] = "Supprimer un tournoi";
             return View("~/Views/Tournoi/Delete.cshtml", tournoi);
         }
 
@@ -243,6 +248,7 @@ namespace Tour0Suisse.Web.Controllers
             Tournoi tournoi = temp.Item2;
 
             ViewBag.error = error;
+            ViewData["Title"] = "Se désinscrire pour " + tournoi.Name;
             return View("~/Views/Tournoi/Unregister.cshtml", tournoi);
         }
 
@@ -289,6 +295,7 @@ namespace Tour0Suisse.Web.Controllers
             if (!int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser) ||
                 (match.IdPlayer1 != IdUser && match.IdPlayer2 != IdUser))
             {
+                ViewData["Title"] = "Match";
                 return View("~/Views/Tournoi/Match.cshtml", match);
             }
 
@@ -323,6 +330,7 @@ namespace Tour0Suisse.Web.Controllers
 
             match.Parties = temp;
             ViewBag.error = error;
+            ViewData["Title"] = "Match";
             return View("~/Views/Tournoi/Match.cshtml", match);
         }
 
@@ -373,6 +381,7 @@ namespace Tour0Suisse.Web.Controllers
             }
 
             ViewBag.error = error;
+            ViewData["Title"] = "Modifier mes decks";
             return View("~/Views/Tournoi/EditDeck.cshtml", joueur);
         }
 

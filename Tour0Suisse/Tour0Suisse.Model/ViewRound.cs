@@ -20,9 +20,9 @@ namespace Tour0Suisse.Model
         public string Name { get; set; }
         [Display(Name = "Round numero")]
         public int RoundNumber { get; set; }
-        [Display(Name = "Début de round")]
+        [Display(Name = "Début de ronde")]
         public DateTime? StartRound { get; set; }
-        [Display(Name = "Fin de round")]
+        [Display(Name = "Fin de ronde")]
         public DateTime? EndRound { get; set; }
     }
 }

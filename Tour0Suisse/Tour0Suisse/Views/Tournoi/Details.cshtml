@@ -1,14 +1,15 @@
 ﻿@using Microsoft.AspNetCore.Http
+@using Tour0Suisse.Web.Models
 @model Tour0Suisse.Model.Tournoi
 
 @{
-    ViewData["Title"] = "Details";
+    TexteFr TB = TexteFr.Instance;
 }
 
-<h2>Details</h2>
+<h2>@ViewData["Title"]</h2>
 
 <div>
-    <h4>Tournoi</h4>
+    <h4>@TB.Tournoi_Details_Title</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -80,35 +81,36 @@
     </dl>
 </div>
 <div class="row">
-    <h2>Details</h2>
+    <h2>@TB.Tournoi_Details_Listing</h2>
     <ul class="nav nav-tabs">
-        <li><a class="navbar-link disabled" data-toggle="tab" href="#Participant">Participant</a></li>
-        <li @((Model.Classement == null || !Model.Classement.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Classement == null || !Model.Classement.Any())? "":"data-toggle=tab") href="#Classement">Classement</a></li>
-        <li @((Model.Classement == null || !Model.Rounds.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Classement == null || !Model.Rounds.Any())? "":"data-toggle=tab") href="#Ronde">Ronde</a></li>
-        <li @((Model.Classement == null || !Model.Resultas.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Classement == null || !Model.Resultas.Any())? "":"data-toggle=tab") href="#Resultat">Resultat</a></li>
-        <li><a class="navbar-link" data-toggle="tab" href="#Admin">Admin</a></li>
+        <li><a class="navbar-link disabled" data-toggle="tab" href="#Participant">@TB.Tournoi_Details_ListingToggleJoueur</a></li>
+        <li @((Model.Classement == null || !Model.Classement.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Classement == null || !Model.Classement.Any())? "":"data-toggle=tab") href="#Classement">@TB.Tournoi_Details_ListingToggleClassement</a></li>
+        <li @((Model.Classement == null || !Model.Rounds.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Classement == null || !Model.Rounds.Any())? "":"data-toggle=tab") href="#Ronde">@TB.Tournoi_Details_ListingToggleRound</a></li>
+        <li @((Model.Classement == null || !Model.Resultas.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Classement == null || !Model.Resultas.Any())? "":"data-toggle=tab") href="#Resultat">@TB.Tournoi_Details_ListingToggleResult</a></li>
+        <li><a class="navbar-link" data-toggle="tab" href="#Admin">@TB.Tournoi_Details_ListingToggleAdmin</a></li>
+        <li @((Model.Dotation == null || !Model.Dotation.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Dotation == null || !Model.Dotation.Any())? "":"data-toggle=tab") href="#Dotation">@TB.Tournoi_Details_ListingToggleDotation</a></li>
     </ul>
-    <div class="tab-content">
+<div class="tab-content">
         <div id="Participant" class="tab-pane fade">
-            --Participant--
+            --@TB.Tournoi_Details_ListingToggleJoueur--
             <div class="container">
-                <table class="table List table-striped">
+                <table class="table List Search table-striped">
                     <thead>
                         <tr>
                             <th>
-                                @Html.DisplayName("Joueur")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingJoueurDisplayNom)
                             </th>
                             <th>
-                                @Html.DisplayName("Pseudo")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingJoueurDisplayPseudo)
                             </th>
                             <th>
-                                @Html.DisplayName("Date d'inscription")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingJoueurDisplayDate)
                             </th>
                             <th>
-                                @Html.DisplayName("CheckIn")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingJoueurDisplayCheckin)
                             </th>
                             <th>
-                                @Html.DisplayName("Drop")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingJoueurDisplayDrop)
                             </th>
                         </tr>
                     </thead>
@@ -131,28 +133,28 @@
             </div>
         </div>
         <div id="Classement" class="tab-pane fade">
-            --Classement--
+            --@TB.Tournoi_Details_ListingToggleClassement--
             <div class="container">
-                <table class="table List table-striped">
+                <table class="table List Search table-striped">
                     <thead>
                         <tr>
                             <th>
-                                @Html.DisplayName("Joueur")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingClassementDisplayNom)
                             </th>
                             <th>
-                                @Html.DisplayName("Pseudo")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingClassementDisplayPseudo)
                             </th>
                             <th>
-                                @Html.DisplayName("Score")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingClassementDisplayScore)
                             </th>
                             <th>
-                                @Html.DisplayName("Victoire")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingClassementDisplayV)
                             </th>
                             <th>
-                                @Html.DisplayName("Egaliter")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingClassementDisplayD)
                             </th>
                             <th>
-                                @Html.DisplayName("Defaite")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingClassementDisplayL)
                             </th>
                         </tr>
                     </thead>
@@ -176,7 +178,7 @@
             </div>
         </div>
         <div id="Ronde" class="tab-pane fade">
-            --Ronde--
+            --@TB.Tournoi_Details_ListingToggleRound--
               @if (Model.Rounds != null)
               {
                   @if (Model.Rounds.Any())
@@ -185,7 +187,7 @@
                           <ul class="nav nav-tabs">
                               @foreach (var round in Model.Rounds)
                               {
-                                  <li><a data-toggle="tab" href="@("#Ronde" + round.RoundNumber)">@("Ronde n°" + round.RoundNumber)</a></li>
+                                  <li><a data-toggle="tab" href="@("#Ronde" + round.RoundNumber)">@(@TB.Tournoi_Details_ListingRondeToggle + " " + round.RoundNumber)</a></li>
                               }
                           </ul>
                       </div>
@@ -197,10 +199,10 @@
                                       <thead>
                                       <tr>
                                           <th>
-                                              @Html.DisplayName("Début de round")
+                                              @Html.DisplayName(@TB.Tournoi_Details_ListingRondeStart)
                                           </th>
                                           <th>
-                                              @Html.DisplayName("Fin de round")
+                                              @Html.DisplayName(@TB.Tournoi_Details_ListingRondeEnd)
                                           </th>
                                       </tr>
                                       </thead>
@@ -219,23 +221,23 @@
                                   </table>
                                   @if (Model.Matchs.Any(m => m.RoundNumber == round.RoundNumber))
                                   {
-                                      <table class="table List table-striped">
+                                      <table class="table List Search table-striped">
                                           <thead>
                                           <tr>
                                               <th style="text-align: left">
-                                                  @Html.DisplayName("Joueur 1")
+                                                  @Html.DisplayName(@TB.Tournoi_Details_ListingRondeDisplayJ1)
                                               </th>
                                               <th style="text-align: left">
-                                                  @Html.DisplayName("Pseudo Joueur 1")
+                                                  @Html.DisplayName(@TB.Tournoi_Details_ListingRondeDisplayJ1Pseudo)
                                               </th>
                                               <th style="text-align: center">
-                                                  @Html.DisplayName("Score")
+                                                  @Html.DisplayName(@TB.Tournoi_Details_ListingRondeDisplayScore)
                                               </th>
                                               <th style="text-align: right">
-                                                  @Html.DisplayName("Pseudo Joueur 2")
+                                                  @Html.DisplayName(@TB.Tournoi_Details_ListingRondeDisplayJ2Pseudo)
                                               </th>
                                               <th style="text-align: right">
-                                                  @Html.DisplayName("Joueur 2")
+                                                  @Html.DisplayName(@TB.Tournoi_Details_ListingRondeDisplayJ2)
                                               </th>
 
                                           </tr>
@@ -272,28 +274,28 @@
               }
         </div>
         <div id="Resultat" class="tab-pane fade">
-            --Resultat--
+            --@TB.Tournoi_Details_ListingToggleResult--
             <div class="container">
-                <table class="table List table-striped">
+                <table class="table List Search table-striped">
                     <thead>
                         <tr>
                             <th>
-                                @Html.DisplayName("Rank")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingResultDisplayRank)
                             </th>
                             <th>
-                                @Html.DisplayName("Joueur")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingResultDisplayJoueur)
                             </th>
                             <th>
-                                @Html.DisplayName("Pseudo")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingResultDisplayPseudo)
                             </th>
                             <th>
-                                @Html.DisplayName("Gain")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingResultDisplayGain)
                             </th>
                             <th>
-                                @Html.DisplayName("Score")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingResultDisplayScore)
                             </th>
                             <th>
-                                @Html.DisplayName("TieBreaker")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingResultDisplayTB)
                             </th>
                             @*<th>
                                 @Html.DisplayName("Victoire")
@@ -305,10 +307,10 @@
                                 @Html.DisplayName("Defaite")
                             </th>*@
                             <th>
-                                @Html.DisplayName("TieBreaker additionnel")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingResultDisplayTBA)
                             </th>
                             <th>
-                                @Html.DisplayName(" regle du TieBreaker additionelle")
+                                @Html.DisplayName(@TB.Tournoi_Details_ListingResultDisplayTBR)
                             </th>
                         </tr>
                     </thead>
@@ -336,40 +338,68 @@
                     </table>
             </div>
         </div>
-        <div id="Admin" class="tab-pane fade">
-            --Admin--
-            <div class="container">
-                <table class="table List table-striped">
-                    <thead>
-                    <tr>
-                        <th>
-                            @Html.DisplayName("Admin")
-                        </th>
-                        <th>
-                            @Html.DisplayName("Level")
-                        </th>
-                        <th>
-                            Contacter
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                        @if (Model.Organisateurs != null)
-                        {
-                            @foreach (var orga in Model.Organisateurs)
-                            {
-                                <tr>
-                                    <td>@Html.DisplayFor(o => orga.Pseudo)</td>
-                                    <td>@Html.DisplayFor(o => orga.Level)</td>
-                                    <td>???</td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
+    <div id="Admin" class="tab-pane fade">
+        --@TB.Tournoi_Details_ListingToggleAdmin--
+        <div class="container">
+            <table class="table List Search table-striped">
+                <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayName(@TB.Tournoi_Details_ListingAdminDisplayName)
+                    </th>
+                    <th>
+                        @Html.DisplayName(@TB.Tournoi_Details_ListingAdminDisplayLvl)
+                    </th>
+                    <th>
+                        @TB.Tournoi_Details_ListingAdminDisplayCnt
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                @if (Model.Organisateurs != null)
+                {
+                    @foreach (var orga in Model.Organisateurs)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(o => orga.Pseudo)</td>
+                            <td>@Html.DisplayFor(o => orga.Level)</td>
+                            <td>???</td>
+                        </tr>
+                    }
+                }
+                </tbody>
+            </table>
         </div>
     </div>
+    
+    <div id="Dotation" class="tab-pane fade">
+        --@TB.Tournoi_Details_ListingToggleDotation--
+        <div class="container">
+            <label asp-for="Dotation" class="control-label"></label>
+            <table class="table List table-striped">
+                <thead>
+                    <tr>
+                        <th>@TB.Tournoi_Details_ListingDotationDisplayTop</th>
+                        <th>@TB.Tournoi_Details_ListingDotationDisplayGain</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model?.Dotation != null && Model.Dotation.Any())
+                    {
+                        foreach (var dot in Model.Dotation)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(d=> dot.Place)</td>
+                                <td>@Html.DisplayFor(d => dot.Gain)</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
 </div>
 <div class="row">
     @{
@@ -377,24 +407,24 @@
         {
             if (Model.Organisateurs.Any(o => o.IdUser == Uid))
             {
-                <a asp-action="Edit" asp-route-id="@Model.IdTournament">Edit</a> @("|")
-                <a asp-controller="Admin" asp-action="Tournoi" asp-route-id="@Model.IdTournament">Admin</a> @("|")
+                <a asp-action="Edit" asp-route-id="@Model.IdTournament">@TB.Tournoi_Details_Edit</a> @("|")
+                <a asp-controller="Admin" asp-action="Tournoi" asp-route-id="@Model.IdTournament">@TB.Tournoi_Details_Admin</a> @("|")
             }
             else if (!Model.Rounds.Any())
             {
                 if (Model.Participants.Any(p => p.IdUser == Uid))
                 {
-                    <a asp-action="EditDeck" asp-route-IdTournoi="@Model.IdTournament">Modifier ces decks</a> @("|")
-                    <a asp-action="Unregister" asp-route-IdTournoi="@Model.IdTournament">Ce désinscrire @Model.IdTournament</a> @("|")
+                    <a asp-action="EditDeck" asp-route-IdTournoi="@Model.IdTournament">@TB.Tournoi_Details_EditDeck</a> @("|")
+                    <a asp-action="Unregister" asp-route-IdTournoi="@Model.IdTournament">@TB.Tournoi_Details_Unregister</a> @("|")
                 }
                 else
                 {
-                    <a asp-action="Register" asp-route-id="@Model.IdTournament">S'inscire</a> @("|")
+                    <a asp-action="Register" asp-route-id="@Model.IdTournament">@TB.Tournoi_Details_Register</a> @("|")
                 }
             }
 
         }
     }
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">@TB.Tournoi_Details_Index</a>
 </div>
 

@@ -1,14 +1,16 @@
 ﻿@using Microsoft.AspNetCore.Http
 @using System.Linq
+@using Tour0Suisse.Web.Models
 @model Tour0Suisse.Model.Tournoi
 
 @{
-    ViewData["Title"] = "CreateTournoi";
+    TexteFr TB = TexteFr.Instance;
+    int counter = 0;
 }
 
-<h2>CreateTournoi</h2>
+<h2>@ViewData["Title"]</h2>
 
-<h4>Tournoi</h4>
+<h4>@TB.Tournoi_Create_Title</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -21,7 +23,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Date" class="control-label"></label>
-                <input asp-for="Date" class="form-control"/>
+                <input asp-for="Date" class="form-control" />
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -31,17 +33,17 @@
             </div>
             <div class="form-group">
                 <label asp-for="IdGame" class="control-label"></label>
-                <select asp-for="IdGame" asp-items ="@ViewData["AllGame"] as SelectList" class="form-control"></select>
+                <select asp-for="IdGame" asp-items="@ViewData["AllGame"] as SelectList" class="form-control"></select>
                 <span asp-validation-for="IdGame" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DeckListNumber" class="control-label"></label>
-                <input asp-for="DeckListNumber" class="form-control" value="3"  min="3" max="5"/>
+                <input asp-for="DeckListNumber" class="form-control" value="3" min="3" max="5" />
                 <span asp-validation-for="DeckListNumber" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="MaxNumberPlayer" class="control-label"></label>
-                <input asp-for="MaxNumberPlayer" class="form-control" min="6"/>
+                <input asp-for="MaxNumberPlayer" class="form-control" min="6" />
                 <span asp-validation-for="MaxNumberPlayer" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -59,20 +61,78 @@
                 <input asp-for="Pplose" class="form-control" value="0" />
                 <span asp-validation-for="Pplose" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="Dotation" class="control-label"></label>
+                <table id="ListDotation">
+                    <thead>
+                        <tr>
+                            <th>@TB.Tournoi_Create_DotationTop</th>
+                            <th>@TB.Tournoi_Create_DotationGain</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @if (Model?.Dotation != null && Model.Dotation.Any())
+                    {
+                        foreach (var dot in Model.Dotation)
+                        {
+                            <tr id="@("Dotation" + counter)">
+                                <td><input name="@("Dotation[" + counter + "].Place")" type="number" class="form-control text-center" value="@dot.Place"/></td>
+                                <td><input name="@("Dotation[" + counter + "].Gain")" type="number" class="form-control text-center" value="@dot.Gain"/></td>
+                            </tr>
+
+                            @(counter++)
+                        }
+                    }
+                    else
+                    {
+                        <tr id="Dotation0">
+                            <td><input name="Dotation[0].Place" type="number" class="form-control text-center"/></td>
+                            <td><input name="Dotation[0].Gain" type="number" class="form-control text-center"/></td>
+                        </tr>
+
+                        @(counter++)
+                    }
+                    </tbody>
+                </table>
+                <div id="add" class="btn btn-primary">@TB.Tournoi_Create_DotationAdd</div> <div class="btn btn-primary" onclick="removeTr();">@TB.Tournoi_Create_DotationRemove</div>
+                <span asp-validation-for="Dotation" class="text-danger"></span>
+            </div>
             <div>
-                <input asp-for="IdTournament" value="@Context.Session.GetString("UserId")" hidden=""/>
+                <input asp-for="IdTournament" value="@Context.Session.GetString("UserId")" hidden="" />
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="@TB.Tournoi_Create_SubmitCreate" class="btn btn-default" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Retourner a l'accueil</a>
+    <a asp-action="Index">@TB.Tournoi_Create_Retour</a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+<script>
+    var counter = @counter;
+    $(function () {
+        $('#add').click(function () {
+            $('<tr id="Dotation' + counter + '">'+
+                '<td><input name="Dotation[' + counter + '].Place" type="number" class="form-control text-center" /></td>' +
+                '<td><input name="Dotation[' + counter + '].Gain" type="number" class="form-control text-center" /></td>' +
+                '</tr>').appendTo('#ListDotation');
+            counter++;
+            return false;
+        });
+    });
+    function removeTr() {
+        if (counter > 1) {
+            counter--;
+            $('#Dotation' + counter).remove();
+        }
+        return false;
+    }
+</script>

@@ -1443,10 +1443,16 @@ namespace Tour0Suisse.Repository
         }
 
 
-        public RetourAPI EditTournoi(ViewTournament P)
+        public RetourAPI EditTournoi(Tournoi P)
         {
             try
             {
+                DataTable Dotation = new DataTable();
+                Dotation.Columns.Add("ID_PlayerOne", typeof(int));
+                Dotation.Columns.Add("ID_PlayerTwo", typeof(int));
+
+                foreach (ViewDotation VD in P.Dotation) Dotation.Rows.Add(VD.Place, VD.Gain);
+
                 SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250)
                 {
                     Direction = ParameterDirection.Output
@@ -1469,6 +1475,7 @@ namespace Tour0Suisse.Repository
                 cmd.Parameters.AddWithValue("@ID_Game", P.IdGame);
                 cmd.Parameters.AddWithValue("@Description", P.Description);
                 cmd.Parameters.AddWithValue("@MaxNumberPlayer", P.MaxNumberPlayer);
+                cmd.Parameters.AddWithValue("@Dotation", Dotation);
                 cmd.Parameters.AddWithValue("@DeckListNumber", P.DeckListNumber);
                 cmd.Parameters.AddWithValue("@PPWin", P.Ppwin);
                 cmd.Parameters.AddWithValue("@PPDraw", P.Ppdraw);

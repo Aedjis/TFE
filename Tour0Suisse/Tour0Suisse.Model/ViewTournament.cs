@@ -23,7 +23,9 @@ namespace Tour0Suisse.Model
 
     public class ViewTournament : IViewTournament
     {
+        [Display(Name = "ID du tournoi")]
         public int IdTournament { get; set; }
+        [Display(Name = "ID du jeu")]
         public int IdGame { get; set; }
         [Display(Name = "Nom du tournoi")]
         public string Name { get; set; }

@@ -110,7 +110,7 @@ namespace Tour0Suisse.API.Controllers
         }
 
         [HttpPost]
-        public RetourAPI EditTournoi(ViewTournament Tournoi)
+        public RetourAPI EditTournoi(Tournoi Tournoi)
         {
             return DB_CURD.EditTournoi(Tournoi);
         }

@@ -1,12 +1,12 @@
 ﻿@using Tour0Suisse.Model
 @using Microsoft.AspNetCore.Http
+@using Tour0Suisse.Web.Models
 @model Tour0Suisse.Model.Match
-
 @{
-    ViewData["Title"] = "Match";
+    TexteFr TB = TexteFr.Instance;
 }
 
-<h4>Match</h4>
+<h2>@ViewData["Title"]</h2>
 <hr />
 @if (ViewBag.error != null)
 {
@@ -16,7 +16,8 @@
 }
 <div class="div-row">
     <div class="text-center div-left">
-        @foreach (var deck in (IEnumerable<ViewDeck>)ViewData["DecksP1"])
+        <h4>@TB.Admin_Match_TitleDeckJ1</h4>
+        @foreach (var deck in (IEnumerable<ViewDeck>) ViewData["DecksP1"])
         {
             <h4>@deck.IdDeck</h4>
             <textarea readonly class="text-info">@(deck.DeckList)</textarea>
@@ -71,12 +72,13 @@
             }
 
             <div class="form-group">
-                    <input type="submit" value="Save" class="btn btn-default" />
-                </div>
-            
+                <input type="submit" value="@TB.Admin_Match_SubmitSave" class="btn btn-default" />
+            </div>
+
         </form>
     </div>
     <div class="text-center div-right">
+        <h4>@TB.Admin_Match_TitleDeckJ2</h4>
         @foreach (var deck in (IEnumerable<ViewDeck>)ViewData["DecksP2"])
         {
             <h4>@deck.IdDeck</h4>
@@ -86,7 +88,7 @@
 </div>
 
 <div>
-    <a asp-action="Tournoi" asp-route-id="@Model.IdTournament">Back to Tournoi</a>
+    <a asp-action="Tournoi" asp-route-id="@Model.IdTournament">@TB.Admin_Match_Back</a>
 </div>
 
 @section Scripts {
