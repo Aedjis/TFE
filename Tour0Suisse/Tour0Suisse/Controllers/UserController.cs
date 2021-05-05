@@ -14,8 +14,7 @@ namespace Tour0Suisse.Web.Controllers
     {
         public IActionResult Index()
         {
-            ViewData["Title"] = "Liste des utilisateurs";
-            return View("~/Views/Home/Index.cshtml");
+            return RedirectToAction("AllUser");
         }
 
         // GET: Utilisateurs
@@ -66,7 +65,9 @@ namespace Tour0Suisse.Web.Controllers
             {
                 return NotFound();
             }
+
             ViewData["Title"] = "Profil " + user.Pseudo;
+            ViewData["Message"] = (user == null) ? "" : user.Pseudo ?? "";
             return View("~/Views/User/Profil.cshtml", user);
         }
 
@@ -114,7 +115,8 @@ namespace Tour0Suisse.Web.Controllers
                 return NotFound();
             }
 
-            ViewData["Title"] = "Modifier son profil";
+            ViewData["Title"] = "Modifier votre profil";
+            ViewData["Message"] = (utilisateur == null) ? "" : utilisateur.Pseudo ?? "";
             return View("~/Views/User/UpdateProfil.cshtml", utilisateur);
         }
 
@@ -151,7 +153,8 @@ namespace Tour0Suisse.Web.Controllers
                 }
             }
 
-            ViewData["Title"] = "Modifier son profil";
+            ViewData["Title"] = "Modifier votre profil";
+            ViewData["Message"] = (utilisateur == null) ? "" : utilisateur.Pseudo ?? "";
             return View("~/Views/User/UpdateProfil.cshtml", utilisateur);
         }
 
@@ -206,7 +209,8 @@ namespace Tour0Suisse.Web.Controllers
                     }
                 }
 
-            ViewData["Title"] = "Ajouter des pseudos de jeu";
+            ViewData["Title"] = "Ajouter ou éditer un pseudo";
+            ViewData["Message"] = (utilisateur == null) ? "" : utilisateur.Pseudo ?? "";
             return View("~/Views/User/AddGamePseudo.cshtml", utilisateur);
         }
 

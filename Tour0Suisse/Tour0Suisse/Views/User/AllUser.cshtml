@@ -1,10 +1,6 @@
 ﻿@model IEnumerable<Tour0Suisse.Model.ViewUser>
 
-@{
-    ViewData["Title"] = "AllUser";
-}
-
-<h2>AllUser</h2>
+<h2>@ViewData["Title"]</h2>
 
 <table class="table List Search table-striped">
     <thead>
@@ -22,7 +18,7 @@
                 @Html.DisplayFor(modelItem => item.Pseudo)
             </td>
             <td>
-                @Html.ActionLink("Details", "Details", new {  id=item.IdUser  }) 
+                @Html.ActionLink("Détails", "Details", new {  id=item.IdUser  }) 
             </td>
         </tr>
 }

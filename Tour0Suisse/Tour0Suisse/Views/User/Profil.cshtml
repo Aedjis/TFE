@@ -1,20 +1,19 @@
 ﻿@using Microsoft.AspNetCore.Http
 @using System.Globalization
 @using Tour0Suisse.Model
+@using Tour0Suisse.Web.Models
 @model Tour0Suisse.Model.Utilisateur
 
 @{
-    ViewData["Title"] = "Profil";
-    ViewData["Message"] = (Model==null)? "": Model.Pseudo ?? "";
+    TexteFr TB = TexteFr.Instance;
     System.Diagnostics.Debug.Assert(Model != null, nameof(Model) + " != null");
     var LoggedUser = int.TryParse(Context.Session.GetString("UserId"), out int Id) && Id == Model.IdUser;
 }
 <h2>@ViewData["Title"]</h2>
 <h3>@ViewData["Message"]</h3>
-
+<hr />
 <div>
-    <h4>Utilisateur</h4>
-    <hr />
+  
     <dl class="dl-horizontal">
         <dt>
             @Html.DisplayNameFor(model => model.Pseudo)
@@ -66,7 +65,7 @@
 
             @if (LoggedUser)
             {
-    <a asp-action="AddGamePseudo" asp-route-id="@Model.IdUser">Ajouté ou modifié des pseudo</a><br />            }
+    <a asp-action="AddGamePseudo" asp-route-id="@Model.IdUser">@TB.User_Profil_BtnAddPseudo</a><br />            }
         </dd>
         @*<dt>
             @Html.DisplayFor(model => model.Resultas)
@@ -102,7 +101,7 @@
 <div>
 @if (LoggedUser)
     {
-        <a asp-action="Edit" asp-route-id="@Model.IdUser">Edit</a><br/>
+        <a class="btn btn-primary" asp-action="Edit" asp-route-id="@Model.IdUser">@TB.User_Profil_BtnEdit</a><br/>
     }
-    <a asp-action="AllUser">Back to List</a>
+    <a asp-action="AllUser">@TB.User_Profil_Retour</a>
 </div>

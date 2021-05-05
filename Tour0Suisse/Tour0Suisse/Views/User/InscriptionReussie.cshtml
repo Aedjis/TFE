@@ -1,8 +1,9 @@
-﻿@{
-    ViewData["Title"] = "Inscription";
+﻿@using Tour0Suisse.Web.Models
+@{
+   TexteFr TB = TexteFr.Instance;
 }
 <h2>@ViewData["Title"]</h2>
 <h3>@ViewData["Message"]</h3>
 
 
-<h4>Inscription réussie</h4>
+<h4>@TB.User_InscriptionConf_Message</h4>

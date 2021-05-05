@@ -1,8 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Http
+@using Tour0Suisse.Web.Models
 @model IEnumerable<Tour0Suisse.Model.ViewTournament>
 
 @{
-    
+    TexteFr TB = TexteFr.Instance;
 }
 
 <h2>@ViewData["Title"]</h2>
@@ -10,7 +11,7 @@
 <p>
     @if (bool.TryParse(Context.Session.GetString("Orga"), out bool Orga) && Orga)
     {
-        <a asp-action="Create">Creer un nouveau tournoi</a>
+        <a class="btn btn-primary" asp-action="Create">@TB.Tournoi_Index_BtnNew</a>
     }
 </p>
 <table class="table List Search table-striped">
@@ -83,7 +84,7 @@
                 @Html.DisplayFor(modelItem => item.Game)
             </td>
             <td>
-                <a asp-action="Details" asp-route-id="@item.IdTournament">Details</a> 
+                <a asp-action="Details" asp-route-id="@item.IdTournament">@TB.Tournoi_Index_Detail</a> 
             </td>
         </tr>
 }

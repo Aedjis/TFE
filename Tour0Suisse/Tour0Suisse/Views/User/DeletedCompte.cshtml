@@ -1,12 +1,13 @@
-﻿@model Tour0Suisse.Model.Utilisateur
+﻿@using Tour0Suisse.Web.Models
+@model Tour0Suisse.Model.Utilisateur
 
 @{
-    ViewData["Title"] = "DeletedCompte";
+    TexteFr TB = TexteFr.Instance;
 }
 
-<h2>Supprimer son compte</h2>
+<h2>@ViewData["Title"]</h2>
 
-<h3>Etes-vous sur de vouloir supprimer votre compte?</h3>
+<h3>@TB.User_Delete_Warrning</h3>
 
 <div>
     <form asp-action="Delete">
@@ -16,7 +17,7 @@
             <span asp-validation-for="Password" class="text-danger"></span>
         </div>
         <input type="hidden" asp-for="IdUser"/>
-        <input type="submit" value="Delete" class="btn btn-default"/> |
-        <a asp-action="Details" asp-route-id="IdUser">Retourner au profil</a>
+        <input type="submit" value="@TB.User_Delete_SubmitDelete" class="btn btn-default"/> |
+        <a asp-action="Details" asp-route-id="IdUser">@TB.User_Delete_Retour</a>
     </form>
 </div>

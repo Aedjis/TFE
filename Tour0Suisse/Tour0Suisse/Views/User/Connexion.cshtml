@@ -1,7 +1,8 @@
-﻿@model Tour0Suisse.Model.Utilisateur
+﻿@using Tour0Suisse.Web.Models
+@model Tour0Suisse.Model.Utilisateur
 
 @{
-    ViewData["Title"] = "Connexion";
+    TexteFr TB = TexteFr.Instance;
 }
 <div class="container div-row">
     <div class="col-lg-4">
@@ -26,7 +27,7 @@
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Log In" class="btn btn-default" />
+                <input type="submit" value="@TB.User_Connexion_Login" class="btn btn-default" />
             </div>
             <br />
         </form>

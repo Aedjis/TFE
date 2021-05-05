@@ -1,9 +1,13 @@
 ﻿
+@using Tour0Suisse.Web.Models
 @model Tour0Suisse.Model.Joueur
+@{
+    TexteFr TB = TexteFr.Instance;
+}
 
-<h2>Create</h2>
+<h2>@ViewData["Title"]</h2>
 
-<h4>Deck</h4>
+<h4>@TB.Tournoi_Register_SubTitle</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -30,14 +34,15 @@
             }
 
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default"/>
+                <input type="submit" value="@TB.Tournoi_Register_SubmitCreate" class="btn btn-default"/>
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">@TB.Tournoi_Register_Index</a>
+    <a asp-action="Details" asp-route-id="@Model.IdTournament" >@TB.Tournoi_Register_Back</a>
 </div>
 
 @section Scripts {
