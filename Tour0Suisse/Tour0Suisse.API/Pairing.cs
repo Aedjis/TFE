@@ -126,6 +126,10 @@ namespace Tour0Suisse.API
             if ((roundNumber - 1) == 0)
             {
                 retour.AddRange(PairingInGroup(players, playerOpponentList, out List<int> outReportedPlayers, inReportedPlayers));//on fait le pairing de chaque groupe et on le rajoute au pairing existant
+
+                inReportedPlayers.Clear();
+                inReportedPlayers.AddRange(outReportedPlayers); //on transmet la liste es joueur reporté
+                outReportedPlayers.Clear();
             }
             else
             {

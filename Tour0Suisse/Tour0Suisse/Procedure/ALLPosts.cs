@@ -132,6 +132,10 @@ namespace Tour0Suisse.Web.Procedure
         {
             return await _PostT("/Procedure/Unregister", j);
         }
+        public static async Task<RetourAPI> DropTournoi(Joueur j)
+        {
+            return await _PostT("/Procedure/Drop", j);
+        }
 
         public static async Task<RetourAPI> EditDeck(ViewDeck Deck)
         {

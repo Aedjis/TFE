@@ -1682,6 +1682,49 @@ namespace Tour0Suisse.Repository
             }
         }
 
+        public RetourAPI DropTournoi(Joueur J)
+        {
+            try
+            {
+                SqlParameter responseMessage = new SqlParameter("@responseMessage", SqlDbType.VarChar, 250)
+                {
+                    Direction = ParameterDirection.Output
+                };
+
+                SqlParameter retour = new SqlParameter("@Reussie", SqlDbType.Bit)
+                {
+                    Direction = ParameterDirection.Output
+                };
+
+
+                SqlConnection db = new SqlConnection(_ConnectionString);
+
+                SqlCommand cmd = db.CreateCommand();
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.CommandText = "SP_DropTournoi";
+                cmd.Parameters.AddWithValue("@ID_Tournoi", J.IdTournament);
+                cmd.Parameters.AddWithValue("@ID_User", J.IdUser);
+                cmd.Parameters.Add(responseMessage);
+                cmd.Parameters.Add(retour);
+
+
+                db.Open();
+
+                Console.WriteLine(cmd.ExecuteNonQuery() + " ligne affecté");
+
+
+                db.Close();
+                return new RetourAPI(bool.Parse(retour.Value.ToString()), responseMessage.Value.ToString());
+            }
+            catch (Exception ex)
+            {
+#if DEBUG
+                throw ex;
+#endif
+                return new RetourAPI(false, "Erreur serveur : " + ex.Message);
+            }
+        }
+
 
         public RetourAPI UpdateDeck(DeckJoueur P, string DeckList)
         {

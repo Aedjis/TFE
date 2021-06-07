@@ -557,7 +557,7 @@ LEFT JOIN PseudoIG AS Ps
 GO
 
 CREATE VIEW [View_Match] AS
-SELECT M.[ID_Tournament], M.[RoundNumber], R.StartRound, [ID_PlayerOne], U1.Pseudo AS [PlayerOne], P1.IG_Pseudo AS [PseudoPlayerOne], [ID_PlayerTwo], U2.Pseudo AS [PlayerTwo], P2.IG_Pseudo AS [PseudoPlayerTwo], ResultP1, ResultDraw, ResultP2
+SELECT M.[ID_Tournament], M.[RoundNumber], R.StartRound, [ID_PlayerOne], U1.Pseudo AS [PlayerOne], P1.IG_Pseudo AS [PseudoPlayerOne], ISNULL([ID_PlayerTwo], 0) AS [ID_PlayerTwo], ISNULL(U2.Pseudo, 'BYE') AS [PlayerTwo], ISNULL(P2.IG_Pseudo, 'BYE') AS [PseudoPlayerTwo], ResultP1, ResultDraw, ResultP2
 FROM [Match] AS M
 JOIN Tournoi AS T
 	ON T.ID_Tournament = M.ID_Tournament
@@ -1328,6 +1328,42 @@ BEGIN
 			INSERT INTO Joueur ([ID_Tournament], [ID_User])
 				VALUES(@ID_Tournoi, @ID_User)
 				
+
+			COMMIT;
+		END TRY
+		BEGIN CATCH
+			SET @responseMessage=ERROR_MESSAGE();
+			SET @Reussie = 0;
+			ROLLBACK;
+		END CATCH
+END
+GO
+
+CREATE PROCEDURE SP_DropTournoi
+	@ID_Tournoi INT,
+	@ID_User INT,
+	@responseMessage NVARCHAR(250) OUTPUT,
+	@Reussie BIT OUTPUT
+AS
+BEGIN
+
+	SET @responseMessage = '';
+	SET @Reussie = 1;
+
+	BEGIN TRANSACTION
+		BEGIN TRY
+			if( @ID_Tournoi IS NULL OR (SELECT COUNT(1) FROM Tournoi WHERE (ID_Tournament = @ID_Tournoi and [Over]=0 )) <> 1)
+				Begin
+					RAISERROR('Le tournoi est introuvable',16,1);
+				End
+			if( @ID_User IS NULL OR (SELECT COUNT(1) FROM Utilisateur WHERE (ID_User = @ID_User)) <> 1)
+				Begin
+					RAISERROR('L utilisateur est introuvable',16,1);
+				End
+			
+			UPDATE Joueur
+			SET [Drop] = 1
+			WHERE [ID_Tournament] = @ID_Tournoi AND [ID_User] = @ID_User
 
 			COMMIT;
 		END TRY
@@ -2553,6 +2589,9 @@ Grant execute
 GO
 Grant execute 
 	on [dbo].[SP_RegisterTournoi] To [API_User]
+GO
+Grant execute 
+	on [dbo].[SP_DropTournoi] To [API_User]
 GO
 Grant execute 
 	on [dbo].[SP_UnregisterTournoi] To [API_User]

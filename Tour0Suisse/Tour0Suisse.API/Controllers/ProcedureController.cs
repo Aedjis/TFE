@@ -150,6 +150,12 @@ namespace Tour0Suisse.API.Controllers
         }
 
         [HttpPost]
+        public RetourAPI Drop(Joueur Joueur)
+        {
+            return DB_CURD.DropTournoi(Joueur);
+        }
+
+        [HttpPost]
         public RetourAPI AddAdmin(ViewOrga Orga)
         {
             return DB_CURD.AddAdmin(Orga);

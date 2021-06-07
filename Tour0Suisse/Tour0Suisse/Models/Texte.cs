@@ -81,7 +81,8 @@ namespace Tour0Suisse.Web.Models
 
         #region Tournoi
 
-        public readonly string Admin_Tournoi_NbJoueur = "Nombre de joueurs";
+        public readonly string Admin_Tournoi_NbJoueur = "Nombre de joueurs ";
+        public readonly string Admin_Tournoi_NbRondeReq = "(Nombre de rondes recommander)";
         public readonly string Admin_Tournoi_SubmitStart = "Commencer tournoi";
         public readonly string Admin_Tournoi_DisplayDebut = "Début de ronde";
         public readonly string Admin_Tournoi_DisplayFin = "Fin de ronde";
@@ -177,6 +178,7 @@ namespace Tour0Suisse.Web.Models
         public readonly string Tournoi_Details_Admin = "Admin";
         public readonly string Tournoi_Details_EditDeck = "Modifier mes decks";
         public readonly string Tournoi_Details_Unregister = "Se désinscrire";
+        public readonly string Tournoi_Details_Drop = "Abandonner le tournoi";
         public readonly string Tournoi_Details_Register = "S'inscrire";
         public readonly string Tournoi_Details_Index = "Retour à la liste des tournois";
 

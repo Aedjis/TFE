@@ -16,7 +16,7 @@
 }
 <div class="div-row">
     <div class="text-center div-left">
-        <h4>@TB.Admin_Match_TitleDeckJ1</h4>
+        <h4>@(Model.Player1)</h4>
         @foreach (var deck in (IEnumerable<ViewDeck>) ViewData["DecksP1"])
         {
             <h4>@deck.IdDeck</h4>
@@ -78,7 +78,7 @@
         </form>
     </div>
     <div class="text-center div-right">
-        <h4>@TB.Admin_Match_TitleDeckJ2</h4>
+        <h4>@(Model.Player2)</h4>
         @foreach (var deck in (IEnumerable<ViewDeck>)ViewData["DecksP2"])
         {
             <h4>@deck.IdDeck</h4>

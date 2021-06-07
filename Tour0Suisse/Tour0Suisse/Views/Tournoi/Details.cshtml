@@ -85,8 +85,8 @@
     <ul class="nav nav-tabs">
         <li><a class="navbar-link disabled" data-toggle="tab" href="#Participant">@TB.Tournoi_Details_ListingToggleJoueur</a></li>
         <li @((Model.Classement == null || !Model.Classement.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Classement == null || !Model.Classement.Any())? "":"data-toggle=tab") href="#Classement">@TB.Tournoi_Details_ListingToggleClassement</a></li>
-        <li @((Model.Classement == null || !Model.Rounds.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Classement == null || !Model.Rounds.Any())? "":"data-toggle=tab") href="#Ronde">@TB.Tournoi_Details_ListingToggleRound</a></li>
-        <li @((Model.Classement == null || !Model.Resultas.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Classement == null || !Model.Resultas.Any())? "":"data-toggle=tab") href="#Resultat">@TB.Tournoi_Details_ListingToggleResult</a></li>
+        <li @((Model.Rounds == null || !Model.Rounds.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Rounds == null || !Model.Rounds.Any())? "":"data-toggle=tab") href="#Ronde">@TB.Tournoi_Details_ListingToggleRound</a></li>
+        <li @((Model.Resultas == null || !Model.Resultas.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Resultas == null || !Model.Resultas.Any())? "":"data-toggle=tab") href="#Resultat">@TB.Tournoi_Details_ListingToggleResult</a></li>
         <li><a class="navbar-link" data-toggle="tab" href="#Admin">@TB.Tournoi_Details_ListingToggleAdmin</a></li>
         <li @((Model.Dotation == null || !Model.Dotation.Any())? "class=disabled":"")><a class="navbar-link" @((Model.Dotation == null || !Model.Dotation.Any())? "":"data-toggle=tab") href="#Dotation">@TB.Tournoi_Details_ListingToggleDotation</a></li>
     </ul>
@@ -410,17 +410,24 @@
                 <a asp-action="Edit" asp-route-id="@Model.IdTournament">@TB.Tournoi_Details_Edit</a> @("|")
                 <a asp-controller="Admin" asp-action="Tournoi" asp-route-id="@Model.IdTournament">@TB.Tournoi_Details_Admin</a> @("|")
             }
-            else if (!Model.Rounds.Any())
-            {
-                if (Model.Participants.Any(p => p.IdUser == Uid))
+            else if(!Model.Over){
+                if (!Model.Rounds.Any())
                 {
-                    <a asp-action="EditDeck" asp-route-IdTournoi="@Model.IdTournament">@TB.Tournoi_Details_EditDeck</a> @("|")
-                    <a asp-action="Unregister" asp-route-IdTournoi="@Model.IdTournament">@TB.Tournoi_Details_Unregister</a> @("|")
+                    if (Model.Participants.Any(p => p.IdUser == Uid))
+                    {
+                        <a asp-action="EditDeck" asp-route-IdTournoi="@Model.IdTournament">@TB.Tournoi_Details_EditDeck</a> @("|")
+                        <a asp-action="Unregister" asp-route-IdTournoi="@Model.IdTournament">@TB.Tournoi_Details_Unregister</a> @("|")
+                    }
+                    else
+                    {
+                        <a asp-action="Register" asp-route-id="@Model.IdTournament">@TB.Tournoi_Details_Register</a> @("|")
+                    }
                 }
-                else
+                else if (Model.Participants.Any(p => p.IdUser == Uid))
                 {
-                    <a asp-action="Register" asp-route-id="@Model.IdTournament">@TB.Tournoi_Details_Register</a> @("|")
+                    <a asp-action="Drop" asp-route-IdTournoi="@Model.IdTournament">@TB.Tournoi_Details_Drop</a> @("|")
                 }
+
             }
 
         }

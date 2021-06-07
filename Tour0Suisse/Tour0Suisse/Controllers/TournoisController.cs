@@ -421,5 +421,55 @@ namespace Tour0Suisse.Web.Controllers
 
             return RedirectToAction("EditDeck", new {IdTournoi = joueur.IdTournament, error = error});
         }
+
+
+
+
+        public async Task<ActionResult> Drop(int IdTournoi, string error = null)
+        {
+            if (IdTournoi < 1 || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
+            {
+                return NotFound();
+            }
+
+            var temp = await CallAPI.GetTournoi(IdTournoi);
+
+            if (temp.Item1)
+            {
+                return NotFound();
+            }
+
+            Tournoi tournoi = temp.Item2;
+
+            ViewBag.error = error;
+            ViewData["Title"] = "Abandonner " + tournoi.Name;
+            return View("~/Views/Tournoi/Drop.cshtml", tournoi);
+        }
+
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Drop([Bind("IdTournament")] Tournoi Tournoi)
+        {
+            if (Tournoi.IdTournament < 1 || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdUser))
+            {
+                return NotFound();
+            }
+
+            var joueur = new Joueur();
+
+            joueur.User.IdUser = IdUser;
+            joueur.IdTournament = Tournoi.IdTournament;
+
+
+            RetourAPI retourApi = await CallAPI.DropTournoi(joueur);
+            if (retourApi.Succes)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return RedirectToAction("Drop", new { IdTournoi = Tournoi.IdTournament, error = retourApi.Message });
+        }
+
     }
 }
