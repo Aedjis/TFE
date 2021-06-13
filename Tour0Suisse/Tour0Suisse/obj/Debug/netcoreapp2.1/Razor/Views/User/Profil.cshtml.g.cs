@@ -239,7 +239,7 @@ Write(ViewData["Message"]);
             WriteLiteral("    ");
             EndContext();
             BeginContext(1877, 91, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "90eec522d4e649e6855e9d4854f4c9ca", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "e8229c8f87454537a6a947a67ad84f48", async() => {
                 BeginContext(1937, 27, false);
 #line 68 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\User\Profil.cshtml"
                                                           Write(TB.User_Profil_BtnAddPseudo);
@@ -298,7 +298,7 @@ Write(ViewData["Message"]);
             WriteLiteral("        ");
             EndContext();
             BeginContext(2888, 101, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "69a45081c06e49a5b5674854204fe180", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "b8146eaf734b4bf787a4405a4177d903", async() => {
                 BeginContext(2963, 22, false);
 #line 104 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\User\Profil.cshtml"
                                                                              Write(TB.User_Profil_BtnEdit);
@@ -346,7 +346,7 @@ Write(ViewData["Message"]);
             WriteLiteral("    ");
             EndContext();
             BeginContext(3005, 50, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "f553c243a656413d817832f763d874c1", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "9826397dba4e4dc38ba26829420db6e1", async() => {
                 BeginContext(3030, 21, false);
 #line 106 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\User\Profil.cshtml"
                        Write(TB.User_Profil_Retour);

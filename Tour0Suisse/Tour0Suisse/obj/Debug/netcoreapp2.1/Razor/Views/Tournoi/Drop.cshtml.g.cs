@@ -236,12 +236,12 @@ Write(ViewData["Title"]);
             WriteLiteral("\r\n        </dd>\r\n    </dl>\r\n\r\n    ");
             EndContext();
             BeginContext(1500, 169, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "df8cf216a0664cf2ac60dc9440f99b58", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "105861f3774f4a599996fabbd9c5aefc", async() => {
                 BeginContext(1524, 10, true);
                 WriteLiteral("\r\n        ");
                 EndContext();
                 BeginContext(1534, 46, false);
-                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("input", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.SelfClosing, "e7374b625e4e405ea95f1a67a7d30eed", async() => {
+                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("input", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.SelfClosing, "d2635ee66f8c4345ba9e1e2b9781ab98", async() => {
                 }
                 );
                 __Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper = CreateTagHelper<global::Microsoft.AspNetCore.Mvc.TagHelpers.InputTagHelper>();
@@ -285,7 +285,7 @@ __Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper.For = ModelExpressionProvid
             WriteLiteral("\r\n</div>\r\n<div>\r\n    ");
             EndContext();
             BeginContext(1690, 54, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "2feff23a4c5b4a7d82dcff9a079beb14", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "4e3f749e68514133b406ac1af35d6fc1", async() => {
                 BeginContext(1713, 27, false);
 #line 66 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\Tournoi\Drop.cshtml"
                      Write(TB.Tournoi_Unregister_Index);
@@ -311,7 +311,7 @@ __Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper.For = ModelExpressionProvid
             WriteLiteral("\r\n    ");
             EndContext();
             BeginContext(1750, 90, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "d309732cbda34d7ab9a1460c798a71b7", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "37dc9784c4d647bb96176859df32c4c0", async() => {
                 BeginContext(1810, 26, false);
 #line 67 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\Tournoi\Drop.cshtml"
                                                           Write(TB.Tournoi_Unregister_Back);

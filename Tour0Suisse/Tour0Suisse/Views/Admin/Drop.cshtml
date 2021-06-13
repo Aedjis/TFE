@@ -1,0 +1,64 @@
+﻿@using Tour0Suisse.Web.Models
+@using Tour0Suisse.Model
+@model Tour0Suisse.Model.Joueur
+
+@{
+    TexteFr TB = TexteFr.Instance;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<h3>Voulez-vous vraiment dropper le joueur du tournoi?</h3>
+
+@if (ViewBag.error != null)
+{
+    <div class="warning">
+        <span class="text-danger">@( (string)@ViewBag.error )</span>
+    </div>
+}
+<div>
+    <h4>@TB.Tournoi_Unregister_SubTitle</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.Display("Nom du tournoi")
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Pseudo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Pseudo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.IGPseudo)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.IGPseudo)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Tournament.Date)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Tournament.Date)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Drop)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Drop)
+        </dd>
+    </dl>
+
+    <form asp-action="Drop">
+        <input type="hidden" asp-for="IdTournament" />
+        <input type="hidden" asp-for="IdUser" />
+        <input type="submit" value="Drop" class="btn btn-default" />
+    </form>
+</div>
+<div>
+    <a asp-action="Index">@TB.Tournoi_Unregister_Index</a>
+    <a asp-action="Tournoi" asp-route-id="@Model.IdTournament">Retour</a>
+</div>

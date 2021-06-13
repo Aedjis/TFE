@@ -283,7 +283,7 @@ Write(ViewData["Title"]);
             WriteLiteral("\r\n                </td>\r\n                <td>\r\n                    ");
             EndContext();
             BeginContext(2507, 111, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "30f0131d48fc4cdbacf41a2620a53bc0", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "2e8922a20d3b40dab5b198e6f1d32e8b", async() => {
                 BeginContext(2592, 22, false);
 #line 80 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\Admin\Index.cshtml"
                                                                                                    Write(TB.Admin_Index_Details);
@@ -324,7 +324,7 @@ Write(ViewData["Title"]);
             WriteLiteral("<br/>\r\n                    ");
             EndContext();
             BeginContext(2645, 105, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "5941c814cf8b4e119b5c4db150397319", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "63090f3ff30340ef939c17094549607d", async() => {
                 BeginContext(2727, 19, false);
 #line 81 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\Admin\Index.cshtml"
                                                                                                 Write(TB.Admin_Index_Edit);
@@ -365,7 +365,7 @@ Write(ViewData["Title"]);
             WriteLiteral("<br/>\r\n                    ");
             EndContext();
             BeginContext(2777, 106, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "c498c476dc0e403c96eb509a55d7d0f8", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "d2e42a4407374dc99c3ec99db31b8379", async() => {
                 BeginContext(2859, 20, false);
 #line 82 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\Admin\Index.cshtml"
                                                                                                 Write(TB.Admin_Index_Admin);

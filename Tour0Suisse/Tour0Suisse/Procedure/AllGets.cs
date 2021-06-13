@@ -193,7 +193,7 @@ namespace Tour0Suisse.Web.Procedure
                 return new Tuple<bool, Tournoi>(false, t);
             }
 
-            return new Tuple<bool, Tournoi>(false, tournoi);
+            return new Tuple<bool, Tournoi>(true, tournoi);
         }
     }
 }

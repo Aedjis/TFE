@@ -55,3 +55,4 @@ E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreap
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Tournoi\Unregister.cshtml.g.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Tournoi\EditDeck.cshtml.g.cs
 E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Tournoi\Drop.cshtml.g.cs
+E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\obj\Debug\netcoreapp2.1\Razor\Views\Admin\Drop.cshtml.g.cs

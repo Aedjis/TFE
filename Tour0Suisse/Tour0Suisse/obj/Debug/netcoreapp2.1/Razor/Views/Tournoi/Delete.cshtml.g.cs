@@ -319,12 +319,12 @@ Write(TB.Tournoi_Delete_Warrning);
             WriteLiteral("\r\n        </dd>\r\n    </dl>\r\n    \r\n    ");
             EndContext();
             BeginContext(2171, 192, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "9e0759c904b34c1e8d1e4b0a434692fa", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "4c537fb7cfa04f639a34e471ec56bffe", async() => {
                 BeginContext(2197, 10, true);
                 WriteLiteral("\r\n        ");
                 EndContext();
                 BeginContext(2207, 46, false);
-                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("input", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.SelfClosing, "acce1249f7584db993b45709db95c8c6", async() => {
+                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("input", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.SelfClosing, "9c8ba8fe589243749930c9ee272c3c39", async() => {
                 }
                 );
                 __Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper = CreateTagHelper<global::Microsoft.AspNetCore.Mvc.TagHelpers.InputTagHelper>();
@@ -378,7 +378,7 @@ WriteAttributeValue("", 2291, TB.Tournoi_Delete_SubmitDelete, 2291, 31, false);
             WriteLiteral("\r\n    <br/>\r\n    ");
             EndContext();
             BeginContext(2380, 90, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "e52eb231547d4965acc15140ec39fd43", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "0c4c3a9d07504bda8247a079ddd93a20", async() => {
                 BeginContext(2442, 24, false);
 #line 88 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\Tournoi\Delete.cshtml"
                                                             Write(TB.Tournoi_Delete_Retour);
@@ -417,7 +417,7 @@ WriteAttributeValue("", 2291, TB.Tournoi_Delete_SubmitDelete, 2291, 31, false);
             WriteLiteral(" |\r\n    ");
             EndContext();
             BeginContext(2478, 50, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "ea2f73ae318b4459afc496182756a0da", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "17fd36c823794487a7948e1fea459e2c", async() => {
                 BeginContext(2501, 23, false);
 #line 89 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\Tournoi\Delete.cshtml"
                      Write(TB.Tournoi_Delete_Index);

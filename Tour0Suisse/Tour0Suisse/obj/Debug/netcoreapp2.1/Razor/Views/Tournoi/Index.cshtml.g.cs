@@ -89,7 +89,7 @@ Write(ViewData["Title"]);
             WriteLiteral("        ");
             EndContext();
             BeginContext(300, 75, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "fc109797219740c78d1d9eacfc626c1b", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "b63df8da7fa44acba76d71949482e0ae", async() => {
                 BeginContext(348, 23, false);
 #line 14 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\Tournoi\Index.cshtml"
                                                   Write(TB.Tournoi_Index_BtnNew);
@@ -332,7 +332,7 @@ Write(ViewData["Title"]);
             WriteLiteral("\r\n            </td>\r\n            <td>\r\n                ");
             EndContext();
             BeginContext(2587, 86, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "7cd3dcc2cc7a46a8923b871e7788b3d9", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "532f4659e0884b019897c7a07e7532ef", async() => {
                 BeginContext(2646, 23, false);
 #line 87 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\Tournoi\Index.cshtml"
                                                                      Write(TB.Tournoi_Index_Detail);

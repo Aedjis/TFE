@@ -94,7 +94,7 @@ namespace Tour0Suisse.Web.Controllers
         {
             var temp = await CallAPI.GetTournoi(id);
 
-            if (temp.Item1)
+            if (!temp.Item1)
             {
                 return NotFound();
             }
@@ -142,7 +142,7 @@ namespace Tour0Suisse.Web.Controllers
         {
             var temp = await CallAPI.GetTournoi(id);
 
-            if (temp.Item1)
+            if (!temp.Item1)
             {
                 return NotFound();
             }
@@ -179,7 +179,7 @@ namespace Tour0Suisse.Web.Controllers
 
             var temp = await CallAPI.GetTournoi(id);
 
-            if (temp.Item1)
+            if (!temp.Item1)
             {
                 return NotFound();
             }
@@ -219,7 +219,7 @@ namespace Tour0Suisse.Web.Controllers
 
             var temp = await CallAPI.GetTournoi(joueur.IdTournament);
 
-            if (temp.Item1)
+            if (!temp.Item1)
             {
                 return NotFound();
             }
@@ -240,7 +240,7 @@ namespace Tour0Suisse.Web.Controllers
            
            var temp = await CallAPI.GetTournoi(IdTournoi);
 
-            if (temp.Item1)
+            if (!temp.Item1)
             {
                 return NotFound();
             }
@@ -434,7 +434,7 @@ namespace Tour0Suisse.Web.Controllers
 
             var temp = await CallAPI.GetTournoi(IdTournoi);
 
-            if (temp.Item1)
+            if (!temp.Item1)
             {
                 return NotFound();
             }

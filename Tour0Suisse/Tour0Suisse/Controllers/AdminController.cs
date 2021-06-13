@@ -30,7 +30,7 @@ namespace Tour0Suisse.Web.Controllers
         {
             var temp = await CallAPI.GetTournoi(id);
 
-            if (temp.Item1)
+            if (!temp.Item1)
             {
                 return NotFound();
             }
@@ -45,7 +45,7 @@ namespace Tour0Suisse.Web.Controllers
         {
             var temp = await CallAPI.GetTournoi(id);
 
-            if (temp.Item1)
+            if (!temp.Item1)
             {
                 return NotFound();
             }
@@ -70,7 +70,7 @@ namespace Tour0Suisse.Web.Controllers
         {
             var temp = await CallAPI.GetTournoi(id);
 
-            if (temp.Item1)
+            if (!temp.Item1)
             {
                 return NotFound();
             }
@@ -95,7 +95,7 @@ namespace Tour0Suisse.Web.Controllers
         {
             var temp = await CallAPI.GetTournoi(id);
 
-            if (temp.Item1)
+            if (!temp.Item1)
             {
                 return NotFound();
             }
@@ -222,7 +222,7 @@ namespace Tour0Suisse.Web.Controllers
         {
             var temp = await CallAPI.GetTournoi(id);
 
-            if (temp.Item1)
+            if (!temp.Item1)
             {
                 return NotFound();
             }
@@ -275,7 +275,7 @@ namespace Tour0Suisse.Web.Controllers
         {
             var temp = await CallAPI.GetTournoi(id);
 
-            if (temp.Item1)
+            if (!temp.Item1)
             {
                 return NotFound();
             }
@@ -292,5 +292,53 @@ namespace Tour0Suisse.Web.Controllers
             ViewData["Title"] = "Finir tournoi";
             return View("~/Views/Admin/EndTournoi.cshtml", tournoi);
         }
+
+
+
+        public async Task<ActionResult> Drop(int IdTournoi, int IdUser, string error = null)
+        {
+            if (IdTournoi < 1 || IdUser <= 0 || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdAdmin))
+            {
+                return NotFound();
+            }
+
+            var tempT = await CallAPI.GetTournoi(IdTournoi);
+            
+            if (!tempT.Item1)
+            {
+                return NotFound();
+            }
+
+            Tournoi tournoi = tempT.Item2;
+            Joueur joueur = await CallAPI.GetJoueur(IdTournoi,IdUser);
+
+
+            ViewBag.error = error;
+            ViewData["Title"] = "Abandonner " + tournoi.Name;
+            return View("~/Views/Admin/Drop.cshtml", joueur);
+        }
+
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Drop([Bind("IdTournament, IdUser")] Joueur joueur)
+        {
+            if (joueur.IdTournament < 1 || joueur.IdUser < 0 || !int.TryParse(HttpContext.Session.GetString("UserId"), out int IdAdmin))
+            {
+                return NotFound();
+            }
+
+
+            RetourAPI retourApi = await CallAPI.DropTournoi(joueur);
+            if (retourApi.Succes)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return RedirectToAction("Drop", new { IdTournoi = joueur.IdTournament, error = retourApi.Message });
+        }
+
     }
 }

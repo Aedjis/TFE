@@ -601,15 +601,16 @@ GROUP BY ID_Tournament, RoundNumber, ID_PlayerOne, [PlayerOne], [PseudoPlayerOne
 GO
 
 CREATE VIEW [View_ClassementTemporaire] AS
-SELECT	ID_Tournament, 
-		ID_Player, 
-		Pseudo, 
-		IG_Pseudo,
+SELECT	VP.ID_Tournament, 
+		VP.ID_User AS ID_Player, 
+		VP.Pseudo, 
+		VP.IG_Pseudo,
 		SUM(CASE WHEN Resulta = 1 THEN 1 ELSE 0 END) AS Victoire, 
 		SUM(CASE WHEN Resulta = 0 THEN 1 ELSE 0 END) AS Egaliter, 
 		SUM(CASE WHEN Resulta = -1 THEN 1 ELSE 0 END) AS Defaite
-FROM [View_ResultMatchPlayer]
-GROUP BY ID_Tournament, ID_Player, Pseudo, IG_Pseudo
+FROM [View_ResultMatchPlayer] AS VR
+RIGHT JOIN [View_Participant] AS VP ON VR.ID_Tournament = VP.ID_Tournament AND VR.ID_Player = VP.ID_User
+GROUP BY VP.ID_Tournament, VP.ID_User, VP.Pseudo, VP.IG_Pseudo
 --ORDER BY  Victoire DESC, Egaliter DESC, Defaite ASC
 GO
 
