@@ -325,10 +325,13 @@
                         </div>
                     </div>
                 }*@
+            @if (!Model.Over) { 
+                
+                <form asp-action="EndTournoiR" asp-route-id="@Model.IdTournament">
+                    <input type="submit" value="@TB.Admin_Tournoi_SubmitEndTournoi" class="btn btn-default" />
+                </form>
 
-            <form asp-action="EndTournoiR" asp-route-id="@Model.IdTournament">
-                <input type="submit" value="@TB.Admin_Tournoi_SubmitEndTournoi" class="btn btn-default" />
-            </form>
+            }
 
         </div>
     }

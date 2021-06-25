@@ -303,12 +303,12 @@ Write(ViewData["Title"]);
             WriteLiteral("                </tbody>\r\n            </table>\r\n        </dd>\r\n    </dl>\r\n</div>\r\n");
             EndContext();
             BeginContext(2433, 198, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "f87ebf3f55984d038e2731577c6ad3c5", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("form", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "5983e17a787b42b09620d76563030123", async() => {
                 BeginContext(2477, 6, true);
                 WriteLiteral("\r\n    ");
                 EndContext();
                 BeginContext(2483, 47, false);
-                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("input", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.SelfClosing, "8f562ae76b714400a3f260389cb30a7e", async() => {
+                __tagHelperExecutionContext = __tagHelperScopeManager.Begin("input", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.SelfClosing, "bd4666b0888f436abc21fe5dcf3cc9c6", async() => {
                 }
                 );
                 __Microsoft_AspNetCore_Mvc_TagHelpers_InputTagHelper = CreateTagHelper<global::Microsoft.AspNetCore.Mvc.TagHelpers.InputTagHelper>();
@@ -368,7 +368,7 @@ WriteAttributeValue("", 2564, TB.Admin_EndTournoi_Submit_End, 2564, 31, false);
             WriteLiteral("\r\n<div>\r\n    ");
             EndContext();
             BeginContext(2644, 100, false);
-            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "146e09eb20f14744b92eaa8bd7fc441c", async() => {
+            __tagHelperExecutionContext = __tagHelperScopeManager.Begin("a", global::Microsoft.AspNetCore.Razor.TagHelpers.TagMode.StartTagAndEndTag, "4c592c79c5534694bfce3557c8b89831", async() => {
                 BeginContext(2716, 24, false);
 #line 76 "E:\Aedjis-PC\Documents\Cours\TFE\TFE\Tour0Suisse\Tour0Suisse\Views\Admin\EndTournoi.cshtml"
                                                                       Write(TB.Admin_EndTournoi_Back);
